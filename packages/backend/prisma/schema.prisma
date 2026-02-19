@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  projects     Project[]
+  createdAt    DateTime  @default(now())
+}
+
+model Project {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  budget      Float?
+  user        User       @relation(fields: [userId], references: [id])
+  userId      String
+  categories  Category[]
+  expenses    Expense[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Category {
+  id        String      @id @default(cuid())
+  name      String
+  type      String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  expenses  Expense[]
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  description String?
+  amount      Float
+  quantity    Float?
+  unit        String?
+  unitPrice   Float?
+  supplier    String?
+  workerName  String?
+  hoursWorked Float?
+  hourlyRate  Float?
+  date        DateTime
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  createdAt   DateTime  @default(now())
+}

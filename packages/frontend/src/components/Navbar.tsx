@@ -1,0 +1,48 @@
+import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+} from "@mui/material";
+import ConstructionIcon from "@mui/icons-material/Construction";
+import { useStore } from "../stores/RootStore";
+
+const Navbar = observer(() => {
+  const { authStore } = useStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authStore.logout();
+    navigate("/login");
+  };
+
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <ConstructionIcon sx={{ mr: 1 }} />
+        <Typography
+          variant="h6"
+          sx={{ cursor: "pointer", flexGrow: 1 }}
+          onClick={() => navigate("/projects")}
+        >
+          Construction Tracker
+        </Typography>
+        {authStore.isAuthenticated && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography variant="body2">
+              {authStore.user?.name}
+            </Typography>
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
+});
+
+export default Navbar;
