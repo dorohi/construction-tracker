@@ -7,3 +7,8 @@ dist/
 .env
 .env.local
 .idea/
+*.tsbuildinfo
+vite.config.d.ts
+vite.config.d.ts.map
+vite.config.js
+vite.config.js.map
