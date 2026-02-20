@@ -63,7 +63,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
           <TableHead
             sx={{
               "& .MuiTableCell-head": {
-                bgcolor: "background.default",
+                bgcolor: "background.paper",
                 fontWeight: 600,
                 "&:first-of-type": { borderRadius: "8px 0 0 0" },
                 "&:last-of-type": { borderRadius: "0 8px 0 0" },
