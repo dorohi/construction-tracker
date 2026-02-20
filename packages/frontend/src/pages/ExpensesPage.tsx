@@ -152,6 +152,7 @@ const ExpensesPage = observer(() => {
         expenses={filteredExpenses}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        hideType={!!typeFilter}
       />
 
       <ExpenseForm

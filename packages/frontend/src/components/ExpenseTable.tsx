@@ -19,6 +19,7 @@ interface ExpenseTableProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
   onDelete: (expense: Expense) => void;
+  hideType?: boolean;
 }
 
 function formatCurrency(amount: number) {
@@ -36,7 +37,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTableProps) {
+export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: ExpenseTableProps) {
   if (expenses.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center" }}>
@@ -52,7 +53,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
           <TableRow>
             <TableCell>Дата</TableCell>
             <TableCell>Название</TableCell>
-            <TableCell>Тип</TableCell>
+            {!hideType && <TableCell>Тип</TableCell>}
             <TableCell>Категория</TableCell>
             <TableCell>Детали</TableCell>
             <TableCell align="right">Сумма</TableCell>
@@ -73,12 +74,14 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
                   </Typography>
                 )}
               </TableCell>
-              <TableCell>
-                <CategoryChip
-                  name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
-                  type={expense.type}
-                />
-              </TableCell>
+              {!hideType && (
+                <TableCell>
+                  <CategoryChip
+                    name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                    type={expense.type}
+                  />
+                </TableCell>
+              )}
               <TableCell>
                 {expense.category ? (
                   <CategoryChip name={expense.category.name} type={expense.category.type} />
