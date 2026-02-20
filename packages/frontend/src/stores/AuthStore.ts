@@ -45,7 +45,7 @@ export class AuthStore {
     } catch (err: unknown) {
       runInAction(() => {
         const error = err as { response?: { data?: { error?: string } } };
-        this.error = error.response?.data?.error || "Login failed";
+        this.error = error.response?.data?.error || "Ошибка входа";
         this.loading = false;
       });
     }
@@ -66,7 +66,7 @@ export class AuthStore {
     } catch (err: unknown) {
       runInAction(() => {
         const error = err as { response?: { data?: { error?: string } } };
-        this.error = error.response?.data?.error || "Registration failed";
+        this.error = error.response?.data?.error || "Ошибка регистрации";
         this.loading = false;
       });
     }

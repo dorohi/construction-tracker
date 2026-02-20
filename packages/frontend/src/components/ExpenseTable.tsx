@@ -22,14 +22,14 @@ interface ExpenseTableProps {
 }
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("ru-RU", {
     style: "currency",
-    currency: "USD",
+    currency: "RUB",
   }).format(amount);
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  return new Date(dateStr).toLocaleDateString("ru-RU", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -40,7 +40,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
   if (expenses.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">No expenses found</Typography>
+        <Typography color="text.secondary">Расходы не найдены</Typography>
       </Paper>
     );
   }
@@ -50,13 +50,13 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Title</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell>Details</TableCell>
-            <TableCell align="right">Amount</TableCell>
-            <TableCell align="center">Actions</TableCell>
+            <TableCell>Дата</TableCell>
+            <TableCell>Название</TableCell>
+            <TableCell>Тип</TableCell>
+            <TableCell>Категория</TableCell>
+            <TableCell>Детали</TableCell>
+            <TableCell align="right">Сумма</TableCell>
+            <TableCell align="center">Действия</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -75,7 +75,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
               </TableCell>
               <TableCell>
                 <CategoryChip
-                  name={expense.type === "MATERIAL" ? "Material" : "Labor"}
+                  name={expense.type === "MATERIAL" ? "Материал" : "Работа"}
                   type={expense.type}
                 />
               </TableCell>
@@ -88,24 +88,24 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
               </TableCell>
               <TableCell>
                 <Typography variant="caption" color="text.secondary">
-                  {expense.type === "MATERIAL" && expense.supplier && `Supplier: ${expense.supplier}`}
+                  {expense.type === "MATERIAL" && expense.supplier && `Поставщик: ${expense.supplier}`}
                   {expense.type === "MATERIAL" && expense.quantity != null &&
-                    ` | ${expense.quantity} ${expense.unit || "units"} @ ${formatCurrency(expense.unitPrice || 0)}`}
-                  {expense.type === "LABOR" && expense.workerName && `Worker: ${expense.workerName}`}
+                    ` | ${expense.quantity} ${expense.unit || "шт."} @ ${formatCurrency(expense.unitPrice || 0)}`}
+                  {expense.type === "LABOR" && expense.workerName && `Работник: ${expense.workerName}`}
                   {expense.type === "LABOR" && expense.hoursWorked != null &&
-                    ` | ${expense.hoursWorked}h @ ${formatCurrency(expense.hourlyRate || 0)}/h`}
+                    ` | ${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`}
                 </Typography>
               </TableCell>
               <TableCell align="right">
                 <Typography fontWeight={600}>{formatCurrency(expense.amount)}</Typography>
               </TableCell>
               <TableCell align="center">
-                <Tooltip title="Edit">
+                <Tooltip title="Редактировать">
                   <IconButton size="small" onClick={() => onEdit(expense)}>
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Delete">
+                <Tooltip title="Удалить">
                   <IconButton size="small" color="error" onClick={() => onDelete(expense)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>

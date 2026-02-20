@@ -22,9 +22,9 @@ import SummaryCard from "../components/SummaryCard";
 import ExpenseChart from "../components/charts/ExpenseChart";
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("ru-RU", {
     style: "currency",
-    currency: "USD",
+    currency: "RUB",
   }).format(amount);
 }
 
@@ -48,7 +48,7 @@ const DashboardPage = observer(() => {
   if (!project || !summary) {
     return (
       <Container>
-        <Typography>Project not found</Typography>
+        <Typography>Проект не найден</Typography>
       </Container>
     );
   }
@@ -62,7 +62,7 @@ const DashboardPage = observer(() => {
           sx={{ cursor: "pointer" }}
           onClick={() => navigate("/projects")}
         >
-          Projects
+          Проекты
         </Link>
         <Typography color="text.primary">{project.name}</Typography>
       </Breadcrumbs>
@@ -76,22 +76,22 @@ const DashboardPage = observer(() => {
         </Box>
         <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)}>
           <ReceiptIcon sx={{ mr: 1 }} />
-          Manage Expenses
+          Управление расходами
         </Button>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SummaryCard
-            title="Total Budget"
-            value={summary.budget != null ? formatCurrency(summary.budget) : "Not set"}
+            title="Общий бюджет"
+            value={summary.budget != null ? formatCurrency(summary.budget) : "Не задан"}
             icon={<AccountBalanceIcon fontSize="large" />}
             color="info.main"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SummaryCard
-            title="Total Spent"
+            title="Потрачено"
             value={formatCurrency(summary.totalSpent)}
             icon={<AttachMoneyIcon fontSize="large" />}
             color="warning.main"
@@ -99,15 +99,15 @@ const DashboardPage = observer(() => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SummaryCard
-            title="Remaining"
-            value={summary.remaining != null ? formatCurrency(summary.remaining) : "N/A"}
+            title="Остаток"
+            value={summary.remaining != null ? formatCurrency(summary.remaining) : "Н/Д"}
             icon={<SavingsIcon fontSize="large" />}
             color={summary.remaining != null && summary.remaining < 0 ? "error.main" : "success.main"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <SummaryCard
-            title="Materials"
+            title="Материалы"
             value={formatCurrency(summary.materialTotal)}
             icon={<BuildIcon fontSize="large" />}
             color="primary.main"
@@ -115,7 +115,7 @@ const DashboardPage = observer(() => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <SummaryCard
-            title="Labor"
+            title="Работы"
             value={formatCurrency(summary.laborTotal)}
             icon={<PeopleIcon fontSize="large" />}
             color="secondary.main"
@@ -126,7 +126,7 @@ const DashboardPage = observer(() => {
       {summary.budget != null && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="body2" gutterBottom>
-            Budget Usage: {((summary.totalSpent / summary.budget) * 100).toFixed(1)}%
+            Использование бюджета: {((summary.totalSpent / summary.budget) * 100).toFixed(1)}%
           </Typography>
           <LinearProgress
             variant="determinate"
@@ -147,13 +147,13 @@ const DashboardPage = observer(() => {
         <Grid size={{ xs: 12, md: 6 }}>
           <ExpenseChart
             data={summary.byCategory.filter((c) => c.type === "MATERIAL")}
-            title="Material Costs by Category"
+            title="Расходы на материалы по категориям"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <ExpenseChart
             data={summary.byCategory.filter((c) => c.type === "LABOR")}
-            title="Labor Costs by Category"
+            title="Расходы на работы по категориям"
           />
         </Grid>
       </Grid>

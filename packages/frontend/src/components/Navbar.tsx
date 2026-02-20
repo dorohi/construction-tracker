@@ -31,7 +31,7 @@ const Navbar = observer(() => {
           sx={{ cursor: "pointer", flexGrow: 1 }}
           onClick={() => navigate("/projects")}
         >
-          Construction Tracker
+          Учёт стройки
         </Typography>
         <IconButton color="inherit" onClick={() => themeStore.toggleTheme()}>
           {themeStore.mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
@@ -42,7 +42,7 @@ const Navbar = observer(() => {
               {authStore.user?.name}
             </Typography>
             <Button color="inherit" onClick={handleLogout}>
-              Logout
+              Выйти
             </Button>
           </Box>
         )}

@@ -123,7 +123,7 @@ export default function ExpenseForm({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{expense ? "Edit Expense" : "Add Expense"}</DialogTitle>
+      <DialogTitle>{expense ? "Редактировать расход" : "Добавить расход"}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <ToggleButtonGroup
@@ -133,12 +133,12 @@ export default function ExpenseForm({
             fullWidth
             size="small"
           >
-            <ToggleButton value="MATERIAL">Material</ToggleButton>
-            <ToggleButton value="LABOR">Labor</ToggleButton>
+            <ToggleButton value="MATERIAL">Материал</ToggleButton>
+            <ToggleButton value="LABOR">Работа</ToggleButton>
           </ToggleButtonGroup>
 
           <TextField
-            label="Title"
+            label="Название"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -146,7 +146,7 @@ export default function ExpenseForm({
           />
 
           <TextField
-            label="Description"
+            label="Описание"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             multiline
@@ -155,13 +155,13 @@ export default function ExpenseForm({
           />
 
           <TextField
-            label="Category"
+            label="Категория"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             select
             fullWidth
           >
-            <MenuItem value="">None</MenuItem>
+            <MenuItem value="">Без категории</MenuItem>
             {filteredCategories.map((c) => (
               <MenuItem key={c.id} value={c.id}>
                 {c.name}
@@ -170,7 +170,7 @@ export default function ExpenseForm({
           </TextField>
 
           <TextField
-            label="Date"
+            label="Дата"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -183,29 +183,29 @@ export default function ExpenseForm({
             <>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField
-                  label="Quantity"
+                  label="Количество"
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   sx={{ flex: 1 }}
                 />
                 <TextField
-                  label="Unit"
+                  label="Ед. изм."
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  placeholder="kg, m2, pcs..."
+                  placeholder="кг, м², шт..."
                   sx={{ flex: 1 }}
                 />
               </Box>
               <TextField
-                label="Unit Price"
+                label="Цена за единицу"
                 type="number"
                 value={unitPrice}
                 onChange={(e) => setUnitPrice(e.target.value)}
                 fullWidth
               />
               <TextField
-                label="Supplier"
+                label="Поставщик"
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
                 fullWidth
@@ -216,21 +216,21 @@ export default function ExpenseForm({
           {type === "LABOR" && (
             <>
               <TextField
-                label="Worker Name"
+                label="Имя работника"
                 value={workerName}
                 onChange={(e) => setWorkerName(e.target.value)}
                 fullWidth
               />
               <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField
-                  label="Hours Worked"
+                  label="Отработано часов"
                   type="number"
                   value={hoursWorked}
                   onChange={(e) => setHoursWorked(e.target.value)}
                   sx={{ flex: 1 }}
                 />
                 <TextField
-                  label="Hourly Rate"
+                  label="Ставка в час"
                   type="number"
                   value={hourlyRate}
                   onChange={(e) => setHourlyRate(e.target.value)}
@@ -241,7 +241,7 @@ export default function ExpenseForm({
           )}
 
           <TextField
-            label="Total Amount"
+            label="Итого"
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -251,13 +251,13 @@ export default function ExpenseForm({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Отмена</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={!title || !amount || !date}
         >
-          {expense ? "Update" : "Add"}
+          {expense ? "Сохранить" : "Добавить"}
         </Button>
       </DialogActions>
     </Dialog>

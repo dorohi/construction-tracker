@@ -24,9 +24,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useStore } from "../stores/RootStore";
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("ru-RU", {
     style: "currency",
-    currency: "USD",
+    currency: "RUB",
   }).format(amount);
 }
 
@@ -56,7 +56,7 @@ const ProjectsPage = observer(() => {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("Delete this project and all its expenses?")) {
+    if (confirm("Удалить этот проект и все его расходы?")) {
       await projectStore.deleteProject(id);
     }
   };
@@ -64,13 +64,13 @@ const ProjectsPage = observer(() => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4">My Projects</Typography>
+        <Typography variant="h4">Мои проекты</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
         >
-          New Project
+          Новый проект
         </Button>
       </Box>
 
@@ -93,7 +93,7 @@ const ProjectsPage = observer(() => {
                     <Typography variant="h6" noWrap>
                       {project.name}
                     </Typography>
-                    <Tooltip title="Delete project">
+                    <Tooltip title="Удалить проект">
                       <IconButton
                         size="small"
                         color="error"
@@ -110,12 +110,12 @@ const ProjectsPage = observer(() => {
                   )}
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="body2">
-                      Spent: <strong>{formatCurrency(project.totalSpent)}</strong>
+                      Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
                     </Typography>
                     {project.budget != null && (
                       <>
                         <Typography variant="body2">
-                          Budget: {formatCurrency(project.budget)}
+                          Бюджет: {formatCurrency(project.budget)}
                         </Typography>
                         <LinearProgress
                           variant="determinate"
@@ -128,15 +128,15 @@ const ProjectsPage = observer(() => {
                   </Box>
                   <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
                     <Typography variant="caption" color="text.secondary">
-                      Materials: {formatCurrency(project.materialTotal)}
+                      Материалы: {formatCurrency(project.materialTotal)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Labor: {formatCurrency(project.laborTotal)}
+                      Работы: {formatCurrency(project.laborTotal)}
                     </Typography>
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <Button size="small">View Details</Button>
+                  <Button size="small">Подробнее</Button>
                 </CardActions>
               </Card>
             </Grid>
@@ -147,13 +147,13 @@ const ProjectsPage = observer(() => {
           <Grid size={{ xs: 12 }}>
             <Box sx={{ textAlign: "center", py: 8 }}>
               <Typography variant="h6" color="text.secondary">
-                No projects yet
+                Проектов пока нет
               </Typography>
               <Typography color="text.secondary" sx={{ mb: 2 }}>
-                Create your first project to start tracking expenses
+                Создайте первый проект для учёта расходов
               </Typography>
               <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-                Create Project
+                Создать проект
               </Button>
             </Box>
           </Grid>
@@ -161,19 +161,19 @@ const ProjectsPage = observer(() => {
       </Grid>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>New Project</DialogTitle>
+        <DialogTitle>Новый проект</DialogTitle>
         <DialogContent>
           <TextField
-            label="Project Name"
+            label="Название проекта"
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
             required
             margin="normal"
-            placeholder="e.g., Beach House Build"
+            placeholder="напр., Строительство дома"
           />
           <TextField
-            label="Description"
+            label="Описание"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
@@ -182,19 +182,19 @@ const ProjectsPage = observer(() => {
             margin="normal"
           />
           <TextField
-            label="Budget"
+            label="Бюджет"
             type="number"
             value={budget}
             onChange={(e) => setBudget(e.target.value)}
             fullWidth
             margin="normal"
-            placeholder="Optional total budget"
+            placeholder="Общий бюджет (необязательно)"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDialogOpen(false)}>Отмена</Button>
           <Button onClick={handleCreate} variant="contained" disabled={!name}>
-            Create
+            Создать
           </Button>
         </DialogActions>
       </Dialog>

@@ -13,9 +13,9 @@ const COLORS = [
 ];
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("ru-RU", {
     style: "currency",
-    currency: "USD",
+    currency: "RUB",
   }).format(amount);
 }
 
@@ -23,7 +23,7 @@ export default function ExpenseChart({ data, title }: ExpenseChartProps) {
   if (!data.length) {
     return (
       <Paper sx={{ p: 3, textAlign: "center" }}>
-        <Typography color="text.secondary">No data for chart</Typography>
+        <Typography color="text.secondary">Нет данных для графика</Typography>
       </Paper>
     );
   }

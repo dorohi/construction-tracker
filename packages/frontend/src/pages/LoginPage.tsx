@@ -33,11 +33,11 @@ const LoginPage = observer(() => {
       <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <ConstructionIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
         <Typography variant="h5" gutterBottom>
-          Construction Tracker
+          Учёт стройки
         </Typography>
         <Paper sx={{ p: 3, width: "100%", mt: 2 }}>
           <Typography variant="h6" gutterBottom>
-            Sign In
+            Вход
           </Typography>
           {authStore.error && (
             <Alert severity="error" sx={{ mb: 2 }} onClose={() => authStore.clearError()}>
@@ -46,7 +46,7 @@ const LoginPage = observer(() => {
           )}
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
-              label="Email"
+              label="Эл. почта"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,7 +55,7 @@ const LoginPage = observer(() => {
               margin="normal"
             />
             <TextField
-              label="Password"
+              label="Пароль"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -70,12 +70,12 @@ const LoginPage = observer(() => {
               sx={{ mt: 2 }}
               disabled={authStore.loading}
             >
-              {authStore.loading ? "Signing in..." : "Sign In"}
+              {authStore.loading ? "Вход..." : "Войти"}
             </Button>
           </Box>
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Link component={RouterLink} to="/register">
-              Don't have an account? Register
+              Нет аккаунта? Зарегистрироваться
             </Link>
           </Box>
         </Paper>

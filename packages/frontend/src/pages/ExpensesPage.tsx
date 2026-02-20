@@ -53,7 +53,7 @@ const ExpensesPage = observer(() => {
   if (!project) {
     return (
       <Container>
-        <Typography>Project not found</Typography>
+        <Typography>Проект не найден</Typography>
       </Container>
     );
   }
@@ -80,7 +80,7 @@ const ExpensesPage = observer(() => {
   };
 
   const handleDelete = async (expense: Expense) => {
-    if (confirm(`Delete expense "${expense.title}"?`)) {
+    if (confirm(`Удалить расход "${expense.title}"?`)) {
       await expenseStore.deleteExpense(expense.id);
       projectStore.loadProject(id!);
     }
@@ -103,7 +103,7 @@ const ExpensesPage = observer(() => {
           sx={{ cursor: "pointer" }}
           onClick={() => navigate("/projects")}
         >
-          Projects
+          Проекты
         </Link>
         <Link
           underline="hover"
@@ -113,18 +113,18 @@ const ExpensesPage = observer(() => {
         >
           {project.name}
         </Link>
-        <Typography color="text.primary">Expenses</Typography>
+        <Typography color="text.primary">Расходы</Typography>
       </Breadcrumbs>
 
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4">Expenses</Typography>
+        <Typography variant="h4">Расходы</Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="outlined"
             startIcon={<CategoryIcon />}
             onClick={() => setCategoryDialogOpen(true)}
           >
-            Categories
+            Категории
           </Button>
           <Button
             variant="contained"
@@ -134,16 +134,16 @@ const ExpensesPage = observer(() => {
               setFormOpen(true);
             }}
           >
-            Add Expense
+            Добавить расход
           </Button>
         </Box>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab label={`All (${expenseStore.expenses.length})`} />
-          <Tab label={`Materials (${expenseStore.materialExpenses.length})`} />
-          <Tab label={`Labor (${expenseStore.laborExpenses.length})`} />
+          <Tab label={`Все (${expenseStore.expenses.length})`} />
+          <Tab label={`Материалы (${expenseStore.materialExpenses.length})`} />
+          <Tab label={`Работы (${expenseStore.laborExpenses.length})`} />
         </Tabs>
       </Box>
 
@@ -171,11 +171,11 @@ const ExpensesPage = observer(() => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Manage Categories</DialogTitle>
+        <DialogTitle>Управление категориями</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Existing Categories
+              Существующие категории
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
               {projectStore.categories.map((cat) => (
@@ -191,37 +191,37 @@ const ExpensesPage = observer(() => {
           </Box>
 
           <Typography variant="subtitle2" gutterBottom>
-            Add New Category
+            Добавить категорию
           </Typography>
           <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
             <TextField
-              label="Category Name"
+              label="Название категории"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               size="small"
               sx={{ flex: 1 }}
             />
             <TextField
-              label="Type"
+              label="Тип"
               value={newCategoryType}
               onChange={(e) => setNewCategoryType(e.target.value as ExpenseType)}
               select
               size="small"
               sx={{ width: 150 }}
             >
-              <MenuItem value="MATERIAL">Material</MenuItem>
-              <MenuItem value="LABOR">Labor</MenuItem>
+              <MenuItem value="MATERIAL">Материал</MenuItem>
+              <MenuItem value="LABOR">Работа</MenuItem>
             </TextField>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCategoryDialogOpen(false)}>Close</Button>
+          <Button onClick={() => setCategoryDialogOpen(false)}>Закрыть</Button>
           <Button
             onClick={handleAddCategory}
             variant="contained"
             disabled={!newCategoryName}
           >
-            Add Category
+            Добавить
           </Button>
         </DialogActions>
       </Dialog>
