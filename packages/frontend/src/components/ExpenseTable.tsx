@@ -57,8 +57,8 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 250px)" }}>
-      <TableContainer component={Paper} sx={{ flex: 1, overflow: "auto" }}>
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <TableContainer sx={{ maxHeight: "calc(100vh - 250px)" }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -145,6 +145,6 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
         labelRowsPerPage="Строк на странице:"
         labelDisplayedRows={({ from, to, count }) => `${from}–${to} из ${count}`}
       />
-    </Box>
+    </Paper>
   );
 }
