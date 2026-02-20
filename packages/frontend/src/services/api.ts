@@ -91,6 +91,8 @@ export const categoriesApi = {
     api
       .post<ApiResponse<Category>>(`/projects/${projectId}/categories`, data)
       .then((r) => r.data.data!),
+  delete: (projectId: string, categoryId: string) =>
+    api.delete(`/projects/${projectId}/categories`, { data: { categoryId } }),
 };
 
 export default api;

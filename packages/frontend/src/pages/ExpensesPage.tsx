@@ -36,6 +36,7 @@ const ExpensesPage = observer(() => {
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState<ExpenseType>("MATERIAL");
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -90,7 +91,15 @@ const ExpensesPage = observer(() => {
     if (newCategoryName && id) {
       await projectStore.createCategory(id, newCategoryName, newCategoryType);
       setNewCategoryName("");
-      setCategoryDialogOpen(false);
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (deletingCategoryId && id) {
+      await projectStore.deleteCategory(id, deletingCategoryId);
+      setDeletingCategoryId(null);
+      expenseStore.loadExpenses(id);
+      projectStore.loadProject(id);
     }
   };
 
@@ -175,24 +184,37 @@ const ExpensesPage = observer(() => {
       >
         <DialogTitle>Управление категориями</DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Существующие категории
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {projectStore.categories.map((cat) => (
-                <Chip
-                  key={cat.id}
-                  label={cat.name}
-                  color={cat.type === "MATERIAL" ? "primary" : cat.type === "LABOR" ? "secondary" : "success"}
-                  variant="outlined"
-                  size="small"
-                />
-              ))}
-            </Box>
-          </Box>
+          {(
+            [
+              { type: "MATERIAL" as const, label: "Материалы", color: "primary" as const },
+              { type: "LABOR" as const, label: "Работы", color: "secondary" as const },
+              { type: "DELIVERY" as const, label: "Доставки", color: "success" as const },
+            ] as const
+          ).map(({ type, label, color }) => {
+            const cats = projectStore.categories.filter((c) => c.type === type);
+            if (!cats.length) return null;
+            return (
+              <Box key={type} sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {label}
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {cats.map((cat) => (
+                    <Chip
+                      key={cat.id}
+                      label={cat.name}
+                      color={color}
+                      variant="outlined"
+                      size="small"
+                      onDelete={() => setDeletingCategoryId(cat.id)}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            );
+          })}
 
-          <Typography variant="subtitle2" gutterBottom>
+          <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
             Добавить
           </Typography>
           <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
@@ -225,6 +247,25 @@ const ExpensesPage = observer(() => {
             disabled={!newCategoryName}
           >
             Добавить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Category Confirmation */}
+      <Dialog
+        open={!!deletingCategoryId}
+        onClose={() => setDeletingCategoryId(null)}
+      >
+        <DialogTitle>Удалить категорию?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Категория будет удалена. Расходы, привязанные к ней, останутся без категории.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeletingCategoryId(null)} variant="contained">Отмена</Button>
+          <Button onClick={handleDeleteCategory} variant="contained" color="error">
+            Удалить
           </Button>
         </DialogActions>
       </Dialog>

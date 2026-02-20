@@ -121,6 +121,24 @@ export class ProjectStore {
     }
   }
 
+  async deleteCategory(projectId: string, categoryId: string) {
+    try {
+      await categoriesApi.delete(projectId, categoryId);
+      runInAction(() => {
+        this.categories = this.categories.filter((c) => c.id !== categoryId);
+        if (this.currentProject) {
+          this.currentProject.categories = this.currentProject.categories.filter(
+            (c) => c.id !== categoryId
+          );
+        }
+      });
+    } catch {
+      runInAction(() => {
+        this.error = "Failed to delete category";
+      });
+    }
+  }
+
   clearError() {
     this.error = null;
   }

@@ -25,6 +25,59 @@ export async function GET(request: NextRequest, { params }: Params) {
   return NextResponse.json({ data: categories });
 }
 
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const auth = requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+
+  const { id: projectId } = await params;
+
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId: auth.userId },
+  });
+  if (!project) {
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
+  }
+
+  try {
+    const { categoryId } = await request.json();
+
+    if (!categoryId) {
+      return NextResponse.json(
+        { error: "ID категории обязателен" },
+        { status: 400 }
+      );
+    }
+
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, projectId },
+    });
+    if (!category) {
+      return NextResponse.json(
+        { error: "Категория не найдена" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.$transaction([
+      prisma.expense.updateMany({
+        where: { categoryId },
+        data: { categoryId: null },
+      }),
+      prisma.category.delete({
+        where: { id: categoryId },
+      }),
+    ]);
+
+    return NextResponse.json({ data: { success: true } });
+  } catch (error) {
+    console.error("Delete category error:", error);
+    return NextResponse.json(
+      { error: "Внутренняя ошибка сервера" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest, { params }: Params) {
   const auth = requireAuth(request);
   if (auth instanceof NextResponse) return auth;
