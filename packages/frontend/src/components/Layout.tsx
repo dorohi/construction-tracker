@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, p: 0, pt: 3, }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 0, pt: 3, pb: 3, }}>
         <Outlet />
       </Box>
     </Box>
