@@ -48,9 +48,9 @@ export async function POST(request: NextRequest, { params }: Params) {
       );
     }
 
-    if (type !== "MATERIAL" && type !== "LABOR") {
+    if (type !== "MATERIAL" && type !== "LABOR" && type !== "DELIVERY") {
       return NextResponse.json(
-        { error: "Тип должен быть MATERIAL или LABOR" },
+        { error: "Тип должен быть MATERIAL, LABOR или DELIVERY" },
         { status: 400 }
       );
     }
