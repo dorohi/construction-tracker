@@ -5,6 +5,7 @@ import type { CategorySummary } from "@construction-tracker/shared";
 interface ExpenseChartProps {
   data: CategorySummary[];
   title: string;
+  colors?: string[];
 }
 
 const COLORS = [
@@ -19,7 +20,7 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export default function ExpenseChart({ data, title }: ExpenseChartProps) {
+export default function ExpenseChart({ data, title, colors }: ExpenseChartProps) {
   if (!data.length) {
     return (
       <Paper sx={{ p: 3, textAlign: "center" }}>
@@ -53,7 +54,7 @@ export default function ExpenseChart({ data, title }: ExpenseChartProps) {
               }
             >
               {chartData.map((_, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                <Cell key={index} fill={(colors || COLORS)[index % (colors || COLORS).length]} />
               ))}
             </Pie>
             <Tooltip formatter={(value: number) => formatCurrency(value)} />

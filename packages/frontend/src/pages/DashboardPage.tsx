@@ -196,6 +196,27 @@ const DashboardPage = observer(() => {
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
+          {(() => {
+            const TYPE_COLOR_MAP: Record<string, string> = {
+              MATERIAL: "#1976d2",
+              LABOR: "#546e7a",
+              DELIVERY: "#16a34a",
+            };
+            const typeData = [
+              { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
+              { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
+              { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
+            ].filter((d) => d.total > 0);
+            return (
+              <ExpenseChart
+                data={typeData}
+                colors={typeData.map((d) => TYPE_COLOR_MAP[d.type])}
+                title="Расходы по типам"
+              />
+            );
+          })()}
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
           <ExpenseChart
             data={summary.byCategory.filter((c) => c.type === "MATERIAL")}
             title="Расходы на материалы по категориям"
