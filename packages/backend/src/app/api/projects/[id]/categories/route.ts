@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     where: { id: projectId, userId: auth.userId },
   });
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   const categories = await prisma.category.findMany({
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     where: { id: projectId, userId: auth.userId },
   });
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   try {
@@ -43,14 +43,14 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     if (!name || !type) {
       return NextResponse.json(
-        { error: "name and type are required" },
+        { error: "Название и тип обязательны" },
         { status: 400 }
       );
     }
 
     if (type !== "MATERIAL" && type !== "LABOR") {
       return NextResponse.json(
-        { error: "type must be MATERIAL or LABOR" },
+        { error: "Тип должен быть MATERIAL или LABOR" },
         { status: 400 }
       );
     }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   } catch (error) {
     console.error("Create category error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Внутренняя ошибка сервера" },
       { status: 500 }
     );
   }

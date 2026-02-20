@@ -15,7 +15,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     include: { project: true },
   });
   if (!expense || expense.project.userId !== auth.userId) {
-    return NextResponse.json({ error: "Expense not found" }, { status: 404 });
+    return NextResponse.json({ error: "Расход не найден" }, { status: 404 });
   }
 
   try {
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   } catch (error) {
     console.error("Update expense error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Внутренняя ошибка сервера" },
       { status: 500 }
     );
   }
@@ -66,7 +66,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     include: { project: true },
   });
   if (!expense || expense.project.userId !== auth.userId) {
-    return NextResponse.json({ error: "Expense not found" }, { status: 404 });
+    return NextResponse.json({ error: "Расход не найден" }, { status: 404 });
   }
 
   await prisma.expense.delete({ where: { id } });

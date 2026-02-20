@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     where: { id: projectId, userId: auth.userId },
   });
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   const expenses = await prisma.expense.findMany({
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     } else {
       categoryMap.set(key, {
         categoryId: expense.categoryId,
-        categoryName: expense.category?.name || "Uncategorized",
+        categoryName: expense.category?.name || "Без категории",
         type: expense.type,
         total: expense.amount,
         count: 1,

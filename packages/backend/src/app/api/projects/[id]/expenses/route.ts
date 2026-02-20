@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     where: { id: projectId, userId: auth.userId },
   });
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   const url = new URL(request.url);
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     where: { id: projectId, userId: auth.userId },
   });
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   try {
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     if (!type || !title || amount === undefined || !date) {
       return NextResponse.json(
-        { error: "type, title, amount, and date are required" },
+        { error: "Тип, название, сумма и дата обязательны" },
         { status: 400 }
       );
     }
 
     if (type !== "MATERIAL" && type !== "LABOR") {
       return NextResponse.json(
-        { error: "type must be MATERIAL or LABOR" },
+        { error: "Тип должен быть MATERIAL или LABOR" },
         { status: 400 }
       );
     }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   } catch (error) {
     console.error("Create expense error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Внутренняя ошибка сервера" },
       { status: 500 }
     );
   }

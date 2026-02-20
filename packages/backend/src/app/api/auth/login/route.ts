@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Эл. почта и пароль обязательны" },
         { status: 400 }
       );
     }
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "Неверная почта или пароль" },
         { status: 401 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const valid = await comparePassword(password, user.passwordHash);
     if (!valid) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "Неверная почта или пароль" },
         { status: 401 }
       );
     }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Внутренняя ошибка сервера" },
       { status: 500 }
     );
   }

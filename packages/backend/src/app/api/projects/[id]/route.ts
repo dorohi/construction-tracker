@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   });
 
   if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   return NextResponse.json({ data: project });
@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     where: { id, userId: auth.userId },
   });
   if (!existing) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   const { name, description, budget } = await request.json();
@@ -56,7 +56,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     where: { id, userId: auth.userId },
   });
   if (!existing) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
   await prisma.project.delete({ where: { id } });

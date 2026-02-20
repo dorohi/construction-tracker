@@ -20,7 +20,7 @@ export function requireAuth(
 ): JwtPayload | NextResponse {
   const user = getAuthUser(request);
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
   return user;
 }
