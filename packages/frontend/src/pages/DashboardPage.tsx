@@ -194,47 +194,71 @@ const DashboardPage = observer(() => {
         </Box>
       )}
 
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          {(() => {
-            const TYPE_COLOR_MAP: Record<string, string> = {
-              MATERIAL: "#1976d2",
-              LABOR: "#546e7a",
-              DELIVERY: "#16a34a",
-            };
-            const typeData = [
-              { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
-              { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
-              { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
-            ].filter((d) => d.total > 0);
-            return (
+      {(() => {
+        const TYPE_COLORS: Record<string, string> = {
+          MATERIAL: "#1976d2",
+          LABOR: "#546e7a",
+          DELIVERY: "#16a34a",
+        };
+
+        function generateShades(hex: string, count: number): string[] {
+          const r = parseInt(hex.slice(1, 3), 16);
+          const g = parseInt(hex.slice(3, 5), 16);
+          const b = parseInt(hex.slice(5, 7), 16);
+          const shades: string[] = [];
+          for (let i = 0; i < count; i++) {
+            const factor = 0.4 + (0.6 * i) / Math.max(count - 1, 1);
+            const nr = Math.round(r + (255 - r) * (1 - factor));
+            const ng = Math.round(g + (255 - g) * (1 - factor));
+            const nb = Math.round(b + (255 - b) * (1 - factor));
+            shades.push(`#${nr.toString(16).padStart(2, "0")}${ng.toString(16).padStart(2, "0")}${nb.toString(16).padStart(2, "0")}`);
+          }
+          return shades;
+        }
+
+        const typeData = [
+          { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
+          { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
+          { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
+        ].filter((d) => d.total > 0);
+
+        const materialData = summary.byCategory.filter((c) => c.type === "MATERIAL");
+        const laborData = summary.byCategory.filter((c) => c.type === "LABOR");
+        const deliveryData = summary.byCategory.filter((c) => c.type === "DELIVERY");
+
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <ExpenseChart
                 data={typeData}
-                colors={typeData.map((d) => TYPE_COLOR_MAP[d.type])}
+                colors={typeData.map((d) => TYPE_COLORS[d.type])}
                 title="Расходы по типам"
               />
-            );
-          })()}
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <ExpenseChart
-            data={summary.byCategory.filter((c) => c.type === "MATERIAL")}
-            title="Расходы на материалы по категориям"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <ExpenseChart
-            data={summary.byCategory.filter((c) => c.type === "LABOR")}
-            title="Расходы на работы по категориям"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <ExpenseChart
-            data={summary.byCategory.filter((c) => c.type === "DELIVERY")}
-            title="Расходы на доставки по категориям"
-          />
-        </Grid>
-      </Grid>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <ExpenseChart
+                data={materialData}
+                colors={generateShades(TYPE_COLORS.MATERIAL, materialData.length)}
+                title="Расходы на материалы по категориям"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <ExpenseChart
+                data={laborData}
+                colors={generateShades(TYPE_COLORS.LABOR, laborData.length)}
+                title="Расходы на работы по категориям"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <ExpenseChart
+                data={deliveryData}
+                colors={generateShades(TYPE_COLORS.DELIVERY, deliveryData.length)}
+                title="Расходы на доставки по категориям"
+              />
+            </Grid>
+          </Grid>
+        );
+      })()}
 
       <Dialog open={editOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
         <DialogTitle>Редактировать проект</DialogTitle>
