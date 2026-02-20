@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
 
 const DEFAULT_MATERIAL_CATEGORIES = [
-  "Foundation", "Walls", "Roof", "Plumbing", "Electrical", "Finishing",
+  "Фундамент", "Стены", "Кровля", "Сантехника", "Электрика", "Отделка",
 ];
 const DEFAULT_LABOR_CATEGORIES = [
-  "Masonry", "Plumbing Work", "Electrical Work", "General Labor",
+  "Каменные работы", "Сантехнические работы", "Электромонтажные работы", "Разнорабочие",
 ];
 
 export async function GET(request: NextRequest) {
