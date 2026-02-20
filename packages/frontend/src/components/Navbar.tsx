@@ -6,12 +6,15 @@ import {
   Typography,
   Button,
   Box,
+  IconButton,
 } from "@mui/material";
 import ConstructionIcon from "@mui/icons-material/Construction";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { useStore } from "../stores/RootStore";
 
 const Navbar = observer(() => {
-  const { authStore } = useStore();
+  const { authStore, themeStore } = useStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -30,6 +33,9 @@ const Navbar = observer(() => {
         >
           Construction Tracker
         </Typography>
+        <IconButton color="inherit" onClick={() => themeStore.toggleTheme()}>
+          {themeStore.mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+        </IconButton>
         {authStore.isAuthenticated && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="body2">
