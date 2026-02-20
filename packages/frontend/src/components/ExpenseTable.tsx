@@ -10,7 +10,7 @@ import {
   Paper,
   IconButton,
   Tooltip,
-  Typography,
+  Typography, Box,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -57,19 +57,10 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
   );
 
   return (
-    <Paper sx={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 250px)" }}>
-      <TableContainer sx={{ flex: 1, overflow: "auto" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 250px)" }}>
+      <TableContainer component={Paper} sx={{ flex: 1, overflow: "auto" }}>
         <Table stickyHeader size="small">
-          <TableHead
-            sx={{
-              "& .MuiTableCell-head": {
-                bgcolor: "background.paper",
-                fontWeight: 600,
-                "&:first-of-type": { borderRadius: "8px 0 0 0" },
-                "&:last-of-type": { borderRadius: "0 8px 0 0" },
-              },
-            }}
-          >
+          <TableHead>
             <TableRow>
               <TableCell>Дата</TableCell>
               <TableCell>Название</TableCell>
@@ -154,6 +145,6 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
         labelRowsPerPage="Строк на странице:"
         labelDisplayedRows={({ from, to, count }) => `${from}–${to} из ${count}`}
       />
-    </Paper>
+    </Box>
   );
 }
