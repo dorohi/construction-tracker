@@ -1,4 +1,4 @@
-export type ExpenseType = "MATERIAL" | "LABOR";
+export type ExpenseType = "MATERIAL" | "LABOR" | "DELIVERY";
 
 export interface Category {
   id: string;
@@ -17,6 +17,7 @@ export interface Expense {
   unit?: string | null;
   unitPrice?: number | null;
   supplier?: string | null;
+  carrier?: string | null;
   workerName?: string | null;
   hoursWorked?: number | null;
   hourlyRate?: number | null;
@@ -36,6 +37,7 @@ export interface CreateExpenseInput {
   unit?: string;
   unitPrice?: number;
   supplier?: string;
+  carrier?: string;
   workerName?: string;
   hoursWorked?: number;
   hourlyRate?: number;

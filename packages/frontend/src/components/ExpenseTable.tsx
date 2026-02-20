@@ -75,7 +75,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
               </TableCell>
               <TableCell>
                 <CategoryChip
-                  name={expense.type === "MATERIAL" ? "Материал" : "Работа"}
+                  name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
                   type={expense.type}
                 />
               </TableCell>
@@ -94,6 +94,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }: ExpenseTabl
                   {expense.type === "LABOR" && expense.workerName && `Работник: ${expense.workerName}`}
                   {expense.type === "LABOR" && expense.hoursWorked != null &&
                     ` | ${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`}
+                  {expense.type === "DELIVERY" && expense.carrier && `Перевозчик: ${expense.carrier}`}
                 </Typography>
               </TableCell>
               <TableCell align="right">

@@ -19,6 +19,10 @@ export class ExpenseStore {
     return this.expenses.filter((e) => e.type === "LABOR");
   }
 
+  get deliveryExpenses() {
+    return this.expenses.filter((e) => e.type === "DELIVERY");
+  }
+
   get totalAmount() {
     return this.expenses.reduce((s, e) => s + e.amount, 0);
   }

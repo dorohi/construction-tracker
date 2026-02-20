@@ -100,7 +100,7 @@ const ProjectsPage = observer(() => {
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
         >
-          Новый проект
+          Новый
         </Button>
       </Box>
 
@@ -166,12 +166,15 @@ const ProjectsPage = observer(() => {
                       </>
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
                     <Typography variant="caption" color="text.secondary">
                       Материалы: {formatCurrency(project.materialTotal)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Работы: {formatCurrency(project.laborTotal)}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Доставки: {formatCurrency(project.deliveryTotal)}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -232,7 +235,7 @@ const ProjectsPage = observer(() => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Отмена</Button>
+          <Button onClick={() => setDialogOpen(false)} variant="contained">Отмена</Button>
           <Button onClick={handleCreate} variant="contained" disabled={!name}>
             Создать
           </Button>
@@ -269,7 +272,7 @@ const ProjectsPage = observer(() => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose}>Отмена</Button>
+          <Button onClick={handleEditClose} variant="contained">Отмена</Button>
           <Button onClick={handleEditSave} variant="contained" disabled={!name}>
             Сохранить
           </Button>

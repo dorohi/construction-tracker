@@ -22,6 +22,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SavingsIcon from "@mui/icons-material/Savings";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import EditIcon from "@mui/icons-material/Edit";
@@ -118,7 +119,7 @@ const DashboardPage = observer(() => {
         </Box>
         <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)}>
           <ReceiptIcon sx={{ mr: 1 }} />
-          Управление расходами
+          Управление
         </Button>
       </Box>
 
@@ -147,7 +148,7 @@ const DashboardPage = observer(() => {
             color={summary.remaining != null && summary.remaining < 0 ? "error.main" : "success.main"}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SummaryCard
             title="Материалы"
             value={formatCurrency(summary.materialTotal)}
@@ -155,12 +156,20 @@ const DashboardPage = observer(() => {
             color="primary.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SummaryCard
             title="Работы"
             value={formatCurrency(summary.laborTotal)}
             icon={<PeopleIcon fontSize="large" />}
             color="secondary.main"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <SummaryCard
+            title="Доставки"
+            value={formatCurrency(summary.deliveryTotal)}
+            icon={<LocalShippingIcon fontSize="large" />}
+            color="success.main"
           />
         </Grid>
       </Grid>
@@ -198,6 +207,12 @@ const DashboardPage = observer(() => {
             title="Расходы на работы по категориям"
           />
         </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <ExpenseChart
+            data={summary.byCategory.filter((c) => c.type === "DELIVERY")}
+            title="Расходы на доставки по категориям"
+          />
+        </Grid>
       </Grid>
 
       <Dialog open={editOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
@@ -230,7 +245,7 @@ const DashboardPage = observer(() => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose}>Отмена</Button>
+          <Button onClick={handleEditClose} variant="contained">Отмена</Button>
           <Button onClick={handleEditSave} variant="contained" disabled={!editName}>
             Сохранить
           </Button>

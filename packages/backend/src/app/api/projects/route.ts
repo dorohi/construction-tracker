@@ -8,6 +8,9 @@ const DEFAULT_MATERIAL_CATEGORIES = [
 const DEFAULT_LABOR_CATEGORIES = [
   "Каменные работы", "Сантехнические работы", "Электромонтажные работы", "Разнорабочие",
 ];
+const DEFAULT_DELIVERY_CATEGORIES = [
+  "Доставка материалов", "Доставка оборудования",
+];
 
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request);
@@ -29,6 +32,9 @@ export async function GET(request: NextRequest) {
     const laborTotal = p.expenses
       .filter((e) => e.type === "LABOR")
       .reduce((s, e) => s + e.amount, 0);
+    const deliveryTotal = p.expenses
+      .filter((e) => e.type === "DELIVERY")
+      .reduce((s, e) => s + e.amount, 0);
 
     const { expenses, ...project } = p;
     return {
@@ -36,6 +42,7 @@ export async function GET(request: NextRequest) {
       totalSpent,
       materialTotal,
       laborTotal,
+      deliveryTotal,
       expenseCount: expenses.length,
     };
   });
@@ -76,6 +83,11 @@ export async function POST(request: NextRequest) {
       ...DEFAULT_LABOR_CATEGORIES.map((n) => ({
         name: n,
         type: "LABOR" as const,
+        projectId: project.id,
+      })),
+      ...DEFAULT_DELIVERY_CATEGORIES.map((n) => ({
+        name: n,
+        type: "DELIVERY" as const,
         projectId: project.id,
       })),
     ];

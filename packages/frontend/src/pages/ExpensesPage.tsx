@@ -58,7 +58,7 @@ const ExpensesPage = observer(() => {
     );
   }
 
-  const typeFilter = tab === 1 ? "MATERIAL" : tab === 2 ? "LABOR" : undefined;
+  const typeFilter = tab === 1 ? "MATERIAL" : tab === 2 ? "LABOR" : tab === 3 ? "DELIVERY" : undefined;
   const filteredExpenses = typeFilter
     ? expenseStore.expenses.filter((e) => e.type === typeFilter)
     : expenseStore.expenses;
@@ -134,7 +134,7 @@ const ExpensesPage = observer(() => {
               setFormOpen(true);
             }}
           >
-            Добавить расход
+            Добавить
           </Button>
         </Box>
       </Box>
@@ -144,6 +144,7 @@ const ExpensesPage = observer(() => {
           <Tab label={`Все (${expenseStore.expenses.length})`} />
           <Tab label={`Материалы (${expenseStore.materialExpenses.length})`} />
           <Tab label={`Работы (${expenseStore.laborExpenses.length})`} />
+          <Tab label={`Доставки (${expenseStore.deliveryExpenses.length})`} />
         </Tabs>
       </Box>
 
@@ -182,7 +183,7 @@ const ExpensesPage = observer(() => {
                 <Chip
                   key={cat.id}
                   label={cat.name}
-                  color={cat.type === "MATERIAL" ? "primary" : "secondary"}
+                  color={cat.type === "MATERIAL" ? "primary" : cat.type === "LABOR" ? "secondary" : "success"}
                   variant="outlined"
                   size="small"
                 />
@@ -191,7 +192,7 @@ const ExpensesPage = observer(() => {
           </Box>
 
           <Typography variant="subtitle2" gutterBottom>
-            Добавить категорию
+            Добавить
           </Typography>
           <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
             <TextField
@@ -211,11 +212,12 @@ const ExpensesPage = observer(() => {
             >
               <MenuItem value="MATERIAL">Материал</MenuItem>
               <MenuItem value="LABOR">Работа</MenuItem>
+              <MenuItem value="DELIVERY">Доставка</MenuItem>
             </TextField>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCategoryDialogOpen(false)}>Закрыть</Button>
+          <Button onClick={() => setCategoryDialogOpen(false)} variant="contained">Закрыть</Button>
           <Button
             onClick={handleAddCategory}
             variant="contained"

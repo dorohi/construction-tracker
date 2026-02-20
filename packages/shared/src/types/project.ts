@@ -12,6 +12,7 @@ export interface ProjectWithTotals extends Project {
   totalSpent: number;
   materialTotal: number;
   laborTotal: number;
+  deliveryTotal: number;
   expenseCount: number;
 }
 

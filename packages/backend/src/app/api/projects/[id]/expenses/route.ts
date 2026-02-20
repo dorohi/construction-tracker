@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const body = await request.json();
     const {
       type, title, description, amount, quantity, unit, unitPrice,
-      supplier, workerName, hoursWorked, hourlyRate, date, categoryId,
+      supplier, carrier, workerName, hoursWorked, hourlyRate, date, categoryId,
     } = body;
 
     if (!type || !title || amount === undefined || !date) {
@@ -61,9 +61,9 @@ export async function POST(request: NextRequest, { params }: Params) {
       );
     }
 
-    if (type !== "MATERIAL" && type !== "LABOR") {
+    if (type !== "MATERIAL" && type !== "LABOR" && type !== "DELIVERY") {
       return NextResponse.json(
-        { error: "Тип должен быть MATERIAL или LABOR" },
+        { error: "Тип должен быть MATERIAL, LABOR или DELIVERY" },
         { status: 400 }
       );
     }
@@ -78,6 +78,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         unit: unit || null,
         unitPrice: unitPrice ?? null,
         supplier: supplier || null,
+        carrier: carrier || null,
         workerName: workerName || null,
         hoursWorked: hoursWorked ?? null,
         hourlyRate: hourlyRate ?? null,

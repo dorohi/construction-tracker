@@ -48,6 +48,7 @@ model Expense {
   unit        String?
   unitPrice   Float?
   supplier    String?
+  carrier     String?
   workerName  String?
   hoursWorked Float?
   hourlyRate  Float?

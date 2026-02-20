@@ -43,6 +43,8 @@ export default function ExpenseForm({
   const [workerName, setWorkerName] = useState("");
   const [hoursWorked, setHoursWorked] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
+  // Delivery fields
+  const [carrier, setCarrier] = useState("");
 
   useEffect(() => {
     if (expense) {
@@ -59,6 +61,7 @@ export default function ExpenseForm({
       setWorkerName(expense.workerName || "");
       setHoursWorked(expense.hoursWorked != null ? String(expense.hoursWorked) : "");
       setHourlyRate(expense.hourlyRate != null ? String(expense.hourlyRate) : "");
+      setCarrier(expense.carrier || "");
     } else {
       resetForm();
     }
@@ -78,6 +81,7 @@ export default function ExpenseForm({
     setWorkerName("");
     setHoursWorked("");
     setHourlyRate("");
+    setCarrier("");
   };
 
   const filteredCategories = categories.filter((c) => c.type === type);
@@ -97,10 +101,12 @@ export default function ExpenseForm({
       if (unit) data.unit = unit;
       if (unitPrice) data.unitPrice = parseFloat(unitPrice);
       if (supplier) data.supplier = supplier;
-    } else {
+    } else if (type === "LABOR") {
       if (workerName) data.workerName = workerName;
       if (hoursWorked) data.hoursWorked = parseFloat(hoursWorked);
       if (hourlyRate) data.hourlyRate = parseFloat(hourlyRate);
+    } else if (type === "DELIVERY") {
+      if (carrier) data.carrier = carrier;
     }
 
     onSubmit(data);
@@ -135,6 +141,7 @@ export default function ExpenseForm({
           >
             <ToggleButton value="MATERIAL">Материал</ToggleButton>
             <ToggleButton value="LABOR">Работа</ToggleButton>
+            <ToggleButton value="DELIVERY">Доставка</ToggleButton>
           </ToggleButtonGroup>
 
           <TextField
@@ -240,6 +247,15 @@ export default function ExpenseForm({
             </>
           )}
 
+          {type === "DELIVERY" && (
+            <TextField
+              label="Перевозчик"
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
+              fullWidth
+            />
+          )}
+
           <TextField
             label="Итого"
             type="number"
@@ -251,7 +267,7 @@ export default function ExpenseForm({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Отмена</Button>
+        <Button onClick={onClose} variant="contained">Отмена</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"

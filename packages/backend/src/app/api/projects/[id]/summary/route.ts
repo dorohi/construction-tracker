@@ -29,6 +29,9 @@ export async function GET(request: NextRequest, { params }: Params) {
   const laborTotal = expenses
     .filter((e) => e.type === "LABOR")
     .reduce((s, e) => s + e.amount, 0);
+  const deliveryTotal = expenses
+    .filter((e) => e.type === "DELIVERY")
+    .reduce((s, e) => s + e.amount, 0);
 
   // Group by category
   const categoryMap = new Map<
@@ -58,6 +61,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       totalSpent,
       materialTotal,
       laborTotal,
+      deliveryTotal,
       budget: project.budget,
       remaining: project.budget ? project.budget - totalSpent : null,
       byCategory: Array.from(categoryMap.values()),

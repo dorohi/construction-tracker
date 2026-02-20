@@ -104,7 +104,7 @@ export class ProjectStore {
   async createCategory(
     projectId: string,
     name: string,
-    type: "MATERIAL" | "LABOR"
+    type: "MATERIAL" | "LABOR" | "DELIVERY"
   ) {
     try {
       const category = await categoriesApi.create(projectId, { name, type });
