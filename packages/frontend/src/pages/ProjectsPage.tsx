@@ -21,6 +21,7 @@ import {
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { useStore } from "../stores/RootStore";
 
 function formatCurrency(amount: number) {
@@ -34,6 +35,8 @@ const ProjectsPage = observer(() => {
   const { projectStore } = useStore();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editProjectId, setEditProjectId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState("");
@@ -52,6 +55,33 @@ const ProjectsPage = observer(() => {
     setName("");
     setDescription("");
     setBudget("");
+  };
+
+  const handleEditOpen = (project: (typeof projectStore.projects)[0], e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditProjectId(project.id);
+    setName(project.name);
+    setDescription(project.description || "");
+    setBudget(project.budget != null ? String(project.budget) : "");
+    setEditDialogOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false);
+    setEditProjectId(null);
+    setName("");
+    setDescription("");
+    setBudget("");
+  };
+
+  const handleEditSave = async () => {
+    if (!editProjectId) return;
+    await projectStore.updateProject(editProjectId, {
+      name,
+      description: description || undefined,
+      budget: budget ? parseFloat(budget) : undefined,
+    });
+    handleEditClose();
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -93,15 +123,25 @@ const ProjectsPage = observer(() => {
                     <Typography variant="h6" noWrap>
                       {project.name}
                     </Typography>
-                    <Tooltip title="Удалить проект">
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={(e) => handleDelete(project.id, e)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                    <Box>
+                      <Tooltip title="Редактировать проект">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleEditOpen(project, e)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Удалить проект">
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={(e) => handleDelete(project.id, e)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
                   {project.description && (
                     <Typography variant="body2" color="text.secondary" noWrap>
@@ -195,6 +235,43 @@ const ProjectsPage = observer(() => {
           <Button onClick={() => setDialogOpen(false)}>Отмена</Button>
           <Button onClick={handleCreate} variant="contained" disabled={!name}>
             Создать
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={editDialogOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Редактировать проект</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Название проекта"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <TextField
+            label="Описание"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            multiline
+            rows={2}
+            margin="normal"
+          />
+          <TextField
+            label="Бюджет"
+            type="number"
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose}>Отмена</Button>
+          <Button onClick={handleEditSave} variant="contained" disabled={!name}>
+            Сохранить
           </Button>
         </DialogActions>
       </Dialog>
