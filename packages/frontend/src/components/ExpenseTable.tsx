@@ -60,7 +60,16 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
     <Paper sx={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 250px)" }}>
       <TableContainer sx={{ flex: 1, overflow: "auto" }}>
         <Table stickyHeader size="small">
-          <TableHead>
+          <TableHead
+            sx={{
+              "& .MuiTableCell-head": {
+                bgcolor: "grey.200",
+                fontWeight: 700,
+                "&:first-of-type": { borderRadius: "8px 0 0 8px" },
+                "&:last-of-type": { borderRadius: "0 8px 8px 0" },
+              },
+            }}
+          >
             <TableRow>
               <TableCell>Дата</TableCell>
               <TableCell>Название</TableCell>
