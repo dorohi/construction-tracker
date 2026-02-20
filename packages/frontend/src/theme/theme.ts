@@ -5,16 +5,15 @@ export function getTheme(mode: "light" | "dark") {
     palette: {
       mode,
       primary: {
-        main: "#d97706", // amber-600 — construction yellow
-        light: "#f59e0b",
-        dark: "#b45309",
+        main: "#1976d2",
+        light: "#42a5f5",
+        dark: "#1565c0",
         contrastText: "#fff",
       },
-      secondary: {
-        main: "#475569", // slate-600
-        light: "#64748b",
-        dark: "#334155",
-      },
+      secondary:
+        mode === "light"
+          ? { main: "#546e7a", light: "#78909c", dark: "#37474f" }
+          : { main: "#90a4ae", light: "#b0bec5", dark: "#78909c" },
       background:
         mode === "light"
           ? { default: "#f8fafc", paper: "#ffffff" }
