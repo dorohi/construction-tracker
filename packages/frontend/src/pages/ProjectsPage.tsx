@@ -113,7 +113,7 @@ const ProjectsPage = observer(() => {
             : 0;
 
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }} key={project.id}>
               <Card
                 sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%" }}
                 onClick={() => navigate(`/projects/${project.id}`)}
