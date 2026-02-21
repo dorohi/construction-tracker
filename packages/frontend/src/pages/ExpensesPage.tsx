@@ -60,11 +60,9 @@ const ExpensesPage = observer(() => {
 
   const { currentProject: project } = projectStore;
 
-  if (projectStore.loading || expenseStore.loading) {
-    return <LinearProgress />;
-  }
+  const isLoading = projectStore.loading || expenseStore.loading;
 
-  if (!project) {
+  if (!isLoading && !project) {
     return (
       <Container>
         <Typography>Проект не найден</Typography>
@@ -137,7 +135,9 @@ const ExpensesPage = observer(() => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <>
+    {isLoading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+    {project && <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link
           underline="hover"
@@ -211,11 +211,11 @@ const ExpensesPage = observer(() => {
           variant={isMobile ? "scrollable" : "standard"}
           scrollButtons={isMobile ? "auto" : false}
         >
-          <Tab icon={<ListAltIcon />} iconPosition="start" label={isMobile ? `${expenseStore.expenses.length}` : `Все (${expenseStore.expenses.length})`} />
-          <Tab icon={<BuildIcon />} iconPosition="start" label={isMobile ? `${expenseStore.materialExpenses.length}` : `Материалы (${expenseStore.materialExpenses.length})`} />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label={isMobile ? `${expenseStore.laborExpenses.length}` : `Работы (${expenseStore.laborExpenses.length})`} />
-          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={isMobile ? `${expenseStore.deliveryExpenses.length}` : `Доставки (${expenseStore.deliveryExpenses.length})`} />
-          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={isMobile ? `${expenseStore.plannedExpenses.length}` : `Запланированные (${expenseStore.plannedExpenses.length})`} />
+          <Tab icon={<ListAltIcon />} iconPosition="start" label={isMobile ? undefined : `Все (${expenseStore.expenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
+          <Tab icon={<BuildIcon />} iconPosition="start" label={isMobile ? undefined : `Материалы (${expenseStore.materialExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
+          <Tab icon={<PeopleIcon />} iconPosition="start" label={isMobile ? undefined : `Работы (${expenseStore.laborExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
+          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={isMobile ? undefined : `Доставки (${expenseStore.deliveryExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
+          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={isMobile ? undefined : `Запланированные (${expenseStore.plannedExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
         </Tabs>
       </Box>
 
@@ -372,7 +372,8 @@ const ExpensesPage = observer(() => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Container>}
+    </>
   );
 });
 

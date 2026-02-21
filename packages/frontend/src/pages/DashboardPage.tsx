@@ -60,10 +60,6 @@ const DashboardPage = observer(() => {
 
   const { currentProject: project, summary } = projectStore;
 
-  if (projectStore.loading) {
-    return <LinearProgress />;
-  }
-
   const handleEditOpen = () => {
     if (!project) return;
     setEditName(project.name);
@@ -86,7 +82,7 @@ const DashboardPage = observer(() => {
     setEditOpen(false);
   };
 
-  if (!project || !summary) {
+  if (!projectStore.loading && (!project || !summary)) {
     return (
       <Container>
         <Typography>Проект не найден</Typography>
@@ -95,7 +91,9 @@ const DashboardPage = observer(() => {
   }
 
   return (
-    <Container maxWidth="lg">
+    <>
+    {projectStore.loading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+    {project && summary && <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link
           underline="hover"
@@ -312,7 +310,8 @@ const DashboardPage = observer(() => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Container>}
+    </>
   );
 });
 

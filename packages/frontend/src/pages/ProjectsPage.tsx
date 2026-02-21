@@ -108,7 +108,9 @@ const ProjectsPage = observer(() => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <>
+      {projectStore.loading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+    <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant={isMobile ? "h5" : "h4"}>Мои проекты</Typography>
         <Button
@@ -120,8 +122,6 @@ const ProjectsPage = observer(() => {
         </Button>
       </Box>
 
-      {projectStore.loading && <LinearProgress sx={{ mb: 2 }} />}
-
       <Grid container spacing={3}>
         {projectStore.projects.map((project) => {
           const spentPercent = project.budget
@@ -129,12 +129,12 @@ const ProjectsPage = observer(() => {
             : 0;
 
           return (
-            <Grid size={{ xs: 12, md: 6 }} key={project.id}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={project.id}>
               <Card
-                sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%" }}
+                sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%", display: "flex", flexDirection: "column" }}
                 onClick={() => navigate(`/projects/${project.id}`)}
               >
-                <CardContent>
+                <CardContent sx={{ flex: 1 }}>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="h6" noWrap>
                       {project.name}
@@ -196,7 +196,7 @@ const ProjectsPage = observer(() => {
                       </>
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1, ml: "32px", flexWrap: "wrap" }}>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap", justifyContent: "space-between" }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                       <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
                       <Typography variant="caption" color="text.secondary">
@@ -217,8 +217,8 @@ const ProjectsPage = observer(() => {
                     </Box>
                   </Box>
                 </CardContent>
-                <CardActions>
-                  <Button size="small">Подробнее</Button>
+                <CardActions sx={{ justifyContent: "flex-end", px: 2, pb: 2 }}>
+                  <Button size="small" variant="outlined">Подробнее</Button>
                 </CardActions>
               </Card>
             </Grid>
@@ -338,6 +338,7 @@ const ProjectsPage = observer(() => {
         </DialogActions>
       </Dialog>
     </Container>
+    </>
   );
 });
 

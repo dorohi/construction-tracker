@@ -1,8 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Avatar,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Drawer,
   IconButton,
@@ -42,10 +48,16 @@ const Sidebar = observer(() => {
 
   const open = uiStore.sidebarOpen;
   const user = authStore.user;
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const drawerWidth = isMobile ? DRAWER_WIDTH : open ? DRAWER_WIDTH : DRAWER_WIDTH_COLLAPSED;
 
   const handleLogout = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setLogoutDialogOpen(false);
     authStore.logout();
     navigate("/login");
   };
@@ -188,16 +200,61 @@ const Sidebar = observer(() => {
     </>
   );
 
+  const logoutDialog = (
+    <Dialog open={logoutDialogOpen} onClose={() => setLogoutDialogOpen(false)} maxWidth="xs">
+      <DialogTitle>Выйти из аккаунта?</DialogTitle>
+      <DialogContent>
+        <Typography>Вы уверены, что хотите выйти?</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setLogoutDialogOpen(false)} variant="contained">Отмена</Button>
+        <Button onClick={confirmLogout} variant="contained" color="error">Выйти</Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   if (isMobile) {
     return (
+      <>
+        <Drawer
+          variant="temporary"
+          open={open}
+          onClose={() => uiStore.closeSidebar()}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              boxSizing: "border-box",
+              display: "flex",
+              flexDirection: "column",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+        {logoutDialog}
+      </>
+    );
+  }
+
+  return (
+    <>
       <Drawer
-        variant="temporary"
-        open={open}
-        onClose={() => uiStore.closeSidebar()}
-        ModalProps={{ keepMounted: true }}
+        variant="permanent"
         sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          whiteSpace: "nowrap",
           "& .MuiDrawer-paper": {
-            width: DRAWER_WIDTH,
+            width: drawerWidth,
+            transition: (t) =>
+              t.transitions.create("width", {
+                easing: t.transitions.easing.sharp,
+                duration: open
+                  ? t.transitions.duration.enteringScreen
+                  : t.transitions.duration.leavingScreen,
+              }),
+            overflowX: "hidden",
             boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
@@ -206,34 +263,8 @@ const Sidebar = observer(() => {
       >
         {drawerContent}
       </Drawer>
-    );
-  }
-
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        whiteSpace: "nowrap",
-        "& .MuiDrawer-paper": {
-          width: drawerWidth,
-          transition: (t) =>
-            t.transitions.create("width", {
-              easing: t.transitions.easing.sharp,
-              duration: open
-                ? t.transitions.duration.enteringScreen
-                : t.transitions.duration.leavingScreen,
-            }),
-          overflowX: "hidden",
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-        },
-      }}
-    >
-      {drawerContent}
-    </Drawer>
+      {logoutDialog}
+    </>
   );
 });
 
