@@ -11,6 +11,12 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  Box,
+  Card,
+  CardContent,
+  CardActions,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,9 +48,32 @@ function formatDate(dateStr: string) {
   });
 }
 
+function getDetails(expense: Expense) {
+  if (expense.type === "MATERIAL") {
+    const parts: string[] = [];
+    if (expense.supplier) parts.push(`Поставщик: ${expense.supplier}`);
+    if (expense.quantity != null)
+      parts.push(`${expense.quantity} ${expense.unit || "шт."} @ ${formatCurrency(expense.unitPrice || 0)}`);
+    return parts.join(" | ");
+  }
+  if (expense.type === "LABOR") {
+    const parts: string[] = [];
+    if (expense.workerName) parts.push(`Работник: ${expense.workerName}`);
+    if (expense.hoursWorked != null)
+      parts.push(`${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`);
+    return parts.join(" | ");
+  }
+  if (expense.type === "DELIVERY" && expense.carrier) {
+    return `Перевозчик: ${expense.carrier}`;
+  }
+  return "";
+}
+
 export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, hideType }: ExpenseTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   if (expenses.length === 0) {
     return (
@@ -58,6 +87,87 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
+  if (isMobile) {
+    return (
+      <Box>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {paginatedExpenses.map((expense) => (
+            <Card key={expense.id} variant="outlined" sx={expense.planned ? { opacity: 0.7 } : undefined}>
+              <CardContent sx={{ pb: 0.5, "&:last-child": { pb: 0.5 } }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography variant="body2" fontWeight={600} noWrap>
+                      {expense.planned && (
+                        <HourglassEmptyIcon sx={{ fontSize: 14, verticalAlign: "text-bottom", mr: 0.5, color: "text.secondary" }} />
+                      )}
+                      {expense.title}
+                    </Typography>
+                    {expense.description && (
+                      <Typography variant="caption" color="text.secondary" noWrap component="div">
+                        {expense.description}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Typography variant="body2" fontWeight={700} sx={{ ml: 1, whiteSpace: "nowrap" }}>
+                    {formatCurrency(expense.amount)}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, alignItems: "center", mt: 0.5 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    {formatDate(expense.date)}
+                  </Typography>
+                  {!hideType && (
+                    <CategoryChip
+                      name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                      type={expense.type}
+                    />
+                  )}
+                  {expense.category && (
+                    <CategoryChip name={expense.category.name} type={expense.category.type} />
+                  )}
+                </Box>
+
+                {getDetails(expense) && (
+                  <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 0.5 }}>
+                    {getDetails(expense)}
+                  </Typography>
+                )}
+              </CardContent>
+              <CardActions sx={{ pt: 0, justifyContent: "flex-end" }}>
+                {expense.planned && onPurchase && (
+                  <IconButton size="small" color="success" onClick={() => onPurchase(expense)}>
+                    <ShoppingCartIcon fontSize="small" />
+                  </IconButton>
+                )}
+                <IconButton size="small" onClick={() => onEdit(expense)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton size="small" color="error" onClick={() => onDelete(expense)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+        <TablePagination
+          component="div"
+          count={expenses.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          labelRowsPerPage="Строк:"
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} из ${count}`}
+        />
+      </Box>
+    );
+  }
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -106,13 +216,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
                 </TableCell>
                 <TableCell>
                   <Typography variant="caption" color="text.secondary">
-                    {expense.type === "MATERIAL" && expense.supplier && `Поставщик: ${expense.supplier}`}
-                    {expense.type === "MATERIAL" && expense.quantity != null &&
-                      ` | ${expense.quantity} ${expense.unit || "шт."} @ ${formatCurrency(expense.unitPrice || 0)}`}
-                    {expense.type === "LABOR" && expense.workerName && `Работник: ${expense.workerName}`}
-                    {expense.type === "LABOR" && expense.hoursWorked != null &&
-                      ` | ${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`}
-                    {expense.type === "DELIVERY" && expense.carrier && `Перевозчик: ${expense.carrier}`}
+                    {getDetails(expense)}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">

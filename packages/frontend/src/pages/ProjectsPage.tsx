@@ -17,6 +17,8 @@ import {
   IconButton,
   LinearProgress,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
@@ -103,10 +105,13 @@ const ProjectsPage = observer(() => {
     }
   };
 
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4">Мои проекты</Typography>
+        <Typography variant={isMobile ? "h5" : "h4"}>Мои проекты</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -125,7 +130,7 @@ const ProjectsPage = observer(() => {
             : 0;
 
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 6 }} key={project.id}>
+            <Grid size={{ xs: 12, md: 6 }} key={project.id}>
               <Card
                 sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%" }}
                 onClick={() => navigate(`/projects/${project.id}`)}

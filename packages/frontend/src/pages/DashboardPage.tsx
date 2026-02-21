@@ -16,6 +16,8 @@ import {
   TextField,
   IconButton,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -90,6 +92,9 @@ const DashboardPage = observer(() => {
     );
   }
 
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+
   return (
     <Container maxWidth="lg">
       <Breadcrumbs sx={{ mb: 2 }}>
@@ -104,21 +109,21 @@ const DashboardPage = observer(() => {
         <Typography color="text.primary">{project.name}</Typography>
       </Breadcrumbs>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Box>
-            <Typography variant="h4">{project.name}</Typography>
+      <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "center", mb: 3, gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant={isMobile ? "h5" : "h4"} noWrap>{project.name}</Typography>
             {project.description && (
-              <Typography color="text.secondary">{project.description}</Typography>
+              <Typography color="text.secondary" noWrap>{project.description}</Typography>
             )}
           </Box>
           <Tooltip title="Редактировать проект">
-            <IconButton onClick={handleEditOpen}>
+            <IconButton onClick={handleEditOpen} sx={{ flexShrink: 0 }}>
               <EditIcon />
             </IconButton>
           </Tooltip>
         </Box>
-        <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)}>
+        <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)} sx={{ flexShrink: 0 }}>
           <ReceiptIcon sx={{ mr: 1 }} />
           Управление
         </Button>

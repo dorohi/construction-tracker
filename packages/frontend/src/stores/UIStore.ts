@@ -14,4 +14,9 @@ export class UIStore {
     this.sidebarOpen = !this.sidebarOpen;
     localStorage.setItem(STORAGE_KEY, String(this.sidebarOpen));
   }
+
+  closeSidebar() {
+    this.sidebarOpen = false;
+    localStorage.setItem(STORAGE_KEY, "false");
+  }
 }

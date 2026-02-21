@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Paper, Typography, Box } from "@mui/material";
+import { Paper, Typography, Box, useMediaQuery, useTheme } from "@mui/material";
 import type { CategorySummary } from "@construction-tracker/shared";
 
 interface ExpenseChartProps {
@@ -21,6 +21,9 @@ function formatCurrency(amount: number) {
 }
 
 export default function ExpenseChart({ data, title, colors }: ExpenseChartProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   if (!data.length) {
     return (
       <Paper sx={{ p: 3, textAlign: "center" }}>
@@ -36,10 +39,10 @@ export default function ExpenseChart({ data, title, colors }: ExpenseChartProps)
 
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant={isMobile ? "body1" : "h6"} fontWeight={600} gutterBottom>
         {title}
       </Typography>
-      <Box sx={{ width: "100%", height: 300 }}>
+      <Box sx={{ width: "100%", height: isMobile ? 240 : 300 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -48,9 +51,11 @@ export default function ExpenseChart({ data, title, colors }: ExpenseChartProps)
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={100}
-              label={({ name, percent }) =>
-                `${name} (${(percent * 100).toFixed(0)}%)`
+              outerRadius={isMobile ? 70 : 100}
+              label={
+                isMobile
+                  ? false
+                  : ({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`
               }
             >
               {chartData.map((_, index) => (

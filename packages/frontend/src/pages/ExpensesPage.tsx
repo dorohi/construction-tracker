@@ -18,6 +18,10 @@ import {
   TextField,
   MenuItem,
   Chip,
+  IconButton,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
@@ -130,6 +134,9 @@ const ExpensesPage = observer(() => {
     }
   };
 
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+
   return (
     <Container maxWidth="lg">
       <Breadcrumbs sx={{ mb: 2 }}>
@@ -152,36 +159,64 @@ const ExpensesPage = observer(() => {
         <Typography color="text.primary">Расходы</Typography>
       </Breadcrumbs>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4">Расходы</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, gap: 1 }}>
+        <Typography variant={isMobile ? "h5" : "h4"}>Расходы</Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<CategoryIcon />}
-            onClick={() => setCategoryDialogOpen(true)}
-          >
-            Категории
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setEditingExpense(null);
-              setFormOpen(true);
-            }}
-          >
-            Добавить
-          </Button>
+          {isMobile ? (
+            <>
+              <Tooltip title="Категории">
+                <IconButton onClick={() => setCategoryDialogOpen(true)}>
+                  <CategoryIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Добавить">
+                <IconButton
+                  color="primary"
+                  onClick={() => {
+                    setEditingExpense(null);
+                    setFormOpen(true);
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                startIcon={<CategoryIcon />}
+                onClick={() => setCategoryDialogOpen(true)}
+              >
+                Категории
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setEditingExpense(null);
+                  setFormOpen(true);
+                }}
+              >
+                Добавить
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab icon={<ListAltIcon />} iconPosition="start" label={`Все (${expenseStore.expenses.length})`} />
-          <Tab icon={<BuildIcon />} iconPosition="start" label={`Материалы (${expenseStore.materialExpenses.length})`} />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label={`Работы (${expenseStore.laborExpenses.length})`} />
-          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={`Доставки (${expenseStore.deliveryExpenses.length})`} />
-          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={`Запланированные (${expenseStore.plannedExpenses.length})`} />
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          variant={isMobile ? "scrollable" : "standard"}
+          scrollButtons={isMobile ? "auto" : false}
+        >
+          <Tab icon={<ListAltIcon />} iconPosition="start" label={isMobile ? `${expenseStore.expenses.length}` : `Все (${expenseStore.expenses.length})`} />
+          <Tab icon={<BuildIcon />} iconPosition="start" label={isMobile ? `${expenseStore.materialExpenses.length}` : `Материалы (${expenseStore.materialExpenses.length})`} />
+          <Tab icon={<PeopleIcon />} iconPosition="start" label={isMobile ? `${expenseStore.laborExpenses.length}` : `Работы (${expenseStore.laborExpenses.length})`} />
+          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={isMobile ? `${expenseStore.deliveryExpenses.length}` : `Доставки (${expenseStore.deliveryExpenses.length})`} />
+          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={isMobile ? `${expenseStore.plannedExpenses.length}` : `Запланированные (${expenseStore.plannedExpenses.length})`} />
         </Tabs>
       </Box>
 

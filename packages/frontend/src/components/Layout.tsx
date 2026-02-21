@@ -9,7 +9,15 @@ const Layout = observer(() => {
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Navbar />
       <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 0, pt: 3, pb: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          minWidth: 0,
+          pt: 3,
+          pb: 3,
+        }}
+      >
         <Toolbar />
         <Outlet />
       </Box>

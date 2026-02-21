@@ -13,17 +13,22 @@ interface SummaryCardProps {
 export default function SummaryCard({ title, value, icon, color = "primary.main", sx }: SummaryCardProps) {
   return (
     <Card sx={sx}>
-      <CardContent>
+      <CardContent sx={{ "&:last-child": { pb: 2 } }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <Box>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
               {title}
             </Typography>
-            <Typography variant="h5" fontWeight={700}>
+            <Typography
+              variant="h5"
+              fontWeight={700}
+              noWrap
+              sx={{ fontSize: { xs: "1.1rem", sm: "1.5rem" } }}
+            >
               {value}
             </Typography>
           </Box>
-          <Box sx={{ color, opacity: 0.8 }}>
+          <Box sx={{ color, opacity: 0.8, flexShrink: 0 }}>
             {icon}
           </Box>
         </Box>
