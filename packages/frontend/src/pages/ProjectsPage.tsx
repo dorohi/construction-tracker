@@ -22,6 +22,12 @@ import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import BuildIcon from "@mui/icons-material/Build";
+import PeopleIcon from "@mui/icons-material/People";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useStore } from "../stores/RootStore";
 
 function formatCurrency(amount: number) {
@@ -36,6 +42,7 @@ const ProjectsPage = observer(() => {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [editProjectId, setEditProjectId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -84,10 +91,15 @@ const ProjectsPage = observer(() => {
     handleEditClose();
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("Удалить этот проект и все его расходы?")) {
-      await projectStore.deleteProject(id);
+    setDeletingProjectId(id);
+  };
+
+  const confirmDeleteProject = async () => {
+    if (deletingProjectId) {
+      await projectStore.deleteProject(deletingProjectId);
+      setDeletingProjectId(null);
     }
   };
 
@@ -148,34 +160,57 @@ const ProjectsPage = observer(() => {
                       {project.description}
                     </Typography>
                   )}
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                      Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
-                    </Typography>
+                  <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.5 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <AttachMoneyIcon sx={{ fontSize: 18, width: 24, color: "warning.main" }} />
+                      <Typography variant="body2">
+                        Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
+                      </Typography>
+                    </Box>
+                    {project.plannedTotal > 0 && (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <PlaylistAddCheckIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                        <Typography variant="body2">
+                          Запланировано: <strong>{formatCurrency(project.plannedTotal)}</strong>
+                        </Typography>
+                      </Box>
+                    )}
                     {project.budget != null && (
                       <>
-                        <Typography variant="body2">
-                          Бюджет: {formatCurrency(project.budget)}
-                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <AccountBalanceIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                          <Typography variant="body2">
+                            Бюджет: {formatCurrency(project.budget)}
+                          </Typography>
+                        </Box>
                         <LinearProgress
                           variant="determinate"
                           value={spentPercent}
                           color={spentPercent > 90 ? "error" : spentPercent > 70 ? "warning" : "primary"}
-                          sx={{ mt: 1, height: 6, borderRadius: 3 }}
+                          sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
                         />
                       </>
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
-                    <Typography variant="caption" color="text.secondary">
-                      Материалы: {formatCurrency(project.materialTotal)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Работы: {formatCurrency(project.laborTotal)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Доставки: {formatCurrency(project.deliveryTotal)}
-                    </Typography>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1, ml: "32px", flexWrap: "wrap" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Материалы: {formatCurrency(project.materialTotal)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <PeopleIcon sx={{ fontSize: 14, color: "secondary.main" }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Работы: {formatCurrency(project.laborTotal)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <LocalShippingIcon sx={{ fontSize: 14, color: "success.main" }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Доставки: {formatCurrency(project.deliveryTotal)}
+                      </Typography>
+                    </Box>
                   </Box>
                 </CardContent>
                 <CardActions>
@@ -275,6 +310,26 @@ const ProjectsPage = observer(() => {
           <Button onClick={handleEditClose} variant="contained">Отмена</Button>
           <Button onClick={handleEditSave} variant="contained" disabled={!name}>
             Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Project Confirmation */}
+      <Dialog
+        open={!!deletingProjectId}
+        onClose={() => setDeletingProjectId(null)}
+        maxWidth="xs"
+      >
+        <DialogTitle>Удалить проект?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Проект и все его расходы будут удалены без возможности восстановления.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeletingProjectId(null)} variant="contained">Отмена</Button>
+          <Button onClick={confirmDeleteProject} variant="contained" color="error">
+            Удалить
           </Button>
         </DialogActions>
       </Dialog>

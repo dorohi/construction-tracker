@@ -24,6 +24,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SavingsIcon from "@mui/icons-material/Savings";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import EditIcon from "@mui/icons-material/Edit";
 import { useStore } from "../stores/RootStore";
@@ -124,15 +125,15 @@ const DashboardPage = observer(() => {
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SummaryCard
-            title="Общий бюджет"
+            title="Бюджет"
             value={summary.budget != null ? formatCurrency(summary.budget) : "Не задан"}
             icon={<AccountBalanceIcon fontSize="large" />}
             color="info.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SummaryCard
             title="Потрачено"
             value={formatCurrency(summary.totalSpent)}
@@ -140,7 +141,15 @@ const DashboardPage = observer(() => {
             color="warning.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <SummaryCard
+            title="Запланировано"
+            value={formatCurrency(summary.plannedTotal)}
+            icon={<PlaylistAddCheckIcon fontSize="large" />}
+            color="info.main"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <SummaryCard
             title="Остаток"
             value={summary.remaining != null ? formatCurrency(summary.remaining) : "Н/Д"}
@@ -148,7 +157,10 @@ const DashboardPage = observer(() => {
             color={summary.remaining != null && summary.remaining < 0 ? "error.main" : "success.main"}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <SummaryCard
             title="Материалы"
             value={formatCurrency(summary.materialTotal)}
@@ -156,7 +168,7 @@ const DashboardPage = observer(() => {
             color="primary.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <SummaryCard
             title="Работы"
             value={formatCurrency(summary.laborTotal)}
@@ -164,7 +176,7 @@ const DashboardPage = observer(() => {
             color="secondary.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <SummaryCard
             title="Доставки"
             value={formatCurrency(summary.deliveryTotal)}

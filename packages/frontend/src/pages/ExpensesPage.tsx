@@ -21,6 +21,11 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import BuildIcon from "@mui/icons-material/Build";
+import PeopleIcon from "@mui/icons-material/People";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import { useStore } from "../stores/RootStore";
 import ExpenseTable from "../components/ExpenseTable";
 import ExpenseForm from "../components/ExpenseForm";
@@ -37,6 +42,8 @@ const ExpensesPage = observer(() => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState<ExpenseType>("MATERIAL");
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [purchasingExpense, setPurchasingExpense] = useState<Expense | null>(null);
+  const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -60,9 +67,12 @@ const ExpensesPage = observer(() => {
   }
 
   const typeFilter = tab === 1 ? "MATERIAL" : tab === 2 ? "LABOR" : tab === 3 ? "DELIVERY" : undefined;
-  const filteredExpenses = typeFilter
-    ? expenseStore.expenses.filter((e) => e.type === typeFilter)
-    : expenseStore.expenses;
+  const plannedFilter = tab === 4;
+  const filteredExpenses = plannedFilter
+    ? expenseStore.plannedExpenses
+    : typeFilter
+      ? expenseStore.expenses.filter((e) => e.type === typeFilter)
+      : expenseStore.expenses;
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (editingExpense) {
@@ -80,10 +90,27 @@ const ExpensesPage = observer(() => {
     setFormOpen(true);
   };
 
-  const handleDelete = async (expense: Expense) => {
-    if (confirm(`Удалить расход "${expense.title}"?`)) {
-      await expenseStore.deleteExpense(expense.id);
+  const handlePurchase = (expense: Expense) => {
+    setPurchasingExpense(expense);
+  };
+
+  const confirmPurchase = async () => {
+    if (purchasingExpense) {
+      await expenseStore.updateExpense(purchasingExpense.id, { planned: false });
       projectStore.loadProject(id!);
+      setPurchasingExpense(null);
+    }
+  };
+
+  const handleDelete = (expense: Expense) => {
+    setDeletingExpense(expense);
+  };
+
+  const confirmDelete = async () => {
+    if (deletingExpense) {
+      await expenseStore.deleteExpense(deletingExpense.id);
+      projectStore.loadProject(id!);
+      setDeletingExpense(null);
     }
   };
 
@@ -150,10 +177,11 @@ const ExpensesPage = observer(() => {
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab label={`Все (${expenseStore.expenses.length})`} />
-          <Tab label={`Материалы (${expenseStore.materialExpenses.length})`} />
-          <Tab label={`Работы (${expenseStore.laborExpenses.length})`} />
-          <Tab label={`Доставки (${expenseStore.deliveryExpenses.length})`} />
+          <Tab icon={<ListAltIcon />} iconPosition="start" label={`Все (${expenseStore.expenses.length})`} />
+          <Tab icon={<BuildIcon />} iconPosition="start" label={`Материалы (${expenseStore.materialExpenses.length})`} />
+          <Tab icon={<PeopleIcon />} iconPosition="start" label={`Работы (${expenseStore.laborExpenses.length})`} />
+          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={`Доставки (${expenseStore.deliveryExpenses.length})`} />
+          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={`Запланированные (${expenseStore.plannedExpenses.length})`} />
         </Tabs>
       </Box>
 
@@ -161,7 +189,8 @@ const ExpensesPage = observer(() => {
         expenses={filteredExpenses}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        hideType={!!typeFilter}
+        onPurchase={handlePurchase}
+        hideType={!!typeFilter && !plannedFilter}
       />
 
       <ExpenseForm
@@ -204,7 +233,6 @@ const ExpensesPage = observer(() => {
                       key={cat.id}
                       label={cat.name}
                       color={color}
-                      variant="outlined"
                       size="small"
                       onDelete={() => setDeletingCategoryId(cat.id)}
                     />
@@ -239,7 +267,7 @@ const ExpensesPage = observer(() => {
             </TextField>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 3 }}>
           <Button onClick={() => setCategoryDialogOpen(false)} variant="contained">Закрыть</Button>
           <Button
             onClick={handleAddCategory}
@@ -251,10 +279,51 @@ const ExpensesPage = observer(() => {
         </DialogActions>
       </Dialog>
 
+      {/* Delete Expense Confirmation */}
+      <Dialog
+        open={!!deletingExpense}
+        onClose={() => setDeletingExpense(null)}
+        maxWidth="xs"
+      >
+        <DialogTitle>Удалить расход?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Расход «{deletingExpense?.title}» будет удалён без возможности восстановления.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeletingExpense(null)} variant="contained">Отмена</Button>
+          <Button onClick={confirmDelete} variant="contained" color="error">
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Purchase Confirmation */}
+      <Dialog
+        open={!!purchasingExpense}
+        onClose={() => setPurchasingExpense(null)}
+        maxWidth="xs"
+      >
+        <DialogTitle>Отметить как купленный?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Расход «{purchasingExpense?.title}» будет переведён из запланированных в фактические.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPurchasingExpense(null)} variant="contained">Отмена</Button>
+          <Button onClick={confirmPurchase} variant="contained" color="success">
+            Купить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Delete Category Confirmation */}
       <Dialog
         open={!!deletingCategoryId}
         onClose={() => setDeletingCategoryId(null)}
+        maxWidth="xs"
       >
         <DialogTitle>Удалить категорию?</DialogTitle>
         <DialogContent>

@@ -21,6 +21,7 @@ export interface Expense {
   workerName?: string | null;
   hoursWorked?: number | null;
   hourlyRate?: number | null;
+  planned: boolean;
   date: string;
   categoryId?: string | null;
   category?: Category | null;
@@ -41,6 +42,7 @@ export interface CreateExpenseInput {
   workerName?: string;
   hoursWorked?: number;
   hourlyRate?: number;
+  planned?: boolean;
   date: string;
   categoryId?: string;
 }

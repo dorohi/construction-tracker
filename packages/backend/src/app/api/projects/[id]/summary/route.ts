@@ -23,6 +23,9 @@ export async function GET(request: NextRequest, { params }: Params) {
   });
 
   const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
+  const plannedTotal = expenses
+    .filter((e) => e.planned)
+    .reduce((s, e) => s + e.amount, 0);
   const materialTotal = expenses
     .filter((e) => e.type === "MATERIAL")
     .reduce((s, e) => s + e.amount, 0);
@@ -59,6 +62,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   return NextResponse.json({
     data: {
       totalSpent,
+      plannedTotal,
       materialTotal,
       laborTotal,
       deliveryTotal,

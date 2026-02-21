@@ -12,6 +12,7 @@ export interface AuthResponse {
 
 export interface ProjectSummary {
   totalSpent: number;
+  plannedTotal: number;
   materialTotal: number;
   laborTotal: number;
   deliveryTotal: number;

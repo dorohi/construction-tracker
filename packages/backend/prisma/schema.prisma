@@ -52,6 +52,7 @@ model Expense {
   workerName  String?
   hoursWorked Float?
   hourlyRate  Float?
+  planned     Boolean  @default(false)
   date        DateTime
   category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  String?

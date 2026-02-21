@@ -10,6 +10,8 @@ import {
   Box,
   ToggleButton,
   ToggleButtonGroup,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import type { Expense, Category, ExpenseType } from "@construction-tracker/shared";
 
@@ -45,6 +47,8 @@ export default function ExpenseForm({
   const [hourlyRate, setHourlyRate] = useState("");
   // Delivery fields
   const [carrier, setCarrier] = useState("");
+  // Planned
+  const [planned, setPlanned] = useState(false);
 
   useEffect(() => {
     if (expense) {
@@ -62,6 +66,7 @@ export default function ExpenseForm({
       setHoursWorked(expense.hoursWorked != null ? String(expense.hoursWorked) : "");
       setHourlyRate(expense.hourlyRate != null ? String(expense.hourlyRate) : "");
       setCarrier(expense.carrier || "");
+      setPlanned(expense.planned ?? false);
     } else {
       resetForm();
     }
@@ -82,6 +87,7 @@ export default function ExpenseForm({
     setHoursWorked("");
     setHourlyRate("");
     setCarrier("");
+    setPlanned(false);
   };
 
   const filteredCategories = categories.filter((c) => c.type === type);
@@ -94,6 +100,7 @@ export default function ExpenseForm({
       amount: parseFloat(amount),
       date,
       categoryId: categoryId || undefined,
+      planned,
     };
 
     if (type === "MATERIAL") {
@@ -143,6 +150,16 @@ export default function ExpenseForm({
             <ToggleButton value="LABOR">Работа</ToggleButton>
             <ToggleButton value="DELIVERY">Доставка</ToggleButton>
           </ToggleButtonGroup>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={planned}
+                onChange={(e) => setPlanned(e.target.checked)}
+              />
+            }
+            label="Запланированный расход"
+          />
 
           <TextField
             label="Название"

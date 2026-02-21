@@ -23,6 +23,14 @@ export class ExpenseStore {
     return this.expenses.filter((e) => e.type === "DELIVERY");
   }
 
+  get plannedExpenses() {
+    return this.expenses.filter((e) => e.planned);
+  }
+
+  get actualExpenses() {
+    return this.expenses.filter((e) => !e.planned);
+  }
+
   get totalAmount() {
     return this.expenses.reduce((s, e) => s + e.amount, 0);
   }

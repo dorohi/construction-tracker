@@ -10,10 +10,12 @@ import {
   Paper,
   IconButton,
   Tooltip,
-  Typography, Box,
+  Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import type { Expense } from "@construction-tracker/shared";
 import CategoryChip from "./CategoryChip";
 
@@ -21,6 +23,7 @@ interface ExpenseTableProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
   onDelete: (expense: Expense) => void;
+  onPurchase?: (expense: Expense) => void;
   hideType?: boolean;
 }
 
@@ -39,7 +42,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: ExpenseTableProps) {
+export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, hideType }: ExpenseTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
@@ -58,7 +61,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: "calc(100vh - 250px)" }}>
+      <TableContainer sx={{ maxHeight: "calc(100vh - 344px)" }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -73,10 +76,11 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
           </TableHead>
           <TableBody>
             {paginatedExpenses.map((expense) => (
-              <TableRow key={expense.id} hover>
+              <TableRow key={expense.id} hover sx={expense.planned ? { opacity: 0.7 } : undefined}>
                 <TableCell>{formatDate(expense.date)}</TableCell>
                 <TableCell>
                   <Typography variant="body2" fontWeight={500}>
+                    {expense.planned && <HourglassEmptyIcon sx={{ fontSize: 16, verticalAlign: "text-bottom", mr: 0.5, color: "text.secondary" }} />}
                     {expense.title}
                   </Typography>
                   {expense.description && (
@@ -115,6 +119,13 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, hideType }: E
                   <Typography fontWeight={600}>{formatCurrency(expense.amount)}</Typography>
                 </TableCell>
                 <TableCell align="center">
+                  {expense.planned && onPurchase && (
+                    <Tooltip title="Купить">
+                      <IconButton size="small" color="success" onClick={() => onPurchase(expense)}>
+                        <ShoppingCartIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <Tooltip title="Редактировать">
                     <IconButton size="small" onClick={() => onEdit(expense)}>
                       <EditIcon fontSize="small" />
