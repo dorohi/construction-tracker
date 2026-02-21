@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import DashboardPage from "./pages/DashboardPage";
 import ExpensesPage from "./pages/ExpensesPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { authStore } = useStore();
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<DashboardPage />} />
           <Route path="/projects/:id/expenses" element={<ExpensesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/projects" replace />} />
       </Routes>

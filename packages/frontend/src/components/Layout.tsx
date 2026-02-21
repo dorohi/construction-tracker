@@ -1,14 +1,20 @@
 import { Outlet } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
+import { observer } from "mobx-react-lite";
 import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
-export default function Layout() {
+const Layout = observer(() => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, p: 0, pt: 3, pb: 3, }}>
+      <Sidebar />
+      <Box component="main" sx={{ flexGrow: 1, p: 0, pt: 3, pb: 3 }}>
+        <Toolbar />
         <Outlet />
       </Box>
     </Box>
   );
-}
+});
+
+export default Layout;

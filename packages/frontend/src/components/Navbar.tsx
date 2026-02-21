@@ -4,27 +4,29 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
-  Box,
   IconButton,
 } from "@mui/material";
 import ConstructionIcon from "@mui/icons-material/Construction";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useStore } from "../stores/RootStore";
 
 const Navbar = observer(() => {
-  const { authStore, themeStore } = useStore();
+  const { authStore, uiStore } = useStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    authStore.logout();
-    navigate("/login");
-  };
-
   return (
-    <AppBar position="static">
+    <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
       <Toolbar>
+        {authStore.isAuthenticated && (
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={() => uiStore.toggleSidebar()}
+            sx={{ mr: 1 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
         <ConstructionIcon sx={{ mr: 1 }} />
         <Typography
           variant="h6"
@@ -33,19 +35,6 @@ const Navbar = observer(() => {
         >
           Учёт стройки
         </Typography>
-        <IconButton color="inherit" onClick={() => themeStore.toggleTheme()}>
-          {themeStore.mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-        </IconButton>
-        {authStore.isAuthenticated && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography variant="body2">
-              {authStore.user?.name}
-            </Typography>
-            <Button color="inherit" onClick={handleLogout}>
-              Выйти
-            </Button>
-          </Box>
-        )}
       </Toolbar>
     </AppBar>
   );
