@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const body = await request.json();
     const {
       type, title, description, amount, quantity, unit, unitPrice,
-      supplier, carrier, workerName, hoursWorked, hourlyRate, date, categoryId, planned,
+      supplier, supplierId, carrier, carrierId, workerName, hoursWorked, hourlyRate, date, categoryId, planned,
     } = body;
 
     const updated = await prisma.expense.update({
@@ -36,7 +36,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
         ...(unit !== undefined && { unit: unit || null }),
         ...(unitPrice !== undefined && { unitPrice: unitPrice ?? null }),
         ...(supplier !== undefined && { supplier: supplier || null }),
+        ...(supplierId !== undefined && { supplierId: supplierId || null }),
         ...(carrier !== undefined && { carrier: carrier || null }),
+        ...(carrierId !== undefined && { carrierId: carrierId || null }),
         ...(workerName !== undefined && { workerName: workerName || null }),
         ...(hoursWorked !== undefined && { hoursWorked: hoursWorked ?? null }),
         ...(hourlyRate !== undefined && { hourlyRate: hourlyRate ?? null }),

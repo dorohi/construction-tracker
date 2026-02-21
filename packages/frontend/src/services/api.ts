@@ -14,6 +14,12 @@ import type {
   Category,
   CreateCategoryInput,
   ProjectSummary,
+  Supplier,
+  CreateSupplierInput,
+  UpdateSupplierInput,
+  Carrier,
+  CreateCarrierInput,
+  UpdateCarrierInput,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -78,7 +84,9 @@ export const expensesApi = {
       .post<ApiResponse<Expense>>(`/projects/${projectId}/expenses`, data)
       .then((r) => r.data.data!),
   update: (id: string, data: UpdateExpenseInput) =>
-    api.put<ApiResponse<Expense>>(`/expenses/${id}`, data).then((r) => r.data.data!),
+    api
+      .put<ApiResponse<Expense>>(`/expenses/${id}`, data)
+      .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/expenses/${id}`),
 };
@@ -86,13 +94,51 @@ export const expensesApi = {
 // Categories
 export const categoriesApi = {
   list: (projectId: string) =>
-    api.get<ApiResponse<Category[]>>(`/projects/${projectId}/categories`).then((r) => r.data.data!),
+    api
+      .get<ApiResponse<Category[]>>(`/projects/${projectId}/categories`)
+      .then((r) => r.data.data!),
   create: (projectId: string, data: CreateCategoryInput) =>
     api
       .post<ApiResponse<Category>>(`/projects/${projectId}/categories`, data)
       .then((r) => r.data.data!),
   delete: (projectId: string, categoryId: string) =>
     api.delete(`/projects/${projectId}/categories`, { data: { categoryId } }),
+};
+
+// Suppliers
+export const suppliersApi = {
+  list: () =>
+    api
+      .get<ApiResponse<Supplier[]>>("/suppliers")
+      .then((r) => r.data.data!),
+  get: (id: string) =>
+    api
+      .get<ApiResponse<Supplier>>(`/suppliers/${id}`)
+      .then((r) => r.data.data!),
+  create: (data: CreateSupplierInput) =>
+    api.post<ApiResponse<Supplier>>("/suppliers", data).then((r) => r.data.data!),
+  update: (id: string, data: UpdateSupplierInput) =>
+    api.put<ApiResponse<Supplier>>(`/suppliers/${id}`, data).then((r) => r.data.data!),
+  delete: (id: string) =>
+    api.delete(`/suppliers/${id}`),
+};
+
+// Carriers
+export const carriersApi = {
+  list: () =>
+    api
+      .get<ApiResponse<Carrier[]>>("/carriers")
+      .then((r) => r.data.data!),
+  get: (id: string) =>
+    api
+      .get<ApiResponse<Carrier>>(`/carriers/${id}`)
+      .then((r) => r.data.data!),
+  create: (data: CreateCarrierInput) =>
+    api.post<ApiResponse<Carrier>>("/carriers", data).then((r) => r.data.data!),
+  update: (id: string, data: UpdateCarrierInput) =>
+    api.put<ApiResponse<Carrier>>(`/carriers/${id}`, data).then((r) => r.data.data!),
+  delete: (id: string) =>
+    api.delete(`/carriers/${id}`),
 };
 
 export default api;

@@ -25,6 +25,8 @@ import {
   useTheme,
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -36,7 +38,8 @@ const DRAWER_WIDTH_COLLAPSED = 65;
 
 const menuItems = [
   { label: "Проекты", icon: <FolderIcon />, path: "/projects" },
-  { label: "Настройки", icon: <SettingsIcon />, path: "/settings" },
+  { label: "Поставщики", icon: <StorefrontIcon />, path: "/suppliers" },
+  { label: "Доставщики", icon: <LocalShippingIcon />, path: "/carriers" },
 ];
 
 const Sidebar = observer(() => {
@@ -117,6 +120,38 @@ const Sidebar = observer(() => {
             </ListItem>
           );
         })}
+      </List>
+
+      {/* Settings */}
+      <Divider />
+      <List disablePadding>
+        <ListItem disablePadding sx={{ display: "block" }}>
+          <Tooltip title={showText ? "" : "Настройки"} placement="right">
+            <ListItemButton
+              selected={location.pathname.startsWith("/settings")}
+              onClick={() => handleNavigate("/settings")}
+              sx={{
+                minHeight: 48,
+                justifyContent: showText ? "initial" : "center",
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: showText ? 2 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Настройки"
+                sx={{ opacity: showText ? 1 : 0 }}
+              />
+            </ListItemButton>
+          </Tooltip>
+        </ListItem>
       </List>
 
       {/* Theme toggle */}

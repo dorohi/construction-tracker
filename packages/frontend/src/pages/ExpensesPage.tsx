@@ -37,7 +37,7 @@ import type { Expense, ExpenseType } from "@construction-tracker/shared";
 
 const ExpensesPage = observer(() => {
   const { id } = useParams<{ id: string }>();
-  const { projectStore, expenseStore } = useStore();
+  const { projectStore, expenseStore, supplierStore, carrierStore } = useStore();
   const navigate = useNavigate();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
@@ -56,7 +56,9 @@ const ExpensesPage = observer(() => {
       projectStore.loadProject(id);
       expenseStore.loadExpenses(id);
     }
-  }, [id, projectStore, expenseStore]);
+    supplierStore.loadSuppliers();
+    carrierStore.loadCarriers();
+  }, [id, projectStore, expenseStore, supplierStore, carrierStore]);
 
   const { currentProject: project } = projectStore;
 
@@ -100,7 +102,7 @@ const ExpensesPage = observer(() => {
 
   const confirmPurchase = async () => {
     if (purchasingExpense) {
-      await expenseStore.updateExpense(purchasingExpense.id, { planned: false });
+      await expenseStore.updateExpense(purchasingExpense.id, { planned: false, date: new Date().toISOString() });
       projectStore.loadProject(id!);
       setPurchasingExpense(null);
     }
@@ -236,6 +238,8 @@ const ExpensesPage = observer(() => {
         onSubmit={handleSubmit}
         expense={editingExpense}
         categories={projectStore.categories}
+        suppliers={supplierStore.suppliers}
+        carriers={carrierStore.carriers}
       />
 
       {/* Category Management Dialog */}

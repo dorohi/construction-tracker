@@ -22,3 +22,15 @@ export type {
   ProjectSummary,
   CategorySummary,
 } from "./types/api";
+
+export type {
+  Supplier,
+  CreateSupplierInput,
+  UpdateSupplierInput,
+} from "./types/supplier";
+
+export type {
+  Carrier,
+  CreateCarrierInput,
+  UpdateCarrierInput,
+} from "./types/carrier";

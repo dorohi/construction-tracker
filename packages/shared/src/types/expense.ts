@@ -17,7 +17,9 @@ export interface Expense {
   unit?: string | null;
   unitPrice?: number | null;
   supplier?: string | null;
+  supplierId?: string | null;
   carrier?: string | null;
+  carrierId?: string | null;
   workerName?: string | null;
   hoursWorked?: number | null;
   hourlyRate?: number | null;
@@ -38,7 +40,9 @@ export interface CreateExpenseInput {
   unit?: string;
   unitPrice?: number;
   supplier?: string;
+  supplierId?: string;
   carrier?: string;
+  carrierId?: string;
   workerName?: string;
   hoursWorked?: number;
   hourlyRate?: number;

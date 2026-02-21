@@ -12,8 +12,9 @@ import {
   ToggleButtonGroup,
   FormControlLabel,
   Switch,
+  Autocomplete,
 } from "@mui/material";
-import type { Expense, Category, ExpenseType } from "@construction-tracker/shared";
+import type { Expense, Category, ExpenseType, Supplier, Carrier } from "@construction-tracker/shared";
 
 interface ExpenseFormProps {
   open: boolean;
@@ -21,6 +22,8 @@ interface ExpenseFormProps {
   onSubmit: (data: Record<string, unknown>) => void;
   expense?: Expense | null;
   categories: Category[];
+  suppliers?: Supplier[];
+  carriers?: Carrier[];
 }
 
 export default function ExpenseForm({
@@ -29,6 +32,8 @@ export default function ExpenseForm({
   onSubmit,
   expense,
   categories,
+  suppliers = [],
+  carriers = [],
 }: ExpenseFormProps) {
   const [type, setType] = useState<ExpenseType>("MATERIAL");
   const [title, setTitle] = useState("");
@@ -41,12 +46,14 @@ export default function ExpenseForm({
   const [unit, setUnit] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [supplierId, setSupplierId] = useState<string | null>(null);
   // Labor fields
   const [workerName, setWorkerName] = useState("");
   const [hoursWorked, setHoursWorked] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
   // Delivery fields
   const [carrier, setCarrier] = useState("");
+  const [carrierId, setCarrierId] = useState<string | null>(null);
   // Planned
   const [planned, setPlanned] = useState(false);
 
@@ -62,10 +69,12 @@ export default function ExpenseForm({
       setUnit(expense.unit || "");
       setUnitPrice(expense.unitPrice != null ? String(expense.unitPrice) : "");
       setSupplier(expense.supplier || "");
+      setSupplierId(expense.supplierId || null);
       setWorkerName(expense.workerName || "");
       setHoursWorked(expense.hoursWorked != null ? String(expense.hoursWorked) : "");
       setHourlyRate(expense.hourlyRate != null ? String(expense.hourlyRate) : "");
       setCarrier(expense.carrier || "");
+      setCarrierId(expense.carrierId || null);
       setPlanned(expense.planned ?? false);
     } else {
       resetForm();
@@ -83,10 +92,12 @@ export default function ExpenseForm({
     setUnit("");
     setUnitPrice("");
     setSupplier("");
+    setSupplierId(null);
     setWorkerName("");
     setHoursWorked("");
     setHourlyRate("");
     setCarrier("");
+    setCarrierId(null);
     setPlanned(false);
   };
 
@@ -108,12 +119,14 @@ export default function ExpenseForm({
       if (unit) data.unit = unit;
       if (unitPrice) data.unitPrice = parseFloat(unitPrice);
       if (supplier) data.supplier = supplier;
+      data.supplierId = supplierId || undefined;
     } else if (type === "LABOR") {
       if (workerName) data.workerName = workerName;
       if (hoursWorked) data.hoursWorked = parseFloat(hoursWorked);
       if (hourlyRate) data.hourlyRate = parseFloat(hourlyRate);
     } else if (type === "DELIVERY") {
       if (carrier) data.carrier = carrier;
+      data.carrierId = carrierId || undefined;
     }
 
     onSubmit(data);
@@ -228,11 +241,41 @@ export default function ExpenseForm({
                 onChange={(e) => setUnitPrice(e.target.value)}
                 fullWidth
               />
-              <TextField
-                label="Поставщик"
-                value={supplier}
-                onChange={(e) => setSupplier(e.target.value)}
-                fullWidth
+              <Autocomplete
+                freeSolo
+                options={suppliers}
+                getOptionLabel={(option) =>
+                  typeof option === "string" ? option : option.name
+                }
+                value={
+                  supplierId
+                    ? suppliers.find((s) => s.id === supplierId) || supplier
+                    : supplier
+                }
+                inputValue={supplier}
+                onInputChange={(_, value) => {
+                  setSupplier(value);
+                  // If the typed text doesn't match any supplier, clear supplierId
+                  const match = suppliers.find((s) => s.name === value);
+                  if (!match) {
+                    setSupplierId(null);
+                  }
+                }}
+                onChange={(_, value) => {
+                  if (value && typeof value !== "string") {
+                    setSupplier(value.name);
+                    setSupplierId(value.id);
+                  } else if (typeof value === "string") {
+                    setSupplier(value);
+                    setSupplierId(null);
+                  } else {
+                    setSupplier("");
+                    setSupplierId(null);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Поставщик" fullWidth />
+                )}
               />
             </>
           )}
@@ -265,11 +308,40 @@ export default function ExpenseForm({
           )}
 
           {type === "DELIVERY" && (
-            <TextField
-              label="Перевозчик"
-              value={carrier}
-              onChange={(e) => setCarrier(e.target.value)}
-              fullWidth
+            <Autocomplete
+              freeSolo
+              options={carriers}
+              getOptionLabel={(option) =>
+                typeof option === "string" ? option : option.name
+              }
+              value={
+                carrierId
+                  ? carriers.find((c) => c.id === carrierId) || carrier
+                  : carrier
+              }
+              inputValue={carrier}
+              onInputChange={(_, value) => {
+                setCarrier(value);
+                const match = carriers.find((c) => c.name === value);
+                if (!match) {
+                  setCarrierId(null);
+                }
+              }}
+              onChange={(_, value) => {
+                if (value && typeof value !== "string") {
+                  setCarrier(value.name);
+                  setCarrierId(value.id);
+                } else if (typeof value === "string") {
+                  setCarrier(value);
+                  setCarrierId(null);
+                } else {
+                  setCarrier("");
+                  setCarrierId(null);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Перевозчик" fullWidth />
+              )}
             />
           )}
 
