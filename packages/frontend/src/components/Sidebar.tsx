@@ -69,10 +69,10 @@ const Sidebar = observer(() => {
 
   const drawerContent = (
     <>
-      {!isMobile && <Toolbar />}
+      <Toolbar />
 
       {/* Navigation */}
-      <List sx={{ flexGrow: 1, pt: isMobile ? 1 : undefined }}>
+      <List sx={{ flexGrow: 1 }}>
         {menuItems.map((item) => {
           const active = location.pathname.startsWith(item.path);
           return (
