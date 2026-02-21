@@ -44,6 +44,8 @@ const DashboardPage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const { projectStore } = useStore();
   const navigate = useNavigate();
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
 
   useEffect(() => {
     if (id) {
@@ -91,9 +93,6 @@ const DashboardPage = observer(() => {
       </Container>
     );
   }
-
-  const thm = useTheme();
-  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
 
   return (
     <Container maxWidth="lg">

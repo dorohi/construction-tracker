@@ -42,6 +42,8 @@ function formatCurrency(amount: number) {
 const ProjectsPage = observer(() => {
   const { projectStore } = useStore();
   const navigate = useNavigate();
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
@@ -104,9 +106,6 @@ const ProjectsPage = observer(() => {
       setDeletingProjectId(null);
     }
   };
-
-  const thm = useTheme();
-  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
 
   return (
     <Container maxWidth="lg">

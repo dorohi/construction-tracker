@@ -39,6 +39,8 @@ const ExpensesPage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const { projectStore, expenseStore } = useStore();
   const navigate = useNavigate();
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
   const [tab, setTab] = useState(0);
   const [formOpen, setFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -133,9 +135,6 @@ const ExpensesPage = observer(() => {
       projectStore.loadProject(id);
     }
   };
-
-  const thm = useTheme();
-  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
 
   return (
     <Container maxWidth="lg">
