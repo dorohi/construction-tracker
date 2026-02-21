@@ -22,17 +22,18 @@ export async function GET(request: NextRequest, { params }: Params) {
     include: { category: true },
   });
 
-  const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
+  const actual = expenses.filter((e) => !e.planned);
+  const totalSpent = actual.reduce((s, e) => s + e.amount, 0);
   const plannedTotal = expenses
     .filter((e) => e.planned)
     .reduce((s, e) => s + e.amount, 0);
-  const materialTotal = expenses
+  const materialTotal = actual
     .filter((e) => e.type === "MATERIAL")
     .reduce((s, e) => s + e.amount, 0);
-  const laborTotal = expenses
+  const laborTotal = actual
     .filter((e) => e.type === "LABOR")
     .reduce((s, e) => s + e.amount, 0);
-  const deliveryTotal = expenses
+  const deliveryTotal = actual
     .filter((e) => e.type === "DELIVERY")
     .reduce((s, e) => s + e.amount, 0);
 

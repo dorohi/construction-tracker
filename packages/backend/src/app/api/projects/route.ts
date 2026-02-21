@@ -25,17 +25,18 @@ export async function GET(request: NextRequest) {
   });
 
   const data = projects.map((p) => {
-    const totalSpent = p.expenses.reduce((s, e) => s + e.amount, 0);
+    const actual = p.expenses.filter((e) => !e.planned);
+    const totalSpent = actual.reduce((s, e) => s + e.amount, 0);
     const plannedTotal = p.expenses
       .filter((e) => e.planned)
       .reduce((s, e) => s + e.amount, 0);
-    const materialTotal = p.expenses
+    const materialTotal = actual
       .filter((e) => e.type === "MATERIAL")
       .reduce((s, e) => s + e.amount, 0);
-    const laborTotal = p.expenses
+    const laborTotal = actual
       .filter((e) => e.type === "LABOR")
       .reduce((s, e) => s + e.amount, 0);
-    const deliveryTotal = p.expenses
+    const deliveryTotal = actual
       .filter((e) => e.type === "DELIVERY")
       .reduce((s, e) => s + e.amount, 0);
 
