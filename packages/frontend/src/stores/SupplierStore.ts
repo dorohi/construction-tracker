@@ -6,9 +6,10 @@ export class SupplierStore {
   suppliers: Supplier[] = [];
   loading = false;
   error: string | null = null;
+  deletingId: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   async loadSuppliers() {

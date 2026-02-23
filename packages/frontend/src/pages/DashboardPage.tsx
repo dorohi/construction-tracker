@@ -18,6 +18,8 @@ import {
   Tooltip,
   useMediaQuery,
   useTheme,
+  Card,
+  CardContent,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -32,6 +34,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useStore } from "../stores/RootStore";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseChart from "../components/charts/ExpenseChart";
+import AppProgress from '@/components/AppProgress';
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -92,7 +95,7 @@ const DashboardPage = observer(() => {
 
   return (
     <>
-    {projectStore.loading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+    {projectStore.loading && <AppProgress />}
     {project && summary && <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link
@@ -126,67 +129,93 @@ const DashboardPage = observer(() => {
         </Button>
       </Box>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+      <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <SummaryCard
             title="Бюджет"
             value={summary.budget != null ? formatCurrency(summary.budget) : "Не задан"}
-            icon={<AccountBalanceIcon fontSize="large" />}
+            icon={<AccountBalanceIcon />}
             color="info.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <SummaryCard
             title="Потрачено"
             value={formatCurrency(summary.totalSpent)}
-            icon={<AttachMoneyIcon fontSize="large" />}
+            icon={<AttachMoneyIcon />}
             color="warning.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <SummaryCard
             title="Запланировано"
             value={formatCurrency(summary.plannedTotal)}
-            icon={<PlaylistAddCheckIcon fontSize="large" />}
+            icon={<PlaylistAddCheckIcon />}
             color="info.main"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <SummaryCard
             title="Остаток"
             value={summary.remaining != null ? formatCurrency(summary.remaining) : "Н/Д"}
-            icon={<SavingsIcon fontSize="large" />}
+            icon={<SavingsIcon />}
             color={summary.remaining != null && summary.remaining < 0 ? "error.main" : "success.main"}
           />
         </Grid>
       </Grid>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title="Материалы"
-            value={formatCurrency(summary.materialTotal)}
-            icon={<BuildIcon fontSize="large" />}
-            color="primary.main"
-          />
+      {isMobile ? (
+        <Card sx={{ mb: 4 }}>
+          <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+            <Box sx={{ display: "flex" }}>
+              {[
+                { title: "Материалы", value: summary.materialTotal, icon: <BuildIcon sx={{ fontSize: "1rem" }} />, color: "primary.main" },
+                { title: "Работы", value: summary.laborTotal, icon: <PeopleIcon sx={{ fontSize: "1rem" }} />, color: "secondary.main" },
+                { title: "Доставки", value: summary.deliveryTotal, icon: <LocalShippingIcon sx={{ fontSize: "1rem" }} />, color: "success.main" },
+              ].map((item, i) => (
+                <Box key={item.title} sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", py: 1.5, px: 1, borderLeft: i > 0 ? 1 : 0, borderColor: "divider" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: item.color, mb: 0.5 }}>
+                    {item.icon}
+                    <Typography variant="body2" sx={{ fontSize: "0.7rem", color: "text.secondary" }}>
+                      {item.title}
+                    </Typography>
+                  </Box>
+                  <Typography fontWeight={700} sx={{ fontSize: "0.85rem" }}>
+                    {formatCurrency(item.value)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      ) : (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid size={{ sm: 4 }}>
+            <SummaryCard
+              title="Материалы"
+              value={formatCurrency(summary.materialTotal)}
+              icon={<BuildIcon />}
+              color="primary.main"
+            />
+          </Grid>
+          <Grid size={{ sm: 4 }}>
+            <SummaryCard
+              title="Работы"
+              value={formatCurrency(summary.laborTotal)}
+              icon={<PeopleIcon />}
+              color="secondary.main"
+            />
+          </Grid>
+          <Grid size={{ sm: 4 }}>
+            <SummaryCard
+              title="Доставки"
+              value={formatCurrency(summary.deliveryTotal)}
+              icon={<LocalShippingIcon />}
+              color="success.main"
+            />
+          </Grid>
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title="Работы"
-            value={formatCurrency(summary.laborTotal)}
-            icon={<PeopleIcon fontSize="large" />}
-            color="secondary.main"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title="Доставки"
-            value={formatCurrency(summary.deliveryTotal)}
-            icon={<LocalShippingIcon fontSize="large" />}
-            color="success.main"
-          />
-        </Grid>
-      </Grid>
+      )}
 
       {summary.budget != null && (
         <Box sx={{ mb: 4 }}>

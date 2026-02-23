@@ -12,12 +12,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  LinearProgress,
   Tooltip,
-  TextField,
-  InputAdornment,
-  useMediaQuery,
-  useTheme,
   Link,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -26,34 +21,42 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PhoneIcon from "@mui/icons-material/Phone";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import SearchIcon from "@mui/icons-material/Search";
-import { useStore } from "../stores/RootStore";
-import CarrierForm from "../components/CarrierForm";
-import type { Carrier } from "@construction-tracker/shared";
+import { useStore } from "../../stores/RootStore";
+import CarrierForm from "./CarrierForm";
+import type { Carrier } from "@construction-tracker/shared/dist";
+import AppProgress from '@/components/AppProgress';
+import EntityTitleAndAdd from '@/components/EntityTitleAndAdd';
+import useSearch from '@/hooks/useSearch';
 
 const CarriersPage = observer(() => {
   const { carrierStore } = useStore();
-  const thm = useTheme();
-  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+  const {
+    loading,
+    carriers,
+    deletingId,
+    loadCarriers,
+    deleteCarrier,
+    updateCarrier,
+    createCarrier,
+  } = carrierStore;
+  const { search, searchField } = useSearch({ placeholder: "Поиск по имени, телефону, машине или номеру..." })
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingCarrier, setEditingCarrier] = useState<Carrier | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    carrierStore.loadCarriers();
+    loadCarriers();
   }, [carrierStore]);
 
   const filteredCarriers = search
-    ? carrierStore.carriers.filter(
+    ? carriers.filter(
         (c) =>
           c.name.toLowerCase().includes(search.toLowerCase()) ||
           c.phone?.includes(search) ||
           c.licensePlate?.toLowerCase().includes(search.toLowerCase()) ||
           c.vehicle?.toLowerCase().includes(search.toLowerCase())
       )
-    : carrierStore.carriers;
+    : carriers;
 
   const handleCreate = () => {
     setEditingCarrier(null);
@@ -68,70 +71,30 @@ const CarriersPage = observer(() => {
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setDeletingId(id);
+    carrierStore.deletingId = id;
   };
 
   const confirmDelete = async () => {
     if (deletingId) {
-      await carrierStore.deleteCarrier(deletingId);
-      setDeletingId(null);
+      await deleteCarrier(deletingId);
+      carrierStore.deletingId = null;
     }
   };
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (editingCarrier) {
-      await carrierStore.updateCarrier(editingCarrier.id, data as unknown as Parameters<typeof carrierStore.updateCarrier>[1]);
+      await updateCarrier(editingCarrier.id, data as unknown as Parameters<typeof updateCarrier>[1]);
     } else {
-      await carrierStore.createCarrier(data as unknown as Parameters<typeof carrierStore.createCarrier>[0]);
+      await createCarrier(data as unknown as Parameters<typeof createCarrier>[0]);
     }
   };
 
   return (
     <>
-      {carrierStore.loading && (
-        <LinearProgress
-          sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }}
-        />
-      )}
+      {loading && <AppProgress />}
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
-          <Typography variant={isMobile ? "h5" : "h4"}>Доставщики</Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            Добавить
-          </Button>
-        </Box>
-
-        {carrierStore.carriers.length > 3 && (
-          <TextField
-            placeholder="Поиск по имени, телефону, машине или номеру..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            size="small"
-            fullWidth
-            sx={{ mb: 3 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        )}
-
+        <EntityTitleAndAdd title="Доставщики" handleCreate={handleCreate} />
+        {carriers.length > 3 && searchField}
         <Grid container spacing={3}>
           {filteredCarriers.map((carrier) => (
             <Grid size={{ xs: 12, md: 6, lg: 4 }} key={carrier.id}>
@@ -232,7 +195,7 @@ const CarriersPage = observer(() => {
             </Grid>
           ))}
 
-          {!carrierStore.loading && filteredCarriers.length === 0 && (
+          {!loading && filteredCarriers.length === 0 && (
             <Grid size={{ xs: 12 }}>
               <Box sx={{ textAlign: "center", py: 8 }}>
                 <Typography variant="h6" color="text.secondary">
@@ -267,7 +230,7 @@ const CarriersPage = observer(() => {
 
         <Dialog
           open={!!deletingId}
-          onClose={() => setDeletingId(null)}
+          onClose={() => carrierStore.deletingId = null}
           maxWidth="xs"
         >
           <DialogTitle>Удалить водителя?</DialogTitle>
@@ -277,7 +240,7 @@ const CarriersPage = observer(() => {
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeletingId(null)} variant="contained">
+            <Button onClick={() => carrierStore.deletingId = null} variant="contained">
               Отмена
             </Button>
             <Button onClick={confirmDelete} variant="contained" color="error">

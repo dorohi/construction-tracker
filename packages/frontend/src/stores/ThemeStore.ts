@@ -9,7 +9,7 @@ export class ThemeStore {
 
   constructor() {
     this.mode = (localStorage.getItem(STORAGE_KEY) as ThemeMode) || "light";
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   toggleTheme() {

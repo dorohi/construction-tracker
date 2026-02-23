@@ -7,7 +7,7 @@ export class UIStore {
 
   constructor() {
     this.sidebarOpen = localStorage.getItem(STORAGE_KEY) !== "false";
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   toggleSidebar() {

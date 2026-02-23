@@ -31,11 +31,15 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useStore } from "../stores/RootStore";
+import AppProgress from '@/components/AppProgress';
+import useSearch from '@/hooks/useSearch';
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
     style: "currency",
     currency: "RUB",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
@@ -44,6 +48,7 @@ const ProjectsPage = observer(() => {
   const navigate = useNavigate();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+  const { search, searchField } = useSearch({ placeholder: "Поиск по названию или описанию..." });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
@@ -109,7 +114,7 @@ const ProjectsPage = observer(() => {
 
   return (
     <>
-      {projectStore.loading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+      {projectStore.loading && <AppProgress />}
     <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant={isMobile ? "h5" : "h4"}>Мои проекты</Typography>
@@ -122,8 +127,15 @@ const ProjectsPage = observer(() => {
         </Button>
       </Box>
 
+      {projectStore.projects.length > 3 && searchField}
       <Grid container spacing={3}>
-        {projectStore.projects.map((project) => {
+        {projectStore.projects
+          .filter((p) => {
+            if (!search) return true;
+            const q = search.toLowerCase();
+            return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
+          })
+          .map((project) => {
           const spentPercent = project.budget
             ? Math.min((project.totalSpent / project.budget) * 100, 100)
             : 0;
@@ -196,22 +208,22 @@ const ProjectsPage = observer(() => {
                       </>
                     )}
                   </Box>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap", justifyContent: "space-between" }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 2, rowGap: 0.5, mt: 1 }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                       <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" noWrap>
                         Материалы: {formatCurrency(project.materialTotal)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                       <PeopleIcon sx={{ fontSize: 14, color: "secondary.main" }} />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" noWrap>
                         Работы: {formatCurrency(project.laborTotal)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                       <LocalShippingIcon sx={{ fontSize: 14, color: "success.main" }} />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" noWrap>
                         Доставки: {formatCurrency(project.deliveryTotal)}
                       </Typography>
                     </Box>

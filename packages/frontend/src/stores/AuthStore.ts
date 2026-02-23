@@ -9,7 +9,7 @@ export class AuthStore {
   error: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
     this.loadFromStorage();
   }
 

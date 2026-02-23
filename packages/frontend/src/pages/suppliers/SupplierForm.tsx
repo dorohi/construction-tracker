@@ -9,7 +9,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import type { Supplier } from "@construction-tracker/shared";
+import type { Supplier } from "@construction-tracker/shared/dist";
 
 interface SupplierFormProps {
   open: boolean;

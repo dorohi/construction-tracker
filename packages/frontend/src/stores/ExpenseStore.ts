@@ -8,7 +8,7 @@ export class ExpenseStore {
   error: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   get materialExpenses() {

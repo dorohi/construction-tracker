@@ -29,32 +29,41 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
-import { useStore } from "../stores/RootStore";
-import SupplierForm from "../components/SupplierForm";
-import type { Supplier } from "@construction-tracker/shared";
+import { useStore } from "../../stores/RootStore";
+import SupplierForm from "./SupplierForm";
+import type { Supplier } from "@construction-tracker/shared/dist";
+import AppProgress from '@/components/AppProgress';
+import EntityTitleAndAdd from '@/components/EntityTitleAndAdd';
+import useSearch from '@/hooks/useSearch';
 
 const SuppliersPage = observer(() => {
   const { supplierStore } = useStore();
-  const thm = useTheme();
-  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+  const {
+    loading,
+    suppliers,
+    deletingId,
+    loadSuppliers,
+    deleteSupplier,
+    updateSupplier,
+    createSupplier,
+  } = supplierStore;
+  const { search, searchField } = useSearch({ placeholder: "Поиск по названию, контакту или телефону..." })
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    supplierStore.loadSuppliers();
+    loadSuppliers();
   }, [supplierStore]);
 
   const filteredSuppliers = search
-    ? supplierStore.suppliers.filter(
+    ? suppliers.filter(
         (s) =>
           s.name.toLowerCase().includes(search.toLowerCase()) ||
           s.contactName?.toLowerCase().includes(search.toLowerCase()) ||
           s.phone?.includes(search)
       )
-    : supplierStore.suppliers;
+    : suppliers;
 
   const handleCreate = () => {
     setEditingSupplier(null);
@@ -69,69 +78,30 @@ const SuppliersPage = observer(() => {
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setDeletingId(id);
+    supplierStore.deletingId = id;
   };
 
   const confirmDelete = async () => {
     if (deletingId) {
-      await supplierStore.deleteSupplier(deletingId);
-      setDeletingId(null);
+      await deleteSupplier(deletingId);
+      supplierStore.deletingId = null;
     }
   };
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (editingSupplier) {
-      await supplierStore.updateSupplier(editingSupplier.id, data as unknown as Parameters<typeof supplierStore.updateSupplier>[1]);
+      await updateSupplier(editingSupplier.id, data as unknown as Parameters<typeof updateSupplier>[1]);
     } else {
-      await supplierStore.createSupplier(data as unknown as Parameters<typeof supplierStore.createSupplier>[0]);
+      await createSupplier(data as unknown as Parameters<typeof createSupplier>[0]);
     }
   };
 
   return (
     <>
-      {supplierStore.loading && (
-        <LinearProgress
-          sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }}
-        />
-      )}
+      {loading && <AppProgress />}
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
-          <Typography variant={isMobile ? "h5" : "h4"}>Поставщики</Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            Добавить
-          </Button>
-        </Box>
-
-        {supplierStore.suppliers.length > 3 && (
-          <TextField
-            placeholder="Поиск по названию, контакту или телефону..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            size="small"
-            fullWidth
-            sx={{ mb: 3 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        )}
+        <EntityTitleAndAdd title="Поставщики" handleCreate={handleCreate} />
+        {suppliers.length > 3 && searchField}
 
         <Grid container spacing={3}>
           {filteredSuppliers.map((supplier) => (
@@ -295,7 +265,7 @@ const SuppliersPage = observer(() => {
             </Grid>
           ))}
 
-          {!supplierStore.loading && filteredSuppliers.length === 0 && (
+          {!loading && filteredSuppliers.length === 0 && (
             <Grid size={{ xs: 12 }}>
               <Box sx={{ textAlign: "center", py: 8 }}>
                 <Typography variant="h6" color="text.secondary">
@@ -330,7 +300,7 @@ const SuppliersPage = observer(() => {
 
         <Dialog
           open={!!deletingId}
-          onClose={() => setDeletingId(null)}
+          onClose={() => supplierStore.deletingId = null}
           maxWidth="xs"
         >
           <DialogTitle>Удалить поставщика?</DialogTitle>
@@ -340,7 +310,7 @@ const SuppliersPage = observer(() => {
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeletingId(null)} variant="contained">
+            <Button onClick={() => supplierStore.deletingId = null} variant="contained">
               Отмена
             </Button>
             <Button onClick={confirmDelete} variant="contained" color="error">

@@ -7,8 +7,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import DashboardPage from "./pages/DashboardPage";
 import ExpensesPage from "./pages/ExpensesPage";
-import SuppliersPage from "./pages/SuppliersPage";
-import CarriersPage from "./pages/CarriersPage";
+import SuppliersPage from "./pages/suppliers/SuppliersPage";
+import CarriersPage from "./pages/carriers/CarriersPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {

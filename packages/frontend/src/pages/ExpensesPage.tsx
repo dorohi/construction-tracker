@@ -8,7 +8,6 @@ import {
   Button,
   Tabs,
   Tab,
-  LinearProgress,
   Breadcrumbs,
   Link,
   Dialog,
@@ -34,6 +33,7 @@ import { useStore } from "../stores/RootStore";
 import ExpenseTable from "../components/ExpenseTable";
 import ExpenseForm from "../components/ExpenseForm";
 import type { Expense, ExpenseType } from "@construction-tracker/shared";
+import AppProgress from '@/components/AppProgress';
 
 const ExpensesPage = observer(() => {
   const { id } = useParams<{ id: string }>();
@@ -138,7 +138,7 @@ const ExpensesPage = observer(() => {
 
   return (
     <>
-    {isLoading && <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1300 }} />}
+    {isLoading && <AppProgress />}
     {project && <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link

@@ -6,9 +6,10 @@ export class CarrierStore {
   carriers: Carrier[] = [];
   loading = false;
   error: string | null = null;
+  deletingId: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   async loadCarriers() {

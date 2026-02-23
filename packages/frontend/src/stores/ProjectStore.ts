@@ -16,7 +16,7 @@ export class ProjectStore {
   error: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   async loadProjects() {

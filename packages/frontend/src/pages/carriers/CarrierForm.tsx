@@ -8,7 +8,7 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import type { Carrier } from "@construction-tracker/shared";
+import type { Carrier } from "@construction-tracker/shared/dist";
 
 interface CarrierFormProps {
   open: boolean;
