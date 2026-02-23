@@ -29,15 +29,15 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import { useStore } from "../stores/RootStore";
-import ExpenseTable from "../components/ExpenseTable";
-import ExpenseForm from "../components/ExpenseForm";
-import type { Expense, ExpenseType } from "@construction-tracker/shared";
+import { useStore } from "../../stores/RootStore";
+import ExpenseTable from "./ExpenseTable";
+import ExpenseForm from "./ExpenseForm";
+import type { Expense, ExpenseType } from "@construction-tracker/shared/dist";
 import AppProgress from '@/components/AppProgress';
 
 const ExpensesPage = observer(() => {
   const { id } = useParams<{ id: string }>();
-  const { projectStore, expenseStore, supplierStore, carrierStore } = useStore();
+  const { projectStore, expenseStore, supplierStore, carrierStore, workersStore } = useStore();
   const navigate = useNavigate();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
@@ -58,7 +58,8 @@ const ExpensesPage = observer(() => {
     }
     supplierStore.loadSuppliers();
     carrierStore.loadCarriers();
-  }, [id, projectStore, expenseStore, supplierStore, carrierStore]);
+    workersStore.loadWorkers();
+  }, [id, projectStore, expenseStore, supplierStore, carrierStore, workersStore]);
 
   const { currentProject: project } = projectStore;
 
@@ -240,6 +241,7 @@ const ExpensesPage = observer(() => {
         categories={projectStore.categories}
         suppliers={supplierStore.suppliers}
         carriers={carrierStore.carriers}
+        workers={workersStore.workers}
       />
 
       {/* Category Management Dialog */}

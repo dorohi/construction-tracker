@@ -20,6 +20,9 @@ import type {
   Carrier,
   CreateCarrierInput,
   UpdateCarrierInput,
+  Worker,
+  UpdateWorkerInput,
+  CreateWorkerInput,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -50,42 +53,47 @@ api.interceptors.response.use(
 // Auth
 export const authApi = {
   login: (data: LoginInput) =>
-    api.post<ApiResponse<AuthResponse>>("/auth/login", data).then((r) => r.data.data!),
+    api.post<ApiResponse<AuthResponse>>("/auth/login", data)
+      .then((r) => r.data.data!),
   register: (data: RegisterInput) =>
-    api.post<ApiResponse<AuthResponse>>("/auth/register", data).then((r) => r.data.data!),
+    api.post<ApiResponse<AuthResponse>>("/auth/register", data)
+      .then((r) => r.data.data!),
 };
 
 // Projects
 export const projectsApi = {
   list: () =>
-    api.get<ApiResponse<ProjectWithTotals[]>>("/projects").then((r) => r.data.data!),
+    api.get<ApiResponse<ProjectWithTotals[]>>("/projects")
+      .then((r) => r.data.data!),
   get: (id: string) =>
-    api.get<ApiResponse<Project & { categories: Category[] }>>(`/projects/${id}`).then((r) => r.data.data!),
+    api.get<ApiResponse<Project & { categories: Category[] }>>(`/projects/${id}`)
+      .then((r) => r.data.data!),
   create: (data: CreateProjectInput) =>
-    api.post<ApiResponse<Project>>("/projects", data).then((r) => r.data.data!),
+    api.post<ApiResponse<Project>>("/projects", data)
+      .then((r) => r.data.data!),
   update: (id: string, data: UpdateProjectInput) =>
-    api.put<ApiResponse<Project>>(`/projects/${id}`, data).then((r) => r.data.data!),
+    api.put<ApiResponse<Project>>(`/projects/${id}`, data)
+      .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/projects/${id}`),
   summary: (id: string) =>
-    api.get<ApiResponse<ProjectSummary>>(`/projects/${id}/summary`).then((r) => r.data.data!),
+    api.get<ApiResponse<ProjectSummary>>(`/projects/${id}/summary`)
+      .then((r) => r.data.data!),
 };
 
 // Expenses
 export const expensesApi = {
-  list: (projectId: string, type?: string) => {
+  list: async (projectId: string, type?: string) => {
     const params = type ? `?type=${type}` : "";
-    return api
-      .get<ApiResponse<Expense[]>>(`/projects/${projectId}/expenses${params}`)
-      .then((r) => r.data.data!);
+    const r = await api
+      .get<ApiResponse<Expense[]>>(`/projects/${projectId}/expenses${params}`);
+    return r.data.data!;
   },
   create: (projectId: string, data: CreateExpenseInput) =>
-    api
-      .post<ApiResponse<Expense>>(`/projects/${projectId}/expenses`, data)
+    api.post<ApiResponse<Expense>>(`/projects/${projectId}/expenses`, data)
       .then((r) => r.data.data!),
   update: (id: string, data: UpdateExpenseInput) =>
-    api
-      .put<ApiResponse<Expense>>(`/expenses/${id}`, data)
+    api.put<ApiResponse<Expense>>(`/expenses/${id}`, data)
       .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/expenses/${id}`),
@@ -94,12 +102,10 @@ export const expensesApi = {
 // Categories
 export const categoriesApi = {
   list: (projectId: string) =>
-    api
-      .get<ApiResponse<Category[]>>(`/projects/${projectId}/categories`)
+    api.get<ApiResponse<Category[]>>(`/projects/${projectId}/categories`)
       .then((r) => r.data.data!),
   create: (projectId: string, data: CreateCategoryInput) =>
-    api
-      .post<ApiResponse<Category>>(`/projects/${projectId}/categories`, data)
+    api.post<ApiResponse<Category>>(`/projects/${projectId}/categories`, data)
       .then((r) => r.data.data!),
   delete: (projectId: string, categoryId: string) =>
     api.delete(`/projects/${projectId}/categories`, { data: { categoryId } }),
@@ -108,17 +114,17 @@ export const categoriesApi = {
 // Suppliers
 export const suppliersApi = {
   list: () =>
-    api
-      .get<ApiResponse<Supplier[]>>("/suppliers")
+    api.get<ApiResponse<Supplier[]>>("/suppliers")
       .then((r) => r.data.data!),
   get: (id: string) =>
-    api
-      .get<ApiResponse<Supplier>>(`/suppliers/${id}`)
+    api.get<ApiResponse<Supplier>>(`/suppliers/${id}`)
       .then((r) => r.data.data!),
   create: (data: CreateSupplierInput) =>
-    api.post<ApiResponse<Supplier>>("/suppliers", data).then((r) => r.data.data!),
+    api.post<ApiResponse<Supplier>>("/suppliers", data)
+      .then((r) => r.data.data!),
   update: (id: string, data: UpdateSupplierInput) =>
-    api.put<ApiResponse<Supplier>>(`/suppliers/${id}`, data).then((r) => r.data.data!),
+    api.put<ApiResponse<Supplier>>(`/suppliers/${id}`, data)
+      .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/suppliers/${id}`),
 };
@@ -126,19 +132,37 @@ export const suppliersApi = {
 // Carriers
 export const carriersApi = {
   list: () =>
-    api
-      .get<ApiResponse<Carrier[]>>("/carriers")
+    api.get<ApiResponse<Carrier[]>>("/carriers")
       .then((r) => r.data.data!),
   get: (id: string) =>
-    api
-      .get<ApiResponse<Carrier>>(`/carriers/${id}`)
+    api.get<ApiResponse<Carrier>>(`/carriers/${id}`)
       .then((r) => r.data.data!),
   create: (data: CreateCarrierInput) =>
-    api.post<ApiResponse<Carrier>>("/carriers", data).then((r) => r.data.data!),
+    api.post<ApiResponse<Carrier>>("/carriers", data)
+      .then((r) => r.data.data!),
   update: (id: string, data: UpdateCarrierInput) =>
-    api.put<ApiResponse<Carrier>>(`/carriers/${id}`, data).then((r) => r.data.data!),
+    api.put<ApiResponse<Carrier>>(`/carriers/${id}`, data)
+      .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/carriers/${id}`),
+};
+
+// Carriers
+export const workersApi = {
+  list: () =>
+    api.get<ApiResponse<Worker[]>>("/workers")
+      .then((r) => r.data.data!),
+  get: (id: string) =>
+    api.get<ApiResponse<Worker>>(`/workers/${id}`)
+      .then((r) => r.data.data!),
+  create: (data: CreateWorkerInput) =>
+    api.post<ApiResponse<Worker>>("/workers", data)
+      .then((r) => r.data.data!),
+  update: (id: string, data: UpdateWorkerInput) =>
+    api.put<ApiResponse<Worker>>(`/workers/${id}`, data)
+      .then((r) => r.data.data!),
+  delete: (id: string) =>
+    api.delete(`/workers/${id}`),
 };
 
 export default api;

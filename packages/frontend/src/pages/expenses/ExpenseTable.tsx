@@ -22,8 +22,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
-import type { Expense } from "@construction-tracker/shared";
-import CategoryChip from "./CategoryChip";
+import type { Expense } from "@construction-tracker/shared/dist";
+import CategoryChip from "../../components/CategoryChip";
 
 interface ExpenseTableProps {
   expenses: Expense[];
@@ -58,7 +58,7 @@ function getDetails(expense: Expense) {
   }
   if (expense.type === "LABOR") {
     const parts: string[] = [];
-    if (expense.workerName) parts.push(`Работник: ${expense.workerName}`);
+    if (expense.worker) parts.push(`Работник: ${expense.worker}`);
     if (expense.hoursWorked != null)
       parts.push(`${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`);
     return parts.join(" | ");

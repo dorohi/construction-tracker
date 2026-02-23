@@ -15,6 +15,7 @@ model User {
   projects     Project[]
   suppliers    Supplier[]
   carriers     Carrier[]
+  workers      Worker[]
   createdAt    DateTime   @default(now())
 }
 
@@ -32,16 +33,16 @@ model Project {
 }
 
 model Category {
-  id        String      @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   type      String
-  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
   expenses  Expense[]
 }
 
 model Expense {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   type        String
   title       String
   description String?
@@ -49,16 +50,18 @@ model Expense {
   quantity    Float?
   unit        String?
   unitPrice   Float?
-  supplier      String?
-  supplierId    String?
-  supplierRef   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
-  carrier       String?
-  carrierId     String?
-  carrierRef    Carrier?  @relation(fields: [carrierId], references: [id], onDelete: SetNull)
-  workerName  String?
+  supplier    String?
+  supplierId  String?
+  supplierRef Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  carrier     String?
+  carrierId   String?
+  carrierRef  Carrier?  @relation(fields: [carrierId], references: [id], onDelete: SetNull)
+  worker      String?
+  workerId    String?
+  workerRef   Worker?   @relation(fields: [workerId], references: [id], onDelete: SetNull)
   hoursWorked Float?
   hourlyRate  Float?
-  planned     Boolean  @default(false)
+  planned     Boolean   @default(false)
   date        DateTime
   category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  String?
@@ -96,4 +99,16 @@ model Carrier {
   expenses     Expense[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model Worker {
+  id        String    @id @default(cuid())
+  name      String
+  phone     String?
+  notes     String?
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  expenses  Expense[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

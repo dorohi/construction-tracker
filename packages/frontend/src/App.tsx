@@ -4,11 +4,12 @@ import { useStore } from "./stores/RootStore";
 import Layout from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import ProjectsPage from "./pages/ProjectsPage";
-import DashboardPage from "./pages/DashboardPage";
-import ExpensesPage from "./pages/ExpensesPage";
+import ProjectsPage from "./pages/projects/ProjectsPage";
+import ProjectPage from "./pages/projects/ProjectPage";
+import ExpensesPage from "./pages/expenses/ExpensesPage";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CarriersPage from "./pages/carriers/CarriersPage";
+import WorkersPage from "./pages/workers/WorkersPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -59,10 +60,11 @@ export default function App() {
           }
         >
           <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:id" element={<DashboardPage />} />
+          <Route path="/projects/:id" element={<ProjectPage />} />
           <Route path="/projects/:id/expenses" element={<ExpensesPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/carriers" element={<CarriersPage />} />
+          <Route path="/workers" element={<WorkersPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/projects" replace />} />

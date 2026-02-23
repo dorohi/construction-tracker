@@ -34,3 +34,9 @@ export type {
   CreateCarrierInput,
   UpdateCarrierInput,
 } from "./types/carrier";
+
+export type {
+  Worker,
+  CreateWorkerInput,
+  UpdateWorkerInput,
+} from "./types/workers";

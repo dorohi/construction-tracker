@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const body = await request.json();
     const {
       type, title, description, amount, quantity, unit, unitPrice,
-      supplier, supplierId, carrier, carrierId, workerName, hoursWorked, hourlyRate, date, categoryId, planned,
+      supplier, supplierId, carrier, carrierId, worker,  workerId, hoursWorked, hourlyRate, date, categoryId, planned,
     } = body;
 
     if (!type || !title || amount === undefined || !date) {
@@ -81,7 +81,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         supplierId: supplierId || null,
         carrier: carrier || null,
         carrierId: carrierId || null,
-        workerName: workerName || null,
+        worker: worker || null,
+        workerId: workerId || null,
         hoursWorked: hoursWorked ?? null,
         hourlyRate: hourlyRate ?? null,
         planned: planned ?? false,

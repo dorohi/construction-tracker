@@ -14,7 +14,7 @@ import {
   Switch,
   Autocomplete,
 } from "@mui/material";
-import type { Expense, Category, ExpenseType, Supplier, Carrier } from "@construction-tracker/shared";
+import type { Expense, Category, ExpenseType, Supplier, Carrier, Worker } from "@construction-tracker/shared/dist";
 
 interface ExpenseFormProps {
   open: boolean;
@@ -24,6 +24,7 @@ interface ExpenseFormProps {
   categories: Category[];
   suppliers?: Supplier[];
   carriers?: Carrier[];
+  workers?: Worker[];
 }
 
 export default function ExpenseForm({
@@ -34,6 +35,7 @@ export default function ExpenseForm({
   categories,
   suppliers = [],
   carriers = [],
+  workers = [],
 }: ExpenseFormProps) {
   const [type, setType] = useState<ExpenseType>("MATERIAL");
   const [title, setTitle] = useState("");
@@ -48,7 +50,8 @@ export default function ExpenseForm({
   const [supplier, setSupplier] = useState("");
   const [supplierId, setSupplierId] = useState<string | null>(null);
   // Labor fields
-  const [workerName, setWorkerName] = useState("");
+  const [worker, setWorker] = useState("");
+  const [workerId, setWorkerId] = useState<string | null>(null);
   const [hoursWorked, setHoursWorked] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
   // Delivery fields
@@ -70,7 +73,8 @@ export default function ExpenseForm({
       setUnitPrice(expense.unitPrice != null ? String(expense.unitPrice) : "");
       setSupplier(expense.supplier || "");
       setSupplierId(expense.supplierId || null);
-      setWorkerName(expense.workerName || "");
+      setWorker(expense.worker || "");
+      setWorkerId(expense.workerId || null);
       setHoursWorked(expense.hoursWorked != null ? String(expense.hoursWorked) : "");
       setHourlyRate(expense.hourlyRate != null ? String(expense.hourlyRate) : "");
       setCarrier(expense.carrier || "");
@@ -93,7 +97,8 @@ export default function ExpenseForm({
     setUnitPrice("");
     setSupplier("");
     setSupplierId(null);
-    setWorkerName("");
+    setWorker("");
+    setWorkerId(null);
     setHoursWorked("");
     setHourlyRate("");
     setCarrier("");
@@ -121,7 +126,8 @@ export default function ExpenseForm({
       if (supplier) data.supplier = supplier;
       data.supplierId = supplierId || undefined;
     } else if (type === "LABOR") {
-      if (workerName) data.workerName = workerName;
+      if (worker) data.worker = worker;
+      data.workerId = workerId || undefined;
       if (hoursWorked) data.hoursWorked = parseFloat(hoursWorked);
       if (hourlyRate) data.hourlyRate = parseFloat(hourlyRate);
     } else if (type === "DELIVERY") {
@@ -282,11 +288,41 @@ export default function ExpenseForm({
 
           {type === "LABOR" && (
             <>
-              <TextField
-                label="Имя работника"
-                value={workerName}
-                onChange={(e) => setWorkerName(e.target.value)}
-                fullWidth
+              <Autocomplete
+                freeSolo
+                options={workers}
+                getOptionLabel={(option) =>
+                  typeof option === "string" ? option : option.name
+                }
+                value={
+                  workerId
+                    ? workers.find((w) => w.id === workerId) || worker
+                    : worker
+                }
+                inputValue={worker}
+                onInputChange={(_, value) => {
+                  setWorker(value);
+                  // If the typed text doesn't match any worker, clear workerId
+                  const match = workers.find((s) => s.name === value);
+                  if (!match) {
+                    setWorkerId(null);
+                  }
+                }}
+                onChange={(_, value) => {
+                  if (value && typeof value !== "string") {
+                    setWorker(value.name);
+                    setWorkerId(value.id);
+                  } else if (typeof value === "string") {
+                    setWorker(value);
+                    setWorkerId(null);
+                  } else {
+                    setWorker("");
+                    setWorkerId(null);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Работник" fullWidth />
+                )}
               />
               <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField

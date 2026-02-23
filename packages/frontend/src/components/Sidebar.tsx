@@ -27,6 +27,7 @@ import {
 import FolderIcon from "@mui/icons-material/Folder";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import EngineeringIcon from '@mui/icons-material/Engineering';
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -40,6 +41,7 @@ const menuItems = [
   { label: "Проекты", icon: <FolderIcon />, path: "/projects" },
   { label: "Поставщики", icon: <StorefrontIcon />, path: "/suppliers" },
   { label: "Доставщики", icon: <LocalShippingIcon />, path: "/carriers" },
+  { label: "Работники", icon: <EngineeringIcon />, path: "/workers" },
 ];
 
 const Sidebar = observer(() => {

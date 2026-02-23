@@ -20,73 +20,71 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PhoneIcon from "@mui/icons-material/Phone";
-import LanguageIcon from "@mui/icons-material/Language";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
 import { useStore } from "../../stores/RootStore";
-import SupplierForm from "./SupplierForm";
-import type { Supplier } from "@construction-tracker/shared/dist";
+import type { Worker } from "@construction-tracker/shared/dist";
 import AppProgress from '@/components/AppProgress';
 import EntityTitleAndAdd from '@/components/EntityTitleAndAdd';
 import useSearch from '@/hooks/useSearch';
+import WorkerForm from '@/pages/workers/WorkerForm';
 
-const SuppliersPage = observer(() => {
-  const { supplierStore } = useStore();
+const WorkersPage = observer(() => {
+  const { workersStore } = useStore();
   const {
     loading,
-    suppliers,
+    workers,
     deletingId,
-    loadSuppliers,
-    deleteSupplier,
-    updateSupplier,
-    createSupplier,
-  } = supplierStore;
-  const { search, searchField } = useSearch({ placeholder: "Поиск по названию, контакту или телефону..." })
+    loadWorkers,
+    deleteWorker,
+    updateWorker,
+    createWorker,
+  } = workersStore;
+  const { search, searchField } = useSearch({ placeholder: "Поиск по названию, заметке или телефону..." })
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingWorker, setEditingWorker] = useState<Worker | null>(null);
 
   useEffect(() => {
-    loadSuppliers();
-  }, [supplierStore]);
+    loadWorkers();
+  }, [workersStore]);
 
-  const filteredSuppliers = search
-    ? suppliers.filter(
+  const filteredWorker = search
+    ? workers.filter(
         (s) =>
           s.name.toLowerCase().includes(search.toLowerCase()) ||
-          s.contactName?.toLowerCase().includes(search.toLowerCase()) ||
+          s.notes?.toLowerCase().includes(search.toLowerCase()) ||
           s.phone?.includes(search)
       )
-    : suppliers;
+    : workers;
 
   const handleCreate = () => {
-    setEditingSupplier(null);
+    setEditingWorker(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (supplier: Supplier, e: React.MouseEvent) => {
+  const handleEdit = (worker: Worker, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingSupplier(supplier);
+    setEditingWorker(worker);
     setFormOpen(true);
   };
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    supplierStore.deletingId = id;
+    workersStore.deletingId = id;
   };
 
   const confirmDelete = async () => {
     if (deletingId) {
-      await deleteSupplier(deletingId);
-      supplierStore.deletingId = null;
+      await deleteWorker(deletingId);
+      workersStore.deletingId = null;
     }
   };
 
   const handleSubmit = async (data: Record<string, unknown>) => {
-    if (editingSupplier) {
-      await updateSupplier(editingSupplier.id, data as unknown as Parameters<typeof updateSupplier>[1]);
+    if (editingWorker) {
+      await updateWorker(editingWorker.id, data as unknown as Parameters<typeof updateWorker>[1]);
     } else {
-      await createSupplier(data as unknown as Parameters<typeof createSupplier>[0]);
+      await createWorker(data as unknown as Parameters<typeof createWorker>[0]);
     }
   };
 
@@ -94,12 +92,12 @@ const SuppliersPage = observer(() => {
     <>
       {loading && <AppProgress />}
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
-        <EntityTitleAndAdd title="Поставщики" handleCreate={handleCreate} />
-        {suppliers.length > 3 && searchField}
+        <EntityTitleAndAdd title="Работники" handleCreate={handleCreate} />
+        {workers.length > 3 && searchField}
 
         <Grid container spacing={3}>
-          {filteredSuppliers.map((supplier) => (
-            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={supplier.id}>
+          {filteredWorker.map((worker) => (
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={worker.id}>
               <Card
                 sx={{
                   height: "100%",
@@ -117,13 +115,13 @@ const SuppliersPage = observer(() => {
                     }}
                   >
                     <Typography variant="h6" noWrap sx={{ flex: 1 }}>
-                      {supplier.name}
+                      {worker.name}
                     </Typography>
                     <Box sx={{ flexShrink: 0 }}>
                       <Tooltip title="Редактировать">
                         <IconButton
                           size="small"
-                          onClick={(e) => handleEdit(supplier, e)}
+                          onClick={(e) => handleEdit(worker, e)}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
@@ -132,7 +130,7 @@ const SuppliersPage = observer(() => {
                         <IconButton
                           size="small"
                           color="error"
-                          onClick={(e) => handleDelete(supplier.id, e)}
+                          onClick={(e) => handleDelete(worker.id, e)}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -148,97 +146,33 @@ const SuppliersPage = observer(() => {
                       gap: 0.75,
                     }}
                   >
-                    {supplier.contactName && (
+                    {worker.name && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <PersonIcon
                           sx={{ fontSize: 18, color: "text.secondary" }}
                         />
                         <Typography variant="body2">
-                          {supplier.contactName}
+                          {worker.name}
                         </Typography>
                       </Box>
                     )}
-                    {supplier.phone && (
+                    {worker.phone && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <PhoneIcon
                           sx={{ fontSize: 18, color: "text.secondary" }}
                         />
                         <Link
-                          href={`tel:${supplier.phone}`}
+                          href={`tel:${worker.phone}`}
                           variant="body2"
                           underline="hover"
                         >
-                          {supplier.phone}
-                        </Link>
-                      </Box>
-                    )}
-                    {supplier.website && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <LanguageIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
-                        <Link
-                          href={
-                            supplier.website.startsWith("http")
-                              ? supplier.website
-                              : `https://${supplier.website}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="body2"
-                          underline="hover"
-                          noWrap
-                        >
-                          {supplier.website}
-                        </Link>
-                      </Box>
-                    )}
-                    {supplier.address && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <LocationOnIcon
-                          sx={{
-                            fontSize: 18,
-                            color: supplier.latitude && supplier.longitude
-                              ? "error.main"
-                              : "text.secondary",
-                          }}
-                        />
-                        {supplier.latitude && supplier.longitude ? (
-                          <Link
-                            href={`https://yandex.ru/maps/?pt=${supplier.longitude},${supplier.latitude}&z=17&l=map`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            variant="body2"
-                            underline="hover"
-                          >
-                            {supplier.address}
-                          </Link>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            {supplier.address}
-                          </Typography>
-                        )}
-                      </Box>
-                    )}
-                    {!supplier.address && supplier.latitude && supplier.longitude && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <LocationOnIcon
-                          sx={{ fontSize: 18, color: "error.main" }}
-                        />
-                        <Link
-                          href={`https://yandex.ru/maps/?pt=${supplier.longitude},${supplier.latitude}&z=17&l=map`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="body2"
-                          underline="hover"
-                        >
-                          Открыть на карте
+                          {worker.phone}
                         </Link>
                       </Box>
                     )}
                   </Box>
 
-                  {supplier.notes && (
+                  {worker.notes && (
                     <Typography
                       variant="body2"
                       color="text.secondary"
@@ -251,7 +185,7 @@ const SuppliersPage = observer(() => {
                         overflow: "hidden",
                       }}
                     >
-                      {supplier.notes}
+                      {worker.notes}
                     </Typography>
                   )}
                 </CardContent>
@@ -259,16 +193,16 @@ const SuppliersPage = observer(() => {
             </Grid>
           ))}
 
-          {!loading && filteredSuppliers.length === 0 && (
+          {!loading && filteredWorker.length === 0 && (
             <Grid size={{ xs: 12 }}>
               <Box sx={{ textAlign: "center", py: 8 }}>
                 <Typography variant="h6" color="text.secondary">
-                  {search ? "Ничего не найдено" : "Поставщиков пока нет"}
+                  {search ? "Ничего не найдено" : "Работников пока нет"}
                 </Typography>
                 {!search && (
                   <>
                     <Typography color="text.secondary" sx={{ mb: 2 }}>
-                      Добавьте поставщиков для удобного выбора при создании
+                      Добавьте работников для удобного выбора при создании
                       расходов
                     </Typography>
                     <Button
@@ -276,7 +210,7 @@ const SuppliersPage = observer(() => {
                       startIcon={<AddIcon />}
                       onClick={handleCreate}
                     >
-                      Добавить поставщика
+                      Добавить работника
                     </Button>
                   </>
                 )}
@@ -285,26 +219,26 @@ const SuppliersPage = observer(() => {
           )}
         </Grid>
 
-        <SupplierForm
+        <WorkerForm
           open={formOpen}
           onClose={() => setFormOpen(false)}
           onSubmit={handleSubmit}
-          supplier={editingSupplier}
+          worker={editingWorker}
         />
 
         <Dialog
           open={!!deletingId}
-          onClose={() => supplierStore.deletingId = null}
+          onClose={() => workersStore.deletingId = null}
           maxWidth="xs"
         >
-          <DialogTitle>Удалить поставщика?</DialogTitle>
+          <DialogTitle>Удалить работника?</DialogTitle>
           <DialogContent>
             <Typography>
-              Поставщик будет удалён. Расходы, связанные с ним, сохранятся.
+              Работник будет удалён. Расходы, связанные с ним, сохранятся.
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => supplierStore.deletingId = null} variant="contained">
+            <Button onClick={() => workersStore.deletingId = null} variant="contained">
               Отмена
             </Button>
             <Button onClick={confirmDelete} variant="contained" color="error">
@@ -317,4 +251,4 @@ const SuppliersPage = observer(() => {
   );
 });
 
-export default SuppliersPage;
+export default WorkersPage;

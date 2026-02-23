@@ -31,9 +31,9 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import EditIcon from "@mui/icons-material/Edit";
-import { useStore } from "../stores/RootStore";
-import SummaryCard from "../components/SummaryCard";
-import ExpenseChart from "../components/charts/ExpenseChart";
+import { useStore } from "../../stores/RootStore";
+import SummaryCard from "../../components/SummaryCard";
+import ExpenseChart from "../../components/charts/ExpenseChart";
 import AppProgress from '@/components/AppProgress';
 
 function formatCurrency(amount: number) {
@@ -43,7 +43,7 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-const DashboardPage = observer(() => {
+const ProjectPage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const { projectStore } = useStore();
   const navigate = useNavigate();
@@ -344,4 +344,4 @@ const DashboardPage = observer(() => {
   );
 });
 
-export default DashboardPage;
+export default ProjectPage;

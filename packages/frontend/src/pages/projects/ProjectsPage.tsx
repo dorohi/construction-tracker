@@ -30,7 +30,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import { useStore } from "../stores/RootStore";
+import { useStore } from "../../stores/RootStore";
 import AppProgress from '@/components/AppProgress';
 import useSearch from '@/hooks/useSearch';
 
