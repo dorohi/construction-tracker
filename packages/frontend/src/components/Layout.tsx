@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Box, Toolbar } from "@mui/material";
 import { observer } from "mobx-react-lite";
 import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar/Sidebar";
 
 const Layout = observer(() => {
   return (

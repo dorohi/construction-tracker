@@ -29,7 +29,7 @@ export class ProjectStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Failed to load projects";
+        this.error = "Не удалось загрузить проекты";
         this.loading = false;
       });
     }
@@ -51,7 +51,7 @@ export class ProjectStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Failed to load project";
+        this.error = "Не удалось загрузить проект";
         this.loading = false;
       });
     }
@@ -63,7 +63,7 @@ export class ProjectStore {
       await this.loadProjects();
     } catch {
       runInAction(() => {
-        this.error = "Failed to create project";
+        this.error = "Не удалось создать проект";
       });
     }
   }
@@ -80,7 +80,7 @@ export class ProjectStore {
       }
     } catch {
       runInAction(() => {
-        this.error = "Failed to update project";
+        this.error = "Не удалось обновить проект";
       });
     }
   }
@@ -96,7 +96,7 @@ export class ProjectStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Failed to delete project";
+        this.error = "Не удалось удалить проект";
       });
     }
   }
@@ -116,7 +116,7 @@ export class ProjectStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Failed to create category";
+        this.error = "Не удалось создать категорию";
       });
     }
   }
@@ -134,7 +134,7 @@ export class ProjectStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Failed to delete category";
+        this.error = "Не удалось удалить категорию";
       });
     }
   }

@@ -22,7 +22,7 @@ export class WorkersStore {
       });
     } catch {
       runInAction(() => {
-        this.error = "Не удалось загрузить поставщиков";
+        this.error = "Не удалось загрузить работников";
         this.loading = false;
       });
     }

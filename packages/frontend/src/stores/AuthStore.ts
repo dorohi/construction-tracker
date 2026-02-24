@@ -7,6 +7,7 @@ export class AuthStore {
   token: string | null = null;
   loading = false;
   error: string | null = null;
+  logoutDialogOpen: boolean = false;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
