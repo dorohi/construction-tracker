@@ -69,7 +69,7 @@ export default function ExpenseForm({
       setTitle(source.title);
       setDescription(source.description || "");
       setAmount(String(source.amount));
-      setDate(source.date.split("T")[0]);
+      setDate(initialData && !expense ? new Date().toISOString().split("T")[0] : source.date.split("T")[0]);
       setCategoryId(source.categoryId || "");
       setQuantity(source.quantity != null ? String(source.quantity) : "");
       setUnit(source.unit || "");
