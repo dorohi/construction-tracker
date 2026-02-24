@@ -21,6 +21,7 @@ interface ExpenseFormProps {
   onClose: () => void;
   onSubmit: (data: Record<string, unknown>) => void;
   expense?: Expense | null;
+  initialData?: Expense | null;
   categories: Category[];
   suppliers?: Supplier[];
   carriers?: Carrier[];
@@ -32,6 +33,7 @@ export default function ExpenseForm({
   onClose,
   onSubmit,
   expense,
+  initialData,
   categories,
   suppliers = [],
   carriers = [],
@@ -61,29 +63,30 @@ export default function ExpenseForm({
   const [planned, setPlanned] = useState(false);
 
   useEffect(() => {
-    if (expense) {
-      setType(expense.type as ExpenseType);
-      setTitle(expense.title);
-      setDescription(expense.description || "");
-      setAmount(String(expense.amount));
-      setDate(expense.date.split("T")[0]);
-      setCategoryId(expense.categoryId || "");
-      setQuantity(expense.quantity != null ? String(expense.quantity) : "");
-      setUnit(expense.unit || "");
-      setUnitPrice(expense.unitPrice != null ? String(expense.unitPrice) : "");
-      setSupplier(expense.supplier || "");
-      setSupplierId(expense.supplierId || null);
-      setWorker(expense.worker || "");
-      setWorkerId(expense.workerId || null);
-      setHoursWorked(expense.hoursWorked != null ? String(expense.hoursWorked) : "");
-      setHourlyRate(expense.hourlyRate != null ? String(expense.hourlyRate) : "");
-      setCarrier(expense.carrier || "");
-      setCarrierId(expense.carrierId || null);
-      setPlanned(expense.planned ?? false);
+    const source = expense || initialData;
+    if (source) {
+      setType(source.type as ExpenseType);
+      setTitle(source.title);
+      setDescription(source.description || "");
+      setAmount(String(source.amount));
+      setDate(source.date.split("T")[0]);
+      setCategoryId(source.categoryId || "");
+      setQuantity(source.quantity != null ? String(source.quantity) : "");
+      setUnit(source.unit || "");
+      setUnitPrice(source.unitPrice != null ? String(source.unitPrice) : "");
+      setSupplier(source.supplier || "");
+      setSupplierId(source.supplierId || null);
+      setWorker(source.worker || "");
+      setWorkerId(source.workerId || null);
+      setHoursWorked(source.hoursWorked != null ? String(source.hoursWorked) : "");
+      setHourlyRate(source.hourlyRate != null ? String(source.hourlyRate) : "");
+      setCarrier(source.carrier || "");
+      setCarrierId(source.carrierId || null);
+      setPlanned(source.planned ?? false);
     } else {
       resetForm();
     }
-  }, [expense, open]);
+  }, [expense, initialData, open]);
 
   const resetForm = () => {
     setType("MATERIAL");

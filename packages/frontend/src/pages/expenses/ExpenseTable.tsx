@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, MouseEvent } from "react";
 import {
   Table,
   TableBody,
@@ -9,7 +9,6 @@ import {
   TablePagination,
   Paper,
   IconButton,
-  Tooltip,
   Typography,
   Box,
   Card,
@@ -17,9 +16,15 @@ import {
   CardActions,
   useMediaQuery,
   useTheme,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import type { Expense } from "@construction-tracker/shared/dist";
@@ -28,6 +33,7 @@ import CategoryChip from "../../components/CategoryChip";
 interface ExpenseTableProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
+  onDuplicate: (expense: Expense) => void;
   onDelete: (expense: Expense) => void;
   onPurchase?: (expense: Expense) => void;
   hideType?: boolean;
@@ -69,11 +75,28 @@ function getDetails(expense: Expense) {
   return "";
 }
 
-export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, hideType }: ExpenseTableProps) {
+export default function ExpenseTable({ expenses, onEdit, onDuplicate, onDelete, onPurchase, hideType }: ExpenseTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [menuExpense, setMenuExpense] = useState<Expense | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const handleMenuOpen = (event: MouseEvent<HTMLElement>, expense: Expense) => {
+    setMenuAnchor(event.currentTarget);
+    setMenuExpense(expense);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setMenuExpense(null);
+  };
+
+  const handleAction = (action: (expense: Expense) => void) => {
+    if (menuExpense) action(menuExpense);
+    handleMenuClose();
+  };
 
   if (expenses.length === 0) {
     return (
@@ -86,6 +109,35 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
   const paginatedExpenses = expenses.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
+  );
+
+  const actionsMenu = (
+    <Menu
+      anchorEl={menuAnchor}
+      open={Boolean(menuAnchor)}
+      onClose={handleMenuClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+    >
+      {menuExpense?.planned && onPurchase && (
+        <MenuItem onClick={() => handleAction(onPurchase)}>
+          <ListItemIcon><ShoppingCartIcon fontSize="small" color="success" /></ListItemIcon>
+          <ListItemText>Купить</ListItemText>
+        </MenuItem>
+      )}
+      <MenuItem onClick={() => handleAction(onEdit)}>
+        <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+        <ListItemText>Редактировать</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={() => handleAction(onDuplicate)}>
+        <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+        <ListItemText>Дублировать</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={() => handleAction(onDelete)}>
+        <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <ListItemText sx={{ color: "error.main" }}>Удалить</ListItemText>
+      </MenuItem>
+    </Menu>
   );
 
   if (isMobile) {
@@ -136,21 +188,14 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
                 )}
               </CardContent>
               <CardActions sx={{ pt: 0, justifyContent: "flex-end" }}>
-                {expense.planned && onPurchase && (
-                  <IconButton size="small" color="success" onClick={() => onPurchase(expense)}>
-                    <ShoppingCartIcon fontSize="small" />
-                  </IconButton>
-                )}
-                <IconButton size="small" onClick={() => onEdit(expense)}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" color="error" onClick={() => onDelete(expense)}>
-                  <DeleteIcon fontSize="small" />
+                <IconButton size="small" onClick={(e) => handleMenuOpen(e, expense)}>
+                  <MoreVertIcon fontSize="small" />
                 </IconButton>
               </CardActions>
             </Card>
           ))}
         </Box>
+        {actionsMenu}
         <TablePagination
           component="div"
           count={expenses.length}
@@ -181,7 +226,7 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
               <TableCell>Категория</TableCell>
               <TableCell>Детали</TableCell>
               <TableCell align="right">Сумма</TableCell>
-              <TableCell align="center">Действия</TableCell>
+              <TableCell align="center" sx={{ width: 56 }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -222,30 +267,17 @@ export default function ExpenseTable({ expenses, onEdit, onDelete, onPurchase, h
                 <TableCell align="right">
                   <Typography fontWeight={600}>{formatCurrency(expense.amount)}</Typography>
                 </TableCell>
-                <TableCell align="center">
-                  {expense.planned && onPurchase && (
-                    <Tooltip title="Купить">
-                      <IconButton size="small" color="success" onClick={() => onPurchase(expense)}>
-                        <ShoppingCartIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  <Tooltip title="Редактировать">
-                    <IconButton size="small" onClick={() => onEdit(expense)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Удалить">
-                    <IconButton size="small" color="error" onClick={() => onDelete(expense)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+                <TableCell align="center" sx={{ width: 56 }}>
+                  <IconButton size="small" onClick={(e) => handleMenuOpen(e, expense)}>
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      {actionsMenu}
       <TablePagination
         component="div"
         count={expenses.length}

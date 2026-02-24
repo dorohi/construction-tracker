@@ -49,6 +49,7 @@ const ExpensesPage = observer(() => {
   const [newCategoryType, setNewCategoryType] = useState<ExpenseType>("MATERIAL");
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
   const [purchasingExpense, setPurchasingExpense] = useState<Expense | null>(null);
+  const [duplicatingExpense, setDuplicatingExpense] = useState<Expense | null>(null);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
@@ -90,10 +91,18 @@ const ExpensesPage = observer(() => {
     // Reload summary
     projectStore.loadProject(id!);
     setEditingExpense(null);
+    setDuplicatingExpense(null);
   };
 
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
+    setDuplicatingExpense(null);
+    setFormOpen(true);
+  };
+
+  const handleDuplicate = (expense: Expense) => {
+    setEditingExpense(null);
+    setDuplicatingExpense(expense);
     setFormOpen(true);
   };
 
@@ -176,6 +185,7 @@ const ExpensesPage = observer(() => {
                   color="primary"
                   onClick={() => {
                     setEditingExpense(null);
+                    setDuplicatingExpense(null);
                     setFormOpen(true);
                   }}
                 >
@@ -225,6 +235,7 @@ const ExpensesPage = observer(() => {
       <ExpenseTable
         expenses={filteredExpenses}
         onEdit={handleEdit}
+        onDuplicate={handleDuplicate}
         onDelete={handleDelete}
         onPurchase={handlePurchase}
         hideType={!!typeFilter && !plannedFilter}
@@ -235,9 +246,11 @@ const ExpensesPage = observer(() => {
         onClose={() => {
           setFormOpen(false);
           setEditingExpense(null);
+          setDuplicatingExpense(null);
         }}
         onSubmit={handleSubmit}
         expense={editingExpense}
+        initialData={duplicatingExpense}
         categories={projectStore.categories}
         suppliers={supplierStore.suppliers}
         carriers={carrierStore.carriers}
