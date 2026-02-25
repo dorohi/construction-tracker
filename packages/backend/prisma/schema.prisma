@@ -111,6 +111,7 @@ model Worker {
   name      String
   phone     String?
   website   String?
+  specialty String?
   notes     String?
   user      User      @relation(fields: [userId], references: [id])
   userId    String

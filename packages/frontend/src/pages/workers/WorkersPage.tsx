@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LanguageIcon from "@mui/icons-material/Language";
+import BuildIcon from "@mui/icons-material/Build";
 import PersonIcon from "@mui/icons-material/Person";
 import { useStore } from "../../stores/RootStore";
 import type { Worker } from "@construction-tracker/shared/dist";
@@ -154,6 +155,16 @@ const WorkersPage = observer(() => {
                         />
                         <Typography variant="body2">
                           {worker.name}
+                        </Typography>
+                      </Box>
+                    )}
+                    {worker.specialty && (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <BuildIcon
+                          sx={{ fontSize: 18, color: "text.secondary" }}
+                        />
+                        <Typography variant="body2">
+                          {worker.specialty}
                         </Typography>
                       </Box>
                     )}

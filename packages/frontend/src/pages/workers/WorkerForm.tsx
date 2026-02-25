@@ -26,6 +26,7 @@ export default function WorkerForm({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
+  const [specialty, setSpecialty] = useState("");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function WorkerForm({
       setName(worker.name);
       setPhone(worker.phone || "");
       setWebsite(worker.website || "");
+      setSpecialty(worker.specialty || "");
       setNotes(worker.notes || "");
     } else {
       resetForm();
@@ -43,6 +45,7 @@ export default function WorkerForm({
     setName("");
     setPhone("");
     setWebsite("");
+    setSpecialty("");
     setNotes("");
   };
 
@@ -51,6 +54,7 @@ export default function WorkerForm({
       name,
       phone: phone || undefined,
       website: website || undefined,
+      specialty: specialty || undefined,
       notes: notes || undefined,
     };
     onSubmit(data);
@@ -85,6 +89,13 @@ export default function WorkerForm({
             onChange={(e) => setWebsite(e.target.value)}
             fullWidth
             placeholder="https://t.me/username"
+          />
+          <TextField
+            label="Специальность"
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            fullWidth
+            placeholder="Электрик, сварщик, плиточник..."
           />
           <TextField
             label="Заметки"

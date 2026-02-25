@@ -3,6 +3,7 @@ export interface Worker {
   name: string;
   phone?: string | null;
   website?: string | null;
+  specialty?: string | null;
   notes?: string | null;
   userId: string;
   createdAt: string;
@@ -13,6 +14,7 @@ export interface CreateWorkerInput {
   name: string;
   phone?: string;
   website?: string;
+  specialty?: string;
   notes?: string;
 }
 
