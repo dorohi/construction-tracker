@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (auth instanceof NextResponse) return auth;
 
   try {
-    const { name, phone, vehicle, licensePlate, notes } =
+    const { name, phone, website, vehicle, licensePlate, notes } =
       await request.json();
 
     if (!name) {
@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         phone: phone || null,
+        website: website || null,
         vehicle: vehicle || null,
         licensePlate: licensePlate || null,
         notes: notes || null,

@@ -57,7 +57,7 @@ export async function PUT(
   if (!existing) {
     return NextResponse.json({ error: "Новость не найдена" }, { status: 404 });
   }
-  if (existing.authorId !== auth.userId) {
+  if (existing.authorId !== auth.userId && !auth.isAdmin) {
     return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
   }
 
@@ -117,7 +117,7 @@ export async function DELETE(
   if (!existing) {
     return NextResponse.json({ error: "Новость не найдена" }, { status: 404 });
   }
-  if (existing.authorId !== auth.userId) {
+  if (existing.authorId !== auth.userId && !auth.isAdmin) {
     return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
   }
 

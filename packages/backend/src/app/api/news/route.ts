@@ -42,6 +42,13 @@ export async function POST(request: NextRequest) {
   if (auth instanceof NextResponse) return auth;
 
   try {
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: "Только администраторы могут создавать новости" },
+        { status: 403 }
+      );
+    }
+
     const { title, content } = await request.json();
 
     if (!title || !content) {

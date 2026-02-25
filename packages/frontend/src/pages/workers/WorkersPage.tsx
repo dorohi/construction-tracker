@@ -20,6 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PhoneIcon from "@mui/icons-material/Phone";
+import LanguageIcon from "@mui/icons-material/Language";
 import PersonIcon from "@mui/icons-material/Person";
 import { useStore } from "../../stores/RootStore";
 import type { Worker } from "@construction-tracker/shared/dist";
@@ -167,6 +168,22 @@ const WorkersPage = observer(() => {
                           underline="hover"
                         >
                           {worker.phone}
+                        </Link>
+                      </Box>
+                    )}
+                    {worker.website && (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <LanguageIcon
+                          sx={{ fontSize: 18, color: "text.secondary" }}
+                        />
+                        <Link
+                          href={worker.website.startsWith("http") ? worker.website : `https://${worker.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="body2"
+                          underline="hover"
+                        >
+                          {worker.website}
                         </Link>
                       </Box>
                     )}

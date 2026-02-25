@@ -111,6 +111,13 @@ export default function ExpenseForm({
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
+  const carrierOptions = [
+    ...carriers.map((c) => ({ ...c, _group: "Перевозчики" })),
+    ...suppliers
+      .filter((s) => s.hasDelivery)
+      .map((s) => ({ ...s, _group: "Поставщики" })),
+  ];
+
   const handleSubmit = () => {
     const data: Record<string, unknown> = {
       type,
@@ -349,19 +356,22 @@ export default function ExpenseForm({
           {type === "DELIVERY" && (
             <Autocomplete
               freeSolo
-              options={carriers}
+              options={carrierOptions}
+              groupBy={(option) =>
+                typeof option === "string" ? "" : option._group
+              }
               getOptionLabel={(option) =>
                 typeof option === "string" ? option : option.name
               }
               value={
                 carrierId
-                  ? carriers.find((c) => c.id === carrierId) || carrier
+                  ? carrierOptions.find((c) => c.id === carrierId) || carrier
                   : carrier
               }
               inputValue={carrier}
               onInputChange={(_, value) => {
                 setCarrier(value);
-                const match = carriers.find((c) => c.name === value);
+                const match = carrierOptions.find((c) => c.name === value);
                 if (!match) {
                   setCarrierId(null);
                 }

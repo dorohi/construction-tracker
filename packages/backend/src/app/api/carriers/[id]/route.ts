@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   try {
-    const { name, phone, vehicle, licensePlate, notes } =
+    const { name, phone, website, vehicle, licensePlate, notes } =
       await request.json();
 
     const updated = await prisma.carrier.update({
@@ -48,6 +48,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data: {
         ...(name !== undefined && { name }),
         ...(phone !== undefined && { phone: phone || null }),
+        ...(website !== undefined && { website: website || null }),
         ...(vehicle !== undefined && { vehicle: vehicle || null }),
         ...(licensePlate !== undefined && { licensePlate: licensePlate || null }),
         ...(notes !== undefined && { notes: notes || null }),

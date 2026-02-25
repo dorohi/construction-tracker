@@ -25,12 +25,14 @@ export default function WorkerForm({
 }: WorkerFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (worker) {
       setName(worker.name);
       setPhone(worker.phone || "");
+      setWebsite(worker.website || "");
       setNotes(worker.notes || "");
     } else {
       resetForm();
@@ -40,6 +42,7 @@ export default function WorkerForm({
   const resetForm = () => {
     setName("");
     setPhone("");
+    setWebsite("");
     setNotes("");
   };
 
@@ -47,6 +50,7 @@ export default function WorkerForm({
     const data: Record<string, unknown> = {
       name,
       phone: phone || undefined,
+      website: website || undefined,
       notes: notes || undefined,
     };
     onSubmit(data);
@@ -74,6 +78,13 @@ export default function WorkerForm({
             onChange={(e) => setPhone(e.target.value)}
             fullWidth
             placeholder="+7 (999) 123-45-67"
+          />
+          <TextField
+            label="Сайт / Telegram"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            fullWidth
+            placeholder="https://t.me/username"
           />
           <TextField
             label="Заметки"

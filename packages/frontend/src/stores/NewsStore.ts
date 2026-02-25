@@ -30,6 +30,30 @@ export class NewsStore {
     }
   }
 
+  async createNews(data: { title: string; content: string }) {
+    const created = await newsApi.create(data);
+    runInAction(() => {
+      this.news.unshift(created);
+    });
+  }
+
+  async updateNews(id: string, data: { title?: string; content?: string }) {
+    const updated = await newsApi.update(id, data);
+    runInAction(() => {
+      const idx = this.news.findIndex((n) => n.id === id);
+      if (idx !== -1) {
+        this.news[idx] = updated;
+      }
+    });
+  }
+
+  async deleteNews(id: string) {
+    await newsApi.delete(id);
+    runInAction(() => {
+      this.news = this.news.filter((n) => n.id !== id);
+    });
+  }
+
   async toggleReaction(newsId: string, type: "like" | "dislike") {
     try {
       const result = await newsApi.react(newsId, type);

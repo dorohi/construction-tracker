@@ -25,6 +25,7 @@ export default function CarrierForm({
 }: CarrierFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
   const [vehicle, setVehicle] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [notes, setNotes] = useState("");
@@ -33,6 +34,7 @@ export default function CarrierForm({
     if (carrier) {
       setName(carrier.name);
       setPhone(carrier.phone || "");
+      setWebsite(carrier.website || "");
       setVehicle(carrier.vehicle || "");
       setLicensePlate(carrier.licensePlate || "");
       setNotes(carrier.notes || "");
@@ -44,6 +46,7 @@ export default function CarrierForm({
   const resetForm = () => {
     setName("");
     setPhone("");
+    setWebsite("");
     setVehicle("");
     setLicensePlate("");
     setNotes("");
@@ -53,6 +56,7 @@ export default function CarrierForm({
     const data: Record<string, unknown> = {
       name,
       phone: phone || undefined,
+      website: website || undefined,
       vehicle: vehicle || undefined,
       licensePlate: licensePlate || undefined,
       notes: notes || undefined,
@@ -82,6 +86,13 @@ export default function CarrierForm({
             onChange={(e) => setPhone(e.target.value)}
             fullWidth
             placeholder="+7 (999) 123-45-67"
+          />
+          <TextField
+            label="Сайт / Telegram"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            fullWidth
+            placeholder="https://t.me/username"
           />
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField

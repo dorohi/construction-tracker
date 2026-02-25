@@ -8,6 +8,8 @@ import {
   TextField,
   Box,
   Typography,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import type { Supplier } from "@construction-tracker/shared/dist";
 
@@ -31,6 +33,7 @@ export default function SupplierForm({
   const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [hasDelivery, setHasDelivery] = useState(false);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -42,6 +45,7 @@ export default function SupplierForm({
       setAddress(supplier.address || "");
       setLatitude(supplier.latitude != null ? String(supplier.latitude) : "");
       setLongitude(supplier.longitude != null ? String(supplier.longitude) : "");
+      setHasDelivery(supplier.hasDelivery ?? false);
       setNotes(supplier.notes || "");
     } else {
       resetForm();
@@ -56,6 +60,7 @@ export default function SupplierForm({
     setAddress("");
     setLatitude("");
     setLongitude("");
+    setHasDelivery(false);
     setNotes("");
   };
 
@@ -68,6 +73,7 @@ export default function SupplierForm({
       address: address || undefined,
       latitude: latitude ? parseFloat(latitude) : undefined,
       longitude: longitude ? parseFloat(longitude) : undefined,
+      hasDelivery,
       notes: notes || undefined,
     };
     onSubmit(data);
@@ -142,6 +148,15 @@ export default function SupplierForm({
               />
             </Box>
           </Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={hasDelivery}
+                onChange={(e) => setHasDelivery(e.target.checked)}
+              />
+            }
+            label="Есть доставка"
+          />
           <TextField
             label="Заметки"
             value={notes}

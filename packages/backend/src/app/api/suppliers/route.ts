@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (auth instanceof NextResponse) return auth;
 
   try {
-    const { name, contactName, phone, website, address, latitude, longitude, notes } =
+    const { name, contactName, phone, website, address, latitude, longitude, hasDelivery, notes } =
       await request.json();
 
     if (!name) {
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
         address: address || null,
         latitude: latitude ?? null,
         longitude: longitude ?? null,
+        hasDelivery: hasDelivery ?? false,
         notes: notes || null,
         userId: auth.userId,
       },

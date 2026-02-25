@@ -171,6 +171,14 @@ export const newsApi = {
   list: () =>
     api.get<ApiResponse<News[]>>("/news")
       .then((r) => r.data.data!),
+  create: (data: { title: string; content: string }) =>
+    api.post<ApiResponse<News>>("/news", data)
+      .then((r) => r.data.data!),
+  update: (id: string, data: { title?: string; content?: string }) =>
+    api.put<ApiResponse<News>>(`/news/${id}`, data)
+      .then((r) => r.data.data!),
+  delete: (id: string) =>
+    api.delete(`/news/${id}`),
   react: (id: string, type: "like" | "dislike") =>
     api.post<ApiResponse<{ likes: number; dislikes: number; userReaction: "like" | "dislike" | null }>>(
       `/news/${id}/reaction`,

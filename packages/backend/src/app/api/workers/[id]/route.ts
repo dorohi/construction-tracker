@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   try {
-    const { name, phone, notes } =
+    const { name, phone, website, notes } =
       await request.json();
 
     const updated = await prisma.worker.update({
@@ -48,6 +48,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data: {
         ...(name !== undefined && { name }),
         ...(phone !== undefined && { phone: phone || null }),
+        ...(website !== undefined && { website: website || null }),
         ...(notes !== undefined && { notes: notes || null }),
       },
     });

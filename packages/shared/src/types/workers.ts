@@ -2,6 +2,7 @@ export interface Worker {
   id: string;
   name: string;
   phone?: string | null;
+  website?: string | null;
   notes?: string | null;
   userId: string;
   createdAt: string;
@@ -11,6 +12,7 @@ export interface Worker {
 export interface CreateWorkerInput {
   name: string;
   phone?: string;
+  website?: string;
   notes?: string;
 }
 
