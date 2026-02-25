@@ -40,3 +40,5 @@ export type {
   CreateWorkerInput,
   UpdateWorkerInput,
 } from "./types/workers";
+
+export type { News, NewsReaction } from "./types/news";

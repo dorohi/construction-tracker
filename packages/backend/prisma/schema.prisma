@@ -8,15 +8,18 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  passwordHash String
-  name         String
-  projects     Project[]
-  suppliers    Supplier[]
-  carriers     Carrier[]
-  workers      Worker[]
-  createdAt    DateTime   @default(now())
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  isAdmin       Boolean        @default(false)
+  projects      Project[]
+  suppliers     Supplier[]
+  carriers      Carrier[]
+  workers       Worker[]
+  news          News[]
+  newsReactions NewsReaction[]
+  createdAt     DateTime       @default(now())
 }
 
 model Project {
@@ -111,4 +114,26 @@ model Worker {
   expenses  Expense[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model News {
+  id        String         @id @default(cuid())
+  title     String
+  content   String
+  author    User           @relation(fields: [authorId], references: [id])
+  authorId  String
+  reactions NewsReaction[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model NewsReaction {
+  id     String @id @default(cuid())
+  type   String
+  news   News   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  newsId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([newsId, userId])
 }

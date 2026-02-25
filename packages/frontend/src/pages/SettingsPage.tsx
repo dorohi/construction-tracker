@@ -33,6 +33,13 @@ const SettingsPage = observer(() => {
           <Divider component="li" />
           <ListItem>
             <ListItemText
+              primary="Роль"
+              secondary={user?.isAdmin ? "Администратор" : "Пользователь"}
+            />
+          </ListItem>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText
               primary="Дата регистрации"
               secondary={
                 user?.createdAt

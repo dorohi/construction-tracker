@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = signToken({ userId: user.id, email: user.email });
+    const token = signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin });
 
     return NextResponse.json({
       data: {
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           name: user.name,
+          isAdmin: user.isAdmin,
           createdAt: user.createdAt.toISOString(),
         },
       },

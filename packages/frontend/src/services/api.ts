@@ -23,6 +23,7 @@ import type {
   Worker,
   UpdateWorkerInput,
   CreateWorkerInput,
+  News,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -163,6 +164,18 @@ export const workersApi = {
       .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/workers/${id}`),
+};
+
+// News
+export const newsApi = {
+  list: () =>
+    api.get<ApiResponse<News[]>>("/news")
+      .then((r) => r.data.data!),
+  react: (id: string, type: "like" | "dislike") =>
+    api.post<ApiResponse<{ likes: number; dislikes: number; userReaction: "like" | "dislike" | null }>>(
+      `/news/${id}/reaction`,
+      { type }
+    ).then((r) => r.data.data!),
 };
 
 export default api;

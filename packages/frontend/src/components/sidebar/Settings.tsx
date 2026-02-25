@@ -2,6 +2,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 
 const Settings = observer((
   {
@@ -13,6 +14,33 @@ const Settings = observer((
   },
 ) => (
   <List disablePadding>
+    <ListItem disablePadding sx={{ display: "block" }}>
+      <Tooltip title={showText ? "" : "Новости"} placement="right">
+        <ListItemButton
+          selected={location.pathname.startsWith("/news")}
+          onClick={() => handleNavigate("/news")}
+          sx={{
+            minHeight: 48,
+            justifyContent: showText ? "initial" : "center",
+            px: 2.5,
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: showText ? 2 : "auto",
+              justifyContent: "center",
+            }}
+          >
+            <NewspaperIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Новости"
+            sx={{ opacity: showText ? 1 : 0 }}
+          />
+        </ListItemButton>
+      </Tooltip>
+    </ListItem>
     <ListItem disablePadding sx={{ display: "block" }}>
       <Tooltip title={showText ? "" : "Настройки"} placement="right">
         <ListItemButton

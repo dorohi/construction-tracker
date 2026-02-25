@@ -7,6 +7,7 @@ import { CarrierStore } from "./CarrierStore";
 import { ThemeStore } from "./ThemeStore";
 import { UIStore } from "./UIStore";
 import { WorkersStore } from '@/stores/WorkersStore';
+import { NewsStore } from './NewsStore';
 
 export class RootStore {
   authStore: AuthStore;
@@ -15,6 +16,7 @@ export class RootStore {
   supplierStore: SupplierStore;
   carrierStore: CarrierStore;
   workersStore: WorkersStore;
+  newsStore: NewsStore;
   themeStore: ThemeStore;
   uiStore: UIStore;
 
@@ -25,6 +27,7 @@ export class RootStore {
     this.supplierStore = new SupplierStore();
     this.carrierStore = new CarrierStore();
     this.workersStore = new WorkersStore();
+    this.newsStore = new NewsStore();
     this.themeStore = new ThemeStore();
     this.uiStore = new UIStore();
   }
