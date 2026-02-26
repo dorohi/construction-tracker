@@ -8,6 +8,7 @@ import { ThemeStore } from "./ThemeStore";
 import { UIStore } from "./UIStore";
 import { WorkersStore } from '@/stores/WorkersStore';
 import { NewsStore } from './NewsStore';
+import { AdminStore } from './AdminStore';
 
 export class RootStore {
   authStore: AuthStore;
@@ -17,6 +18,7 @@ export class RootStore {
   carrierStore: CarrierStore;
   workersStore: WorkersStore;
   newsStore: NewsStore;
+  adminStore: AdminStore;
   themeStore: ThemeStore;
   uiStore: UIStore;
 
@@ -28,6 +30,7 @@ export class RootStore {
     this.carrierStore = new CarrierStore();
     this.workersStore = new WorkersStore();
     this.newsStore = new NewsStore();
+    this.adminStore = new AdminStore();
     this.themeStore = new ThemeStore();
     this.uiStore = new UIStore();
   }

@@ -42,3 +42,9 @@ export type {
 } from "./types/workers";
 
 export type { News, NewsReaction } from "./types/news";
+
+export type {
+  AdminUserInfo,
+  AdminSummary,
+  AdminDashboard,
+} from "./types/admin";

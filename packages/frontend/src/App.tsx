@@ -11,6 +11,7 @@ import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CarriersPage from "./pages/carriers/CarriersPage";
 import WorkersPage from "./pages/workers/WorkersPage";
 import NewsPage from "./pages/news/NewsPage";
+import AdminPage from "./pages/admin/AdminPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/carriers" element={<CarriersPage />} />
           <Route path="/workers" element={<WorkersPage />} />
           <Route path="/news" element={<NewsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/projects" replace />} />
