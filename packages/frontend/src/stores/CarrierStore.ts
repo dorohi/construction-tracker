@@ -33,7 +33,10 @@ export class CarrierStore {
       const carrier = await carriersApi.create(data);
       runInAction(() => {
         this.carriers.push(carrier);
-        this.carriers.sort((a, b) => a.name.localeCompare(b.name));
+        this.carriers.sort((a, b) => {
+          if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
       });
       return carrier;
     } catch {
@@ -42,6 +45,20 @@ export class CarrierStore {
       });
       return null;
     }
+  }
+
+  async toggleFavorite(id: string) {
+    const carrier = this.carriers.find((c) => c.id === id);
+    if (!carrier) return;
+    const updated = await carriersApi.update(id, { isFavorite: !carrier.isFavorite });
+    runInAction(() => {
+      const idx = this.carriers.findIndex((c) => c.id === id);
+      if (idx !== -1) this.carriers[idx] = updated;
+      this.carriers.sort((a, b) => {
+        if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+    });
   }
 
   async updateCarrier(id: string, data: UpdateCarrierInput) {

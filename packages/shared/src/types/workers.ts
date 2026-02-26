@@ -4,6 +4,7 @@ export interface Worker {
   phone?: string | null;
   website?: string | null;
   specialty?: string | null;
+  isFavorite?: boolean;
   notes?: string | null;
   userId: string;
   createdAt: string;
@@ -15,6 +16,7 @@ export interface CreateWorkerInput {
   phone?: string;
   website?: string;
   specialty?: string;
+  isFavorite?: boolean;
   notes?: string;
 }
 

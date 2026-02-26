@@ -8,6 +8,7 @@ export interface Supplier {
   latitude?: number | null;
   longitude?: number | null;
   hasDelivery?: boolean;
+  isFavorite?: boolean;
   notes?: string | null;
   userId: string;
   createdAt: string;
@@ -23,6 +24,7 @@ export interface CreateSupplierInput {
   latitude?: number;
   longitude?: number;
   hasDelivery?: boolean;
+  isFavorite?: boolean;
   notes?: string;
 }
 

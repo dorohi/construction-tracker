@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 
   const workers = await prisma.worker.findMany({
     where: { userId: auth.userId },
-    orderBy: { name: "asc" },
+    orderBy: [{ isFavorite: "desc" }, { name: "asc" }],
   });
 
   return NextResponse.json({ data: workers });

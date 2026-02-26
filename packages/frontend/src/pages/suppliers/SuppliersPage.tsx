@@ -19,6 +19,8 @@ import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LanguageIcon from "@mui/icons-material/Language";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -120,6 +122,15 @@ const SuppliersPage = observer(() => {
                       {supplier.name}
                     </Typography>
                     <Box sx={{ flexShrink: 0 }}>
+                      <Tooltip title={supplier.isFavorite ? "Убрать из избранного" : "В избранное"}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); supplierStore.toggleFavorite(supplier.id); }}
+                          sx={{ color: supplier.isFavorite ? "warning.main" : "action.disabled" }}
+                        >
+                          {supplier.isFavorite ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="Редактировать">
                         <IconButton
                           size="small"

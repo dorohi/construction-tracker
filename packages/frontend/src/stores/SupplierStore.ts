@@ -33,7 +33,10 @@ export class SupplierStore {
       const supplier = await suppliersApi.create(data);
       runInAction(() => {
         this.suppliers.push(supplier);
-        this.suppliers.sort((a, b) => a.name.localeCompare(b.name));
+        this.suppliers.sort((a, b) => {
+          if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
       });
       return supplier;
     } catch {
@@ -42,6 +45,20 @@ export class SupplierStore {
       });
       return null;
     }
+  }
+
+  async toggleFavorite(id: string) {
+    const supplier = this.suppliers.find((s) => s.id === id);
+    if (!supplier) return;
+    const updated = await suppliersApi.update(id, { isFavorite: !supplier.isFavorite });
+    runInAction(() => {
+      const idx = this.suppliers.findIndex((s) => s.id === id);
+      if (idx !== -1) this.suppliers[idx] = updated;
+      this.suppliers.sort((a, b) => {
+        if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+    });
   }
 
   async updateSupplier(id: string, data: UpdateSupplierInput) {

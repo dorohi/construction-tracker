@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 
   const carriers = await prisma.carrier.findMany({
     where: { userId: auth.userId },
-    orderBy: { name: "asc" },
+    orderBy: [{ isFavorite: "desc" }, { name: "asc" }],
   });
 
   return NextResponse.json({ data: carriers });

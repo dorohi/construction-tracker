@@ -83,6 +83,7 @@ model Supplier {
   latitude    Float?
   longitude   Float?
   hasDelivery Boolean   @default(false)
+  isFavorite  Boolean   @default(false)
   notes       String?
   user        User      @relation(fields: [userId], references: [id])
   userId      String
@@ -98,6 +99,7 @@ model Carrier {
   website      String?
   vehicle      String?
   licensePlate String?
+  isFavorite   Boolean   @default(false)
   notes        String?
   user         User      @relation(fields: [userId], references: [id])
   userId       String
@@ -107,17 +109,18 @@ model Carrier {
 }
 
 model Worker {
-  id        String    @id @default(cuid())
-  name      String
-  phone     String?
-  website   String?
-  specialty String?
-  notes     String?
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String
-  expenses  Expense[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  phone      String?
+  website    String?
+  specialty  String?
+  isFavorite Boolean   @default(false)
+  notes      String?
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  expenses   Expense[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model News {

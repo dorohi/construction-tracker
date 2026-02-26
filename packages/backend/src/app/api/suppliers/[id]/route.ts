@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   try {
-    const { name, contactName, phone, website, address, latitude, longitude, hasDelivery, notes } =
+    const { name, contactName, phone, website, address, latitude, longitude, hasDelivery, isFavorite, notes } =
       await request.json();
 
     const updated = await prisma.supplier.update({
@@ -54,6 +54,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         ...(latitude !== undefined && { latitude: latitude ?? null }),
         ...(longitude !== undefined && { longitude: longitude ?? null }),
         ...(hasDelivery !== undefined && { hasDelivery }),
+        ...(isFavorite !== undefined && { isFavorite }),
         ...(notes !== undefined && { notes: notes || null }),
       },
     });

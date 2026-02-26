@@ -19,6 +19,8 @@ import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LanguageIcon from "@mui/icons-material/Language";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
@@ -119,6 +121,15 @@ const CarriersPage = observer(() => {
                       {carrier.name}
                     </Typography>
                     <Box sx={{ flexShrink: 0 }}>
+                      <Tooltip title={carrier.isFavorite ? "Убрать из избранного" : "В избранное"}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); carrierStore.toggleFavorite(carrier.id); }}
+                          sx={{ color: carrier.isFavorite ? "warning.main" : "action.disabled" }}
+                        >
+                          {carrier.isFavorite ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="Редактировать">
                         <IconButton
                           size="small"

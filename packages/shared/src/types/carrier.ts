@@ -5,6 +5,7 @@ export interface Carrier {
   website?: string | null;
   vehicle?: string | null;
   licensePlate?: string | null;
+  isFavorite?: boolean;
   notes?: string | null;
   userId: string;
   createdAt: string;
@@ -17,6 +18,7 @@ export interface CreateCarrierInput {
   website?: string;
   vehicle?: string;
   licensePlate?: string;
+  isFavorite?: boolean;
   notes?: string;
 }
 

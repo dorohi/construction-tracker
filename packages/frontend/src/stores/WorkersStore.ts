@@ -33,7 +33,10 @@ export class WorkersStore {
       const worker = await workersApi.create(data);
       runInAction(() => {
         this.workers.push(worker);
-        this.workers.sort((a, b) => a.name.localeCompare(b.name));
+        this.workers.sort((a, b) => {
+          if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
       });
       return worker;
     } catch {
@@ -42,6 +45,20 @@ export class WorkersStore {
       });
       return null;
     }
+  }
+
+  async toggleFavorite(id: string) {
+    const worker = this.workers.find((w) => w.id === id);
+    if (!worker) return;
+    const updated = await workersApi.update(id, { isFavorite: !worker.isFavorite });
+    runInAction(() => {
+      const idx = this.workers.findIndex((w) => w.id === id);
+      if (idx !== -1) this.workers[idx] = updated;
+      this.workers.sort((a, b) => {
+        if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+    });
   }
 
   async updateWorker(id: string, data: UpdateWorkerInput) {
