@@ -65,16 +65,17 @@ export default function SupplierForm({
   };
 
   const handleSubmit = () => {
+    const optional = (val: string) => val || (supplier ? "" : undefined);
     const data: Record<string, unknown> = {
       name,
-      contactName: contactName || undefined,
-      phone: phone || undefined,
-      website: website || undefined,
-      address: address || undefined,
-      latitude: latitude ? parseFloat(latitude) : undefined,
-      longitude: longitude ? parseFloat(longitude) : undefined,
+      contactName: optional(contactName),
+      phone: optional(phone),
+      website: optional(website),
+      address: optional(address),
+      latitude: latitude ? parseFloat(latitude) : (supplier ? null : undefined),
+      longitude: longitude ? parseFloat(longitude) : (supplier ? null : undefined),
       hasDelivery,
-      notes: notes || undefined,
+      notes: optional(notes),
     };
     onSubmit(data);
     onClose();

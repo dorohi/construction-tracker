@@ -53,13 +53,14 @@ export default function CarrierForm({
   };
 
   const handleSubmit = () => {
+    const optional = (val: string) => val || (carrier ? "" : undefined);
     const data: Record<string, unknown> = {
       name,
-      phone: phone || undefined,
-      website: website || undefined,
-      vehicle: vehicle || undefined,
-      licensePlate: licensePlate || undefined,
-      notes: notes || undefined,
+      phone: optional(phone),
+      website: optional(website),
+      vehicle: optional(vehicle),
+      licensePlate: optional(licensePlate),
+      notes: optional(notes),
     };
     onSubmit(data);
     onClose();

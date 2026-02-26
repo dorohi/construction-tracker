@@ -50,12 +50,13 @@ export default function WorkerForm({
   };
 
   const handleSubmit = () => {
+    const optional = (val: string) => val || (worker ? "" : undefined);
     const data: Record<string, unknown> = {
       name,
-      phone: phone || undefined,
-      website: website || undefined,
-      specialty: specialty || undefined,
-      notes: notes || undefined,
+      phone: optional(phone),
+      website: optional(website),
+      specialty: optional(specialty),
+      notes: optional(notes),
     };
     onSubmit(data);
     onClose();
