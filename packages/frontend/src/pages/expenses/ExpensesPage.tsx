@@ -64,14 +64,6 @@ const ExpensesPage = observer(() => {
 
   const isLoading = projectStore.loading || expenseStore.loading;
 
-  if (!isLoading && !project) {
-    return (
-      <Container>
-        <Typography>Проект не найден</Typography>
-      </Container>
-    );
-  }
-
   const filteredExpenses = useMemo(() => {
     let result = expenseStore.expenses;
     const f = filters;
@@ -182,6 +174,14 @@ const ExpensesPage = observer(() => {
       projectStore.loadProject(id);
     }
   };
+
+  if (!isLoading && !project) {
+    return (
+      <Container>
+        <Typography>Проект не найден</Typography>
+      </Container>
+    );
+  }
 
   return (
     <>
