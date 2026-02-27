@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -6,8 +6,7 @@ import {
   Typography,
   Box,
   Button,
-  Tabs,
-  Tab,
+  Badge,
   Breadcrumbs,
   Link,
   Dialog,
@@ -24,14 +23,11 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import BuildIcon from "@mui/icons-material/Build";
-import PeopleIcon from "@mui/icons-material/People";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { useStore } from "../../stores/RootStore";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseForm from "./ExpenseForm";
+import ExpenseFilters, { type ExpenseFilterValues, defaultFilters, countActiveFilters } from "./ExpenseFilters";
 import type { Expense, ExpenseType } from "@construction-tracker/shared/dist";
 import AppProgress from '@/components/AppProgress';
 
@@ -41,7 +37,8 @@ const ExpensesPage = observer(() => {
   const navigate = useNavigate();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
-  const [tab, setTab] = useState(0);
+  const [filters, setFilters] = useState<ExpenseFilterValues>({ ...defaultFilters });
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -74,13 +71,52 @@ const ExpensesPage = observer(() => {
     );
   }
 
-  const typeFilter = tab === 1 ? "MATERIAL" : tab === 2 ? "LABOR" : tab === 3 ? "DELIVERY" : undefined;
-  const plannedFilter = tab === 4;
-  const filteredExpenses = plannedFilter
-    ? expenseStore.plannedExpenses
-    : typeFilter
-      ? expenseStore.expenses.filter((e) => e.type === typeFilter)
-      : expenseStore.expenses;
+  const filteredExpenses = useMemo(() => {
+    let result = expenseStore.expenses;
+    const f = filters;
+
+    if (f.types.length > 0) {
+      result = result.filter((e) => f.types.includes(e.type));
+    }
+    if (f.categoryIds.length > 0) {
+      result = result.filter((e) => e.categoryId && f.categoryIds.includes(e.categoryId));
+    }
+    if (f.title) {
+      const search = f.title.toLowerCase();
+      result = result.filter((e) => e.title.toLowerCase().includes(search));
+    }
+    if (f.dateFrom) {
+      result = result.filter((e) => e.date >= f.dateFrom!);
+    }
+    if (f.dateTo) {
+      result = result.filter((e) => e.date <= f.dateTo! + "T23:59:59");
+    }
+    if (f.amountFrom !== null) {
+      result = result.filter((e) => e.amount >= f.amountFrom!);
+    }
+    if (f.amountTo !== null) {
+      result = result.filter((e) => e.amount <= f.amountTo!);
+    }
+    if (f.supplier) {
+      const s = f.supplier.toLowerCase();
+      result = result.filter((e) => e.supplier?.toLowerCase().includes(s));
+    }
+    if (f.carrier) {
+      const s = f.carrier.toLowerCase();
+      result = result.filter((e) => e.carrier?.toLowerCase().includes(s));
+    }
+    if (f.worker) {
+      const s = f.worker.toLowerCase();
+      result = result.filter((e) => e.worker?.toLowerCase().includes(s));
+    }
+    if (f.plannedStatus === "planned") {
+      result = result.filter((e) => e.planned);
+    } else if (f.plannedStatus === "actual") {
+      result = result.filter((e) => !e.planned);
+    }
+
+    return result;
+  }, [expenseStore.expenses, filters]);
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (editingExpense) {
@@ -171,10 +207,19 @@ const ExpensesPage = observer(() => {
       </Breadcrumbs>
 
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, gap: 1 }}>
-        <Typography variant={isMobile ? "h5" : "h4"}>Расходы</Typography>
+        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+          <Typography variant={isMobile ? "h5" : "h4"}>Расходы</Typography>
+        </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
           {isMobile ? (
             <>
+              <Tooltip title="Фильтры">
+                <IconButton onClick={() => setFiltersOpen(true)}>
+                  <Badge badgeContent={countActiveFilters(filters)} color="primary">
+                    <FilterListIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Категории">
                 <IconButton onClick={() => setCategoryDialogOpen(true)}>
                   <CategoryIcon />
@@ -195,6 +240,15 @@ const ExpensesPage = observer(() => {
             </>
           ) : (
             <>
+              <Badge badgeContent={countActiveFilters(filters)} color="primary">
+                <Button
+                  variant="outlined"
+                  startIcon={<FilterListIcon />}
+                  onClick={() => setFiltersOpen(true)}
+                >
+                  Фильтры
+                </Button>
+              </Badge>
               <Button
                 variant="outlined"
                 startIcon={<CategoryIcon />}
@@ -217,20 +271,16 @@ const ExpensesPage = observer(() => {
         </Box>
       </Box>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs
-          value={tab}
-          onChange={(_, v) => setTab(v)}
-          variant={isMobile ? "scrollable" : "standard"}
-          scrollButtons={isMobile ? "auto" : false}
-        >
-          <Tab icon={<ListAltIcon />} iconPosition="start" label={isMobile ? undefined : `Все (${expenseStore.expenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
-          <Tab icon={<BuildIcon />} iconPosition="start" label={isMobile ? undefined : `Материалы (${expenseStore.materialExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label={isMobile ? undefined : `Работы (${expenseStore.laborExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
-          <Tab icon={<LocalShippingIcon />} iconPosition="start" label={isMobile ? undefined : `Доставки (${expenseStore.deliveryExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
-          <Tab icon={<PlaylistAddCheckIcon />} iconPosition="start" label={isMobile ? undefined : `Запланированные (${expenseStore.plannedExpenses.length})`} sx={isMobile ? { minWidth: 'auto', px: 1 } : undefined} />
-        </Tabs>
-      </Box>
+      <ExpenseFilters
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        categories={projectStore.categories}
+        suppliers={supplierStore.suppliers}
+        carriers={carrierStore.carriers}
+        workers={workersStore.workers}
+      />
 
       <ExpenseTable
         expenses={filteredExpenses}
@@ -238,7 +288,6 @@ const ExpensesPage = observer(() => {
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
         onPurchase={handlePurchase}
-        hideType={!!typeFilter && !plannedFilter}
       />
 
       <ExpenseForm
