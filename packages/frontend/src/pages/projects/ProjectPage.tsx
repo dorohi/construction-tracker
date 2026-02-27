@@ -31,6 +31,7 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import EditIcon from "@mui/icons-material/Edit";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useStore } from "../../stores/RootStore";
 import SummaryCard from "../../components/SummaryCard";
 import ExpenseChart from "../../components/charts/ExpenseChart";
@@ -123,10 +124,16 @@ const ProjectPage = observer(() => {
             </IconButton>
           </Tooltip>
         </Box>
-        <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)} sx={{ flexShrink: 0 }}>
-          <ReceiptIcon sx={{ mr: 1 }} />
-          Управление
-        </Button>
+        <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
+          <Button variant="outlined" onClick={() => navigate(`/projects/${id}/calendar`)} sx={{ flexShrink: 0 }}>
+            <CalendarMonthIcon sx={{ mr: 1 }} />
+            Календарь
+          </Button>
+          <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)} sx={{ flexShrink: 0 }}>
+            <ReceiptIcon sx={{ mr: 1 }} />
+            Управление
+          </Button>
+        </Box>
       </Box>
 
       <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>

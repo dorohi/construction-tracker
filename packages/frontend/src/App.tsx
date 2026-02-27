@@ -13,6 +13,7 @@ import WorkersPage from "./pages/workers/WorkersPage";
 import NewsPage from "./pages/news/NewsPage";
 import AdminPage from "./pages/admin/AdminPage";
 import SettingsPage from "./pages/SettingsPage";
+import CalendarPage from "./pages/calendar/CalendarPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { authStore } = useStore();
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectPage />} />
           <Route path="/projects/:id/expenses" element={<ExpensesPage />} />
+          <Route path="/projects/:id/calendar" element={<CalendarPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/carriers" element={<CarriersPage />} />
           <Route path="/workers" element={<WorkersPage />} />

@@ -216,7 +216,7 @@ export default function ExpenseTable({ expenses, onEdit, onDuplicate, onDelete, 
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: "calc(-368px + 100vh)" }}>
+      <TableContainer sx={{ maxHeight: "calc(-270px + 100vh)" }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>

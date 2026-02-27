@@ -24,6 +24,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useStore } from "../../stores/RootStore";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseForm from "./ExpenseForm";
@@ -213,6 +214,11 @@ const ExpensesPage = observer(() => {
         <Box sx={{ display: "flex", gap: 1 }}>
           {isMobile ? (
             <>
+              <Tooltip title="Календарь">
+                <IconButton onClick={() => navigate(`/projects/${id}/calendar`)}>
+                  <CalendarMonthIcon />
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Фильтры">
                 <IconButton onClick={() => setFiltersOpen(true)}>
                   <Badge badgeContent={countActiveFilters(filters)} color="primary">
@@ -240,6 +246,13 @@ const ExpensesPage = observer(() => {
             </>
           ) : (
             <>
+              <Button
+                variant="outlined"
+                startIcon={<CalendarMonthIcon />}
+                onClick={() => navigate(`/projects/${id}/calendar`)}
+              >
+                Календарь
+              </Button>
               <Badge badgeContent={countActiveFilters(filters)} color="primary">
                 <Button
                   variant="outlined"
