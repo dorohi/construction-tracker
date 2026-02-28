@@ -52,8 +52,19 @@ export async function PUT(request: NextRequest, { params }: Params) {
     });
 
     return NextResponse.json({ data: updated });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Update expense error:", error);
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      return NextResponse.json(
+        { error: "Связанная запись (поставщик, перевозчик или работник) не найдена. Возможно, она была удалена." },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: "Внутренняя ошибка сервера" },
       { status: 500 }

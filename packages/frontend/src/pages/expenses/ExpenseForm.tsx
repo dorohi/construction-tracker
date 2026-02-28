@@ -127,6 +127,7 @@ const ExpenseForm = observer(() => {
     } else if (type === "DELIVERY") {
       if (carrier) data.carrier = carrier;
       data.carrierId = carrierId || undefined;
+      data.supplierId = supplierId || undefined;
     }
 
     const projectId = projectStore.currentProject!.id;
@@ -270,23 +271,34 @@ const ExpenseForm = observer(() => {
               options={carrierOptions}
               groupBy={(option) => typeof option === "string" ? "" : option._group}
               getOptionLabel={(option) => typeof option === "string" ? option : option.name}
-              value={carrierId ? carrierOptions.find((c) => c.id === carrierId) || carrier : carrier}
+              value={carrierId || supplierId ? carrierOptions.find((c) => c.id === (carrierId || supplierId)) || carrier : carrier}
               inputValue={carrier}
               onInputChange={(_, value) => {
                 setCarrier(value);
                 const match = carrierOptions.find((c) => c.name === value);
-                if (!match) setCarrierId(null);
+                if (!match) {
+                  setCarrierId(null);
+                  setSupplierId(null);
+                }
               }}
               onChange={(_, value) => {
                 if (value && typeof value !== "string") {
                   setCarrier(value.name);
-                  setCarrierId(value.id);
+                  if (value._group === "Поставщики") {
+                    setSupplierId(value.id);
+                    setCarrierId(null);
+                  } else {
+                    setCarrierId(value.id);
+                    setSupplierId(null);
+                  }
                 } else if (typeof value === "string") {
                   setCarrier(value);
                   setCarrierId(null);
+                  setSupplierId(null);
                 } else {
                   setCarrier("");
                   setCarrierId(null);
+                  setSupplierId(null);
                 }
               }}
               renderInput={(params) => <TextField {...params} label="Перевозчик" fullWidth />}

@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { Worker, CreateWorkerInput, UpdateWorkerInput } from "@construction-tracker/shared";
 import { workersApi } from "../services/api";
+import { rootStore } from "./RootStore";
 
 export class WorkersStore {
   workers: Worker[] = [];
@@ -65,11 +66,12 @@ export class WorkersStore {
           return a.name.localeCompare(b.name);
         });
       });
+      rootStore.snackbarStore.show("Работник добавлен", "success");
       return worker;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось создать работника";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать работника";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -97,11 +99,12 @@ export class WorkersStore {
           this.workers[idx] = updated;
         }
       });
+      rootStore.snackbarStore.show("Работник обновлён", "success");
       return updated;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось обновить работника";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить работника";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -112,10 +115,11 @@ export class WorkersStore {
       runInAction(() => {
         this.workers = this.workers.filter((s) => s.id !== id);
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось удалить работника";
-      });
+      rootStore.snackbarStore.show("Работник удалён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить работника";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 

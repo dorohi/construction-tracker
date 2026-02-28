@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { Expense, CreateExpenseInput, UpdateExpenseInput, ExpenseType } from "@construction-tracker/shared";
 import { expensesApi } from "../services/api";
+import { rootStore } from "./RootStore";
 
 export interface ExpenseFilterValues {
   types: ExpenseType[];
@@ -186,11 +187,12 @@ export class ExpenseStore {
       runInAction(() => {
         this.expenses.unshift(expense);
       });
+      rootStore.snackbarStore.show("Расход добавлен", "success");
       return expense;
-    } catch {
-      runInAction(() => {
-        this.error = "Failed to create expense";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать расход";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -204,11 +206,12 @@ export class ExpenseStore {
           this.expenses[idx] = updated;
         }
       });
+      rootStore.snackbarStore.show("Расход обновлён", "success");
       return updated;
-    } catch {
-      runInAction(() => {
-        this.error = "Failed to update expense";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить расход";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -219,10 +222,11 @@ export class ExpenseStore {
       runInAction(() => {
         this.expenses = this.expenses.filter((e) => e.id !== id);
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Failed to delete expense";
-      });
+      rootStore.snackbarStore.show("Расход удалён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить расход";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 

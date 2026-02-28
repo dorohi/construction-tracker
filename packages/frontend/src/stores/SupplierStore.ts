@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { Supplier, CreateSupplierInput, UpdateSupplierInput } from "@construction-tracker/shared";
 import { suppliersApi } from "../services/api";
+import { rootStore } from "./RootStore";
 
 export class SupplierStore {
   suppliers: Supplier[] = [];
@@ -70,11 +71,12 @@ export class SupplierStore {
           return a.name.localeCompare(b.name);
         });
       });
+      rootStore.snackbarStore.show("Поставщик добавлен", "success");
       return supplier;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось создать поставщика";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать поставщика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -102,11 +104,12 @@ export class SupplierStore {
           this.suppliers[idx] = updated;
         }
       });
+      rootStore.snackbarStore.show("Поставщик обновлён", "success");
       return updated;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось обновить поставщика";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить поставщика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -117,10 +120,11 @@ export class SupplierStore {
       runInAction(() => {
         this.suppliers = this.suppliers.filter((s) => s.id !== id);
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось удалить поставщика";
-      });
+      rootStore.snackbarStore.show("Поставщик удалён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить поставщика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 

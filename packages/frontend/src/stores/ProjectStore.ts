@@ -7,6 +7,7 @@ import type {
   ExpenseType,
 } from "@construction-tracker/shared";
 import { projectsApi, categoriesApi } from "../services/api";
+import { rootStore } from "./RootStore";
 
 export class ProjectStore {
   projects: ProjectWithTotals[] = [];
@@ -110,10 +111,11 @@ export class ProjectStore {
     try {
       await projectsApi.create({ name, description, budget });
       await this.loadProjects();
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось создать проект";
-      });
+      rootStore.snackbarStore.show("Проект создан", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать проект";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 
@@ -175,10 +177,11 @@ export class ProjectStore {
       if (this.currentProject?.id === id) {
         await this.loadProject(id);
       }
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось обновить проект";
-      });
+      rootStore.snackbarStore.show("Проект обновлён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить проект";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 
@@ -191,10 +194,11 @@ export class ProjectStore {
           this.currentProject = null;
         }
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось удалить проект";
-      });
+      rootStore.snackbarStore.show("Проект удалён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить проект";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 
@@ -211,10 +215,11 @@ export class ProjectStore {
           this.currentProject.categories.push(category);
         }
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось создать категорию";
-      });
+      rootStore.snackbarStore.show("Категория добавлена", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать категорию";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 
@@ -229,10 +234,11 @@ export class ProjectStore {
           );
         }
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось удалить категорию";
-      });
+      rootStore.snackbarStore.show("Категория удалена", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить категорию";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 

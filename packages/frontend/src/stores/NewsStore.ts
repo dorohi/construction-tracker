@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { News } from "@construction-tracker/shared";
 import { newsApi } from "@/services/api";
+import { rootStore } from "./RootStore";
 
 export class NewsStore {
   news: News[] = [];
@@ -94,27 +95,48 @@ export class NewsStore {
   }
 
   async createNews(data: { title: string; content: string }) {
-    const created = await newsApi.create(data);
-    runInAction(() => {
-      this.news.unshift(created);
-    });
+    try {
+      const created = await newsApi.create(data);
+      runInAction(() => {
+        this.news.unshift(created);
+      });
+      rootStore.snackbarStore.show("Новость опубликована", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать новость";
+      rootStore.snackbarStore.show(msg, "error");
+      throw e;
+    }
   }
 
   async updateNews(id: string, data: { title?: string; content?: string }) {
-    const updated = await newsApi.update(id, data);
-    runInAction(() => {
-      const idx = this.news.findIndex((n) => n.id === id);
-      if (idx !== -1) {
-        this.news[idx] = updated;
-      }
-    });
+    try {
+      const updated = await newsApi.update(id, data);
+      runInAction(() => {
+        const idx = this.news.findIndex((n) => n.id === id);
+        if (idx !== -1) {
+          this.news[idx] = updated;
+        }
+      });
+      rootStore.snackbarStore.show("Новость обновлена", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить новость";
+      rootStore.snackbarStore.show(msg, "error");
+      throw e;
+    }
   }
 
   async deleteNews(id: string) {
-    await newsApi.delete(id);
-    runInAction(() => {
-      this.news = this.news.filter((n) => n.id !== id);
-    });
+    try {
+      await newsApi.delete(id);
+      runInAction(() => {
+        this.news = this.news.filter((n) => n.id !== id);
+      });
+      rootStore.snackbarStore.show("Новость удалена", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить новость";
+      rootStore.snackbarStore.show(msg, "error");
+      throw e;
+    }
   }
 
   async toggleReaction(newsId: string, type: "like" | "dislike") {

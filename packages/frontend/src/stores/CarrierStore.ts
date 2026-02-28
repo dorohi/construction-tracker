@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { Carrier, CreateCarrierInput, UpdateCarrierInput } from "@construction-tracker/shared";
 import { carriersApi } from "../services/api";
+import { rootStore } from "./RootStore";
 
 export class CarrierStore {
   carriers: Carrier[] = [];
@@ -70,11 +71,12 @@ export class CarrierStore {
           return a.name.localeCompare(b.name);
         });
       });
+      rootStore.snackbarStore.show("Перевозчик добавлен", "success");
       return carrier;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось создать доставщика";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось создать перевозчика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -102,11 +104,12 @@ export class CarrierStore {
           this.carriers[idx] = updated;
         }
       });
+      rootStore.snackbarStore.show("Перевозчик обновлён", "success");
       return updated;
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось обновить доставщика";
-      });
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось обновить перевозчика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
       return null;
     }
   }
@@ -117,10 +120,11 @@ export class CarrierStore {
       runInAction(() => {
         this.carriers = this.carriers.filter((c) => c.id !== id);
       });
-    } catch {
-      runInAction(() => {
-        this.error = "Не удалось удалить доставщика";
-      });
+      rootStore.snackbarStore.show("Перевозчик удалён", "success");
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось удалить перевозчика";
+      runInAction(() => { this.error = msg; });
+      rootStore.snackbarStore.show(msg, "error");
     }
   }
 

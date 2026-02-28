@@ -3,6 +3,7 @@ import { Box, Toolbar } from "@mui/material";
 import { observer } from "mobx-react-lite";
 import Navbar from "./Navbar";
 import Sidebar from "./sidebar/Sidebar";
+import AppSnackbar from "./AppSnackbar";
 
 const Layout = observer(() => {
   return (
@@ -21,6 +22,7 @@ const Layout = observer(() => {
         <Toolbar />
         <Outlet />
       </Box>
+      <AppSnackbar />
     </Box>
   );
 });
