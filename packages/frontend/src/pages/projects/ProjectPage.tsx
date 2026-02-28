@@ -24,14 +24,17 @@ import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+import TableViewIcon from '@mui/icons-material/TableView';
 import EditIcon from "@mui/icons-material/Edit";
+import CategoryIcon from "@mui/icons-material/Category";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useStore } from "../../stores/RootStore";
 import SummaryCard from "../../components/SummaryCard";
 import ExpenseChart from "../../components/charts/ExpenseChart";
 import AppProgress from "@/components/AppProgress";
 import ProjectForm from "./ProjectForm";
+import CategoryDialog from "./CategoryDialog";
+import DeleteCategoryDialog from "./DeleteCategoryDialog";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -89,14 +92,30 @@ const ProjectPage = observer(() => {
                 </IconButton>
               </Tooltip>
             </Box>
-            <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
-              <Button variant="outlined" onClick={() => navigate(`/projects/${id}/calendar`)} sx={{ flexShrink: 0 }}>
+            <Box sx={{ display: "flex", gap: 2, flexShrink: 0, width: isMobile ? "100%" : "auto" }}>
+              <Button
+                variant="outlined"
+                fullWidth={isMobile}
+                onClick={projectStore.openCategoryDialog}
+              >
+                <CategoryIcon sx={{ mr: 1 }} />
+                Категории
+              </Button>
+              <Button
+                variant="contained"
+                fullWidth={isMobile}
+                onClick={() => navigate(`/projects/${id}/calendar`)}
+              >
                 <CalendarMonthIcon sx={{ mr: 1 }} />
                 Календарь
               </Button>
-              <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)} sx={{ flexShrink: 0 }}>
-                <ReceiptIcon sx={{ mr: 1 }} />
-                Управление
+              <Button
+                variant="contained"
+                fullWidth={isMobile}
+                onClick={() => navigate(`/projects/${id}/expenses`)}
+              >
+                <TableViewIcon sx={{ mr: 1 }} />
+                Расходы
               </Button>
             </Box>
           </Box>
@@ -215,6 +234,8 @@ const ProjectPage = observer(() => {
           })()}
 
           <ProjectForm />
+          <CategoryDialog />
+          <DeleteCategoryDialog />
         </Container>
       )}
     </>

@@ -15,18 +15,18 @@ import type { ExpenseType } from "@construction-tracker/shared/dist";
 import { useStore } from "../../stores/RootStore";
 
 const CategoryDialog = observer(() => {
-  const { projectStore, expenseStore } = useStore();
+  const { projectStore } = useStore();
 
   const handleAdd = async () => {
     const projectId = projectStore.currentProject?.id;
-    if (expenseStore.newCategoryName && projectId) {
-      await projectStore.createCategory(projectId, expenseStore.newCategoryName, expenseStore.newCategoryType);
-      expenseStore.resetNewCategory();
+    if (projectStore.newCategoryName && projectId) {
+      await projectStore.createCategory(projectId, projectStore.newCategoryName, projectStore.newCategoryType);
+      projectStore.resetNewCategory();
     }
   };
 
   return (
-    <Dialog open={expenseStore.categoryDialogOpen} onClose={expenseStore.closeCategoryDialog} maxWidth="sm" fullWidth>
+    <Dialog open={projectStore.categoryDialogOpen} onClose={projectStore.closeCategoryDialog} maxWidth="sm" fullWidth>
       <DialogTitle>Управление категориями</DialogTitle>
       <DialogContent>
         {(
@@ -50,7 +50,7 @@ const CategoryDialog = observer(() => {
                     label={cat.name}
                     color={color}
                     size="small"
-                    onDelete={() => expenseStore.setDeletingCategoryId(cat.id)}
+                    onDelete={() => projectStore.setDeletingCategoryId(cat.id)}
                   />
                 ))}
               </Box>
@@ -64,15 +64,15 @@ const CategoryDialog = observer(() => {
         <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
           <TextField
             label="Название категории"
-            value={expenseStore.newCategoryName}
-            onChange={(e) => expenseStore.setNewCategoryName(e.target.value)}
+            value={projectStore.newCategoryName}
+            onChange={(e) => projectStore.setNewCategoryName(e.target.value)}
             size="small"
             sx={{ flex: 1 }}
           />
           <TextField
             label="Тип"
-            value={expenseStore.newCategoryType}
-            onChange={(e) => expenseStore.setNewCategoryType(e.target.value as ExpenseType)}
+            value={projectStore.newCategoryType}
+            onChange={(e) => projectStore.setNewCategoryType(e.target.value as ExpenseType)}
             select
             size="small"
             sx={{ width: 150 }}
@@ -84,8 +84,8 @@ const CategoryDialog = observer(() => {
         </Box>
       </DialogContent>
       <DialogActions sx={{ p: 3 }}>
-        <Button onClick={expenseStore.closeCategoryDialog} variant="contained">Закрыть</Button>
-        <Button onClick={handleAdd} variant="contained" disabled={!expenseStore.newCategoryName}>
+        <Button onClick={projectStore.closeCategoryDialog} variant="contained">Закрыть</Button>
+        <Button onClick={handleAdd} variant="contained" disabled={!projectStore.newCategoryName}>
           Добавить
         </Button>
       </DialogActions>

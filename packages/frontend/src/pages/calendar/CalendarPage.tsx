@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ViewListIcon from "@mui/icons-material/ViewList";
+import TableViewIcon from "@mui/icons-material/TableView";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -182,7 +182,7 @@ const CalendarPage = observer(() => {
                 <>
                   <Tooltip title="Расходы">
                     <IconButton onClick={() => navigate(`/projects/${id}/expenses`)}>
-                      <ViewListIcon />
+                      <TableViewIcon />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Добавить">
@@ -195,7 +195,7 @@ const CalendarPage = observer(() => {
                 <>
                   <Button
                     variant="outlined"
-                    startIcon={<ViewListIcon />}
+                    startIcon={<TableViewIcon />}
                     onClick={() => navigate(`/projects/${id}/expenses`)}
                   >
                     Расходы

@@ -19,6 +19,10 @@ import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
@@ -103,14 +107,14 @@ const ProjectsPage = observer(() => {
                     )}
                     <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.5 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <AttachMoneyIcon sx={{ fontSize: 18, width: 24, color: "warning.main" }} />
+                        <AttachMoneyIcon sx={{ fontSize: 18, color: "warning.main" }} />
                         <Typography variant="body2">
                           Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
                         </Typography>
                       </Box>
                       {project.plannedTotal > 0 && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <PlaylistAddCheckIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                          <PlaylistAddCheckIcon sx={{ fontSize: 18, color: "info.main" }} />
                           <Typography variant="body2">
                             Запланировано: <strong>{formatCurrency(project.plannedTotal)}</strong>
                           </Typography>
@@ -119,7 +123,7 @@ const ProjectsPage = observer(() => {
                       {project.budget != null && (
                         <>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <AccountBalanceIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                            <AccountBalanceIcon sx={{ fontSize: 18, color: "info.main" }} />
                             <Typography variant="body2">Бюджет: {formatCurrency(project.budget)}</Typography>
                           </Box>
                           <LinearProgress
@@ -152,7 +156,34 @@ const ProjectsPage = observer(() => {
                       </Box>
                     </Box>
                   </CardContent>
-                  <CardActions sx={{ justifyContent: "flex-end", px: 2, pb: 2 }}>
+                  <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2 }}>
+                    <Box>
+                      {project.order != null ? (
+                        <>
+                          <Tooltip title="Поднять выше">
+                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); projectStore.moveProjectUp(project.id); }}>
+                              <ArrowUpwardIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Опустить ниже">
+                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); projectStore.moveProjectDown(project.id); }}>
+                              <ArrowDownwardIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Открепить">
+                            <IconButton size="small" color="primary" onClick={(e) => { e.stopPropagation(); projectStore.unpinProject(project.id); }}>
+                              <PushPinIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      ) : (
+                        <Tooltip title="Закрепить">
+                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); projectStore.pinProject(project.id); }}>
+                            <PushPinOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
                     <Button size="small" variant="outlined">Подробнее</Button>
                   </CardActions>
                 </Card>

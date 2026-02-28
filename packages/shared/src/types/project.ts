@@ -3,6 +3,7 @@ export interface Project {
   name: string;
   description?: string | null;
   budget?: number | null;
+  order?: number | null;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -23,4 +24,6 @@ export interface CreateProjectInput {
   budget?: number;
 }
 
-export interface UpdateProjectInput extends Partial<CreateProjectInput> {}
+export interface UpdateProjectInput extends Partial<CreateProjectInput> {
+  order?: number | null;
+}

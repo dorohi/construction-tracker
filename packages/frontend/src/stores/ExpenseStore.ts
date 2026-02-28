@@ -60,12 +60,6 @@ export class ExpenseStore {
   editingExpense: Expense | null = null;
   duplicatingExpense: Expense | null = null;
 
-  // UI: category dialog
-  categoryDialogOpen = false;
-  newCategoryName = "";
-  newCategoryType: ExpenseType = "MATERIAL";
-  deletingCategoryId: string | null = null;
-
   // UI: confirmations
   purchasingExpense: Expense | null = null;
   deletingExpense: Expense | null = null;
@@ -271,17 +265,8 @@ export class ExpenseStore {
     this.duplicatingExpense = null;
   }
 
-  // --- Actions: UI category dialog ---
-
-  openCategoryDialog() { this.categoryDialogOpen = true; }
-  closeCategoryDialog() { this.categoryDialogOpen = false; }
-  setNewCategoryName(name: string) { this.newCategoryName = name; }
-  setNewCategoryType(type: ExpenseType) { this.newCategoryType = type; }
-  resetNewCategory() { this.newCategoryName = ""; }
-
   // --- Actions: UI confirmations ---
 
-  setDeletingCategoryId(id: string | null) { this.deletingCategoryId = id; }
   setPurchasingExpense(expense: Expense | null) { this.purchasingExpense = expense; }
   setDeletingExpense(expense: Expense | null) { this.deletingExpense = expense; }
 

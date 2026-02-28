@@ -15,17 +15,14 @@ import {
   useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import CategoryIcon from "@mui/icons-material/Category";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useStore } from "../../stores/RootStore";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseForm from "./ExpenseForm";
 import ExpenseFilters from "./ExpenseFilters";
-import CategoryDialog from "./CategoryDialog";
 import DeleteExpenseDialog from "./DeleteExpenseDialog";
 import PurchaseDialog from "./PurchaseDialog";
-import DeleteCategoryDialog from "./DeleteCategoryDialog";
 import AppProgress from "@/components/AppProgress";
 
 const ExpensesPage = observer(() => {
@@ -90,11 +87,6 @@ const ExpensesPage = observer(() => {
                       </Badge>
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Категории">
-                    <IconButton onClick={expenseStore.openCategoryDialog}>
-                      <CategoryIcon />
-                    </IconButton>
-                  </Tooltip>
                   <Tooltip title="Добавить">
                     <IconButton color="primary" onClick={expenseStore.openAddForm}>
                       <AddIcon />
@@ -111,9 +103,6 @@ const ExpensesPage = observer(() => {
                       Фильтры
                     </Button>
                   </Badge>
-                  <Button variant="outlined" startIcon={<CategoryIcon />} onClick={expenseStore.openCategoryDialog}>
-                    Категории
-                  </Button>
                   <Button variant="contained" startIcon={<AddIcon />} onClick={expenseStore.openAddForm}>
                     Добавить
                   </Button>
@@ -125,10 +114,8 @@ const ExpensesPage = observer(() => {
           <ExpenseFilters />
           <ExpenseTable />
           <ExpenseForm />
-          <CategoryDialog />
           <DeleteExpenseDialog />
           <PurchaseDialog />
-          <DeleteCategoryDialog />
         </Container>
       )}
     </>

@@ -33,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
-  const { name, description, budget } = await request.json();
+  const { name, description, budget, order } = await request.json();
 
   const project = await prisma.project.update({
     where: { id },
@@ -41,6 +41,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       ...(name !== undefined && { name }),
       ...(description !== undefined && { description }),
       ...(budget !== undefined && { budget }),
+      ...(order !== undefined && { order }),
     },
   });
 

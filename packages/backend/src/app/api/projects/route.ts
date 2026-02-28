@@ -24,6 +24,14 @@ export async function GET(request: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
+  // Sort: pinned projects first (by order asc), then unpinned by createdAt desc
+  projects.sort((a, b) => {
+    if (a.order != null && b.order != null) return a.order - b.order;
+    if (a.order != null) return -1;
+    if (b.order != null) return 1;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
   const data = projects.map((p) => {
     const actual = p.expenses.filter((e) => !e.planned);
     const totalSpent = actual.reduce((s, e) => s + e.amount, 0);

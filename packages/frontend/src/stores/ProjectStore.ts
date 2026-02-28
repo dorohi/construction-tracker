@@ -4,6 +4,7 @@ import type {
   ProjectWithTotals,
   Category,
   ProjectSummary,
+  ExpenseType,
 } from "@construction-tracker/shared";
 import { projectsApi, categoriesApi } from "../services/api";
 
@@ -19,6 +20,12 @@ export class ProjectStore {
   formOpen = false;
   editingProject: ProjectWithTotals | (Project & { categories: Category[] }) | null = null;
   deletingProjectId: string | null = null;
+
+  // UI: category dialog
+  categoryDialogOpen = false;
+  newCategoryName = "";
+  newCategoryType: ExpenseType = "MATERIAL";
+  deletingCategoryId: string | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
@@ -44,6 +51,15 @@ export class ProjectStore {
   setDeletingProjectId(id: string | null) {
     this.deletingProjectId = id;
   }
+
+  // --- UI: category dialog ---
+
+  openCategoryDialog() { this.categoryDialogOpen = true; }
+  closeCategoryDialog() { this.categoryDialogOpen = false; }
+  setNewCategoryName(name: string) { this.newCategoryName = name; }
+  setNewCategoryType(type: ExpenseType) { this.newCategoryType = type; }
+  resetNewCategory() { this.newCategoryName = ""; }
+  setDeletingCategoryId(id: string | null) { this.deletingCategoryId = id; }
 
   confirmDeleteProject() {
     if (this.deletingProjectId) {
@@ -99,6 +115,54 @@ export class ProjectStore {
         this.error = "Не удалось создать проект";
       });
     }
+  }
+
+  async updateProjectOrder(id: string, order: number | null) {
+    try {
+      await projectsApi.update(id, { order });
+      await this.loadProjects();
+    } catch {
+      runInAction(() => {
+        this.error = "Не удалось обновить порядок проекта";
+      });
+    }
+  }
+
+  async pinProject(id: string) {
+    const minOrder = this.projects.reduce((min, p) => {
+      if (p.order != null && p.order < min) return p.order;
+      return min;
+    }, 1);
+    const newOrder = this.projects.some((p) => p.order != null) ? minOrder - 1 : 1;
+    await this.updateProjectOrder(id, newOrder);
+  }
+
+  async unpinProject(id: string) {
+    await this.updateProjectOrder(id, null);
+  }
+
+  async moveProjectUp(id: string) {
+    const pinned = this.projects.filter((p) => p.order != null);
+    const idx = pinned.findIndex((p) => p.id === id);
+    if (idx <= 0) return;
+    const prev = pinned[idx - 1];
+    const curr = pinned[idx];
+    // Swap orders
+    await projectsApi.update(prev.id, { order: curr.order });
+    await projectsApi.update(curr.id, { order: prev.order });
+    await this.loadProjects();
+  }
+
+  async moveProjectDown(id: string) {
+    const pinned = this.projects.filter((p) => p.order != null);
+    const idx = pinned.findIndex((p) => p.id === id);
+    if (idx < 0 || idx >= pinned.length - 1) return;
+    const next = pinned[idx + 1];
+    const curr = pinned[idx];
+    // Swap orders
+    await projectsApi.update(next.id, { order: curr.order });
+    await projectsApi.update(curr.id, { order: next.order });
+    await this.loadProjects();
   }
 
   async updateProject(
