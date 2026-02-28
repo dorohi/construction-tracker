@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,11 +9,6 @@ import {
   CardActions,
   Button,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   IconButton,
   LinearProgress,
   Tooltip,
@@ -31,8 +26,10 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useStore } from "../../stores/RootStore";
-import AppProgress from '@/components/AppProgress';
-import useSearch from '@/hooks/useSearch';
+import AppProgress from "@/components/AppProgress";
+import useSearch from "@/hooks/useSearch";
+import ProjectForm from "./ProjectForm";
+import DeleteProjectDialog from "./DeleteProjectDialog";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -49,307 +46,138 @@ const ProjectsPage = observer(() => {
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
   const { search, searchField } = useSearch({ placeholder: "Поиск по названию или описанию..." });
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
-  const [editProjectId, setEditProjectId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [budget, setBudget] = useState("");
 
   useEffect(() => {
     projectStore.loadProjects();
   }, [projectStore]);
 
-  const handleCreate = async () => {
-    await projectStore.createProject(
-      name,
-      description || undefined,
-      budget ? parseFloat(budget) : undefined
-    );
-    setDialogOpen(false);
-    setName("");
-    setDescription("");
-    setBudget("");
-  };
-
-  const handleEditOpen = (project: (typeof projectStore.projects)[0], e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditProjectId(project.id);
-    setName(project.name);
-    setDescription(project.description || "");
-    setBudget(project.budget != null ? String(project.budget) : "");
-    setEditDialogOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setEditDialogOpen(false);
-    setEditProjectId(null);
-    setName("");
-    setDescription("");
-    setBudget("");
-  };
-
-  const handleEditSave = async () => {
-    if (!editProjectId) return;
-    await projectStore.updateProject(editProjectId, {
-      name,
-      description: description || undefined,
-      budget: budget ? parseFloat(budget) : undefined,
-    });
-    handleEditClose();
-  };
-
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDeletingProjectId(id);
-  };
-
-  const confirmDeleteProject = async () => {
-    if (deletingProjectId) {
-      await projectStore.deleteProject(deletingProjectId);
-      setDeletingProjectId(null);
-    }
-  };
+  const filteredProjects = search
+    ? projectStore.projects.filter((p) => {
+        const q = search.toLowerCase();
+        return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
+      })
+    : projectStore.projects;
 
   return (
     <>
       {projectStore.loading && <AppProgress />}
-    <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant={isMobile ? "h5" : "h4"}>Мои проекты</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
-        >
-          Новый
-        </Button>
-      </Box>
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+          <Typography variant={isMobile ? "h5" : "h4"}>Мои проекты</Typography>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={projectStore.openCreateForm}>
+            Новый
+          </Button>
+        </Box>
 
-      {projectStore.projects.length > 3 && searchField}
-      <Grid container spacing={3}>
-        {projectStore.projects
-          .filter((p) => {
-            if (!search) return true;
-            const q = search.toLowerCase();
-            return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
-          })
-          .map((project) => {
-          const spentPercent = project.budget
-            ? Math.min((project.totalSpent / project.budget) * 100, 100)
-            : 0;
+        {projectStore.projects.length > 3 && searchField}
+        <Grid container spacing={3}>
+          {filteredProjects.map((project) => {
+            const spentPercent = project.budget
+              ? Math.min((project.totalSpent / project.budget) * 100, 100)
+              : 0;
 
-          return (
-            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={project.id}>
-              <Card
-                sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%", display: "flex", flexDirection: "column" }}
-                onClick={() => navigate(`/projects/${project.id}`)}
-              >
-                <CardContent sx={{ flex: 1 }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="h6" noWrap>
-                      {project.name}
-                    </Typography>
-                    <Box>
-                      <Tooltip title="Редактировать проект">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleEditOpen(project, e)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Удалить проект">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={(e) => handleDelete(project.id, e)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+            return (
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} key={project.id}>
+                <Card
+                  sx={{ cursor: "pointer", "&:hover": { boxShadow: 4 }, height: "100%", display: "flex", flexDirection: "column" }}
+                  onClick={() => navigate(`/projects/${project.id}`)}
+                >
+                  <CardContent sx={{ flex: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Typography variant="h6" noWrap>{project.name}</Typography>
+                      <Box>
+                        <Tooltip title="Редактировать проект">
+                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); projectStore.openEditForm(project); }}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Удалить проект">
+                          <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); projectStore.setDeletingProjectId(project.id); }}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </Box>
-                  </Box>
-                  {project.description && (
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      {project.description}
-                    </Typography>
-                  )}
-                  <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.5 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <AttachMoneyIcon sx={{ fontSize: 18, width: 24, color: "warning.main" }} />
-                      <Typography variant="body2">
-                        Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
-                      </Typography>
-                    </Box>
-                    {project.plannedTotal > 0 && (
+                    {project.description && (
+                      <Typography variant="body2" color="text.secondary" noWrap>{project.description}</Typography>
+                    )}
+                    <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.5 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <PlaylistAddCheckIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                        <AttachMoneyIcon sx={{ fontSize: 18, width: 24, color: "warning.main" }} />
                         <Typography variant="body2">
-                          Запланировано: <strong>{formatCurrency(project.plannedTotal)}</strong>
+                          Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
                         </Typography>
                       </Box>
-                    )}
-                    {project.budget != null && (
-                      <>
+                      {project.plannedTotal > 0 && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <AccountBalanceIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                          <PlaylistAddCheckIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
                           <Typography variant="body2">
-                            Бюджет: {formatCurrency(project.budget)}
+                            Запланировано: <strong>{formatCurrency(project.plannedTotal)}</strong>
                           </Typography>
                         </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={spentPercent}
-                          color={spentPercent > 90 ? "error" : spentPercent > 70 ? "warning" : "primary"}
-                          sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
-                        />
-                      </>
-                    )}
-                  </Box>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 2, rowGap: 0.5, mt: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
-                      <Typography variant="caption" color="text.secondary" noWrap>
-                        Материалы: {formatCurrency(project.materialTotal)}
-                      </Typography>
+                      )}
+                      {project.budget != null && (
+                        <>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <AccountBalanceIcon sx={{ fontSize: 18, width: 24, color: "info.main" }} />
+                            <Typography variant="body2">Бюджет: {formatCurrency(project.budget)}</Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={spentPercent}
+                            color={spentPercent > 90 ? "error" : spentPercent > 70 ? "warning" : "primary"}
+                            sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
+                          />
+                        </>
+                      )}
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <PeopleIcon sx={{ fontSize: 14, color: "secondary.main" }} />
-                      <Typography variant="caption" color="text.secondary" noWrap>
-                        Работы: {formatCurrency(project.laborTotal)}
-                      </Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 2, rowGap: 0.5, mt: 1 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          Материалы: {formatCurrency(project.materialTotal)}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <PeopleIcon sx={{ fontSize: 14, color: "secondary.main" }} />
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          Работы: {formatCurrency(project.laborTotal)}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <LocalShippingIcon sx={{ fontSize: 14, color: "success.main" }} />
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          Доставки: {formatCurrency(project.deliveryTotal)}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <LocalShippingIcon sx={{ fontSize: 14, color: "success.main" }} />
-                      <Typography variant="caption" color="text.secondary" noWrap>
-                        Доставки: {formatCurrency(project.deliveryTotal)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-                <CardActions sx={{ justifyContent: "flex-end", px: 2, pb: 2 }}>
-                  <Button size="small" variant="outlined">Подробнее</Button>
-                </CardActions>
-              </Card>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: "flex-end", px: 2, pb: 2 }}>
+                    <Button size="small" variant="outlined">Подробнее</Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            );
+          })}
+
+          {!projectStore.loading && projectStore.projects.length === 0 && (
+            <Grid size={{ xs: 12 }}>
+              <Box sx={{ textAlign: "center", py: 8 }}>
+                <Typography variant="h6" color="text.secondary">Проектов пока нет</Typography>
+                <Typography color="text.secondary" sx={{ mb: 2 }}>
+                  Создайте первый проект для учёта расходов
+                </Typography>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={projectStore.openCreateForm}>
+                  Создать проект
+                </Button>
+              </Box>
             </Grid>
-          );
-        })}
+          )}
+        </Grid>
 
-        {!projectStore.loading && projectStore.projects.length === 0 && (
-          <Grid size={{ xs: 12 }}>
-            <Box sx={{ textAlign: "center", py: 8 }}>
-              <Typography variant="h6" color="text.secondary">
-                Проектов пока нет
-              </Typography>
-              <Typography color="text.secondary" sx={{ mb: 2 }}>
-                Создайте первый проект для учёта расходов
-              </Typography>
-              <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-                Создать проект
-              </Button>
-            </Box>
-          </Grid>
-        )}
-      </Grid>
-
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Новый проект</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Название проекта"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-            required
-            margin="normal"
-            placeholder="напр., Строительство дома"
-          />
-          <TextField
-            label="Описание"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            multiline
-            rows={2}
-            margin="normal"
-          />
-          <TextField
-            label="Бюджет"
-            type="number"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            fullWidth
-            margin="normal"
-            placeholder="Общий бюджет (необязательно)"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} variant="contained">Отмена</Button>
-          <Button onClick={handleCreate} variant="contained" disabled={!name}>
-            Создать
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={editDialogOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Редактировать проект</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Название проекта"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-            required
-            margin="normal"
-          />
-          <TextField
-            label="Описание"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            multiline
-            rows={2}
-            margin="normal"
-          />
-          <TextField
-            label="Бюджет"
-            type="number"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditClose} variant="contained">Отмена</Button>
-          <Button onClick={handleEditSave} variant="contained" disabled={!name}>
-            Сохранить
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete Project Confirmation */}
-      <Dialog
-        open={!!deletingProjectId}
-        onClose={() => setDeletingProjectId(null)}
-        maxWidth="xs"
-      >
-        <DialogTitle>Удалить проект?</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Проект и все его расходы будут удалены без возможности восстановления.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeletingProjectId(null)} variant="contained">Отмена</Button>
-          <Button onClick={confirmDeleteProject} variant="contained" color="error">
-            Удалить
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+        <ProjectForm />
+        <DeleteProjectDialog />
+      </Container>
     </>
   );
 });

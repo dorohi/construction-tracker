@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { News } from "@construction-tracker/shared";
 import { newsApi } from "@/services/api";
 
@@ -7,8 +7,71 @@ export class NewsStore {
   loading = false;
   error: string | null = null;
 
+  // UI
+  formOpen = false;
+  editingNews: News | null = null;
+  deletingId: string | null = null;
+  menuAnchor: HTMLElement | null = null;
+  menuNewsId: string | null = null;
+
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, { menuAnchor: observable.ref }, { autoBind: true });
+  }
+
+  // --- UI actions ---
+
+  openAddForm() {
+    this.editingNews = null;
+    this.formOpen = true;
+  }
+
+  openEditForm(item: News) {
+    this.closeMenu();
+    this.editingNews = item;
+    this.formOpen = true;
+  }
+
+  closeForm() {
+    this.formOpen = false;
+    this.editingNews = null;
+  }
+
+  setDeletingId(id: string | null) {
+    this.deletingId = id;
+  }
+
+  confirmDelete() {
+    if (this.deletingId) {
+      this.deleteNews(this.deletingId);
+      this.deletingId = null;
+    }
+  }
+
+  openMenu(anchor: HTMLElement, id: string) {
+    this.menuAnchor = anchor;
+    this.menuNewsId = id;
+  }
+
+  closeMenu() {
+    this.menuAnchor = null;
+    this.menuNewsId = null;
+  }
+
+  get menuNews(): News | null {
+    return this.news.find((n) => n.id === this.menuNewsId) ?? null;
+  }
+
+  handleMenuEdit() {
+    if (this.menuNews) {
+      this.openEditForm(this.menuNews);
+    }
+  }
+
+  handleMenuDelete() {
+    if (this.menuNewsId) {
+      this.setDeletingId(this.menuNewsId);
+      this.closeMenu();
+    }
   }
 
   async loadNews() {

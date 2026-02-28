@@ -6,10 +6,42 @@ export class SupplierStore {
   suppliers: Supplier[] = [];
   loading = false;
   error: string | null = null;
+
+  // UI
+  formOpen = false;
+  editingSupplier: Supplier | null = null;
   deletingId: string | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  // --- UI actions ---
+
+  openAddForm() {
+    this.editingSupplier = null;
+    this.formOpen = true;
+  }
+
+  openEditForm(supplier: Supplier) {
+    this.editingSupplier = supplier;
+    this.formOpen = true;
+  }
+
+  closeForm() {
+    this.formOpen = false;
+    this.editingSupplier = null;
+  }
+
+  setDeletingId(id: string | null) {
+    this.deletingId = id;
+  }
+
+  confirmDelete() {
+    if (this.deletingId) {
+      this.deleteSupplier(this.deletingId);
+      this.deletingId = null;
+    }
   }
 
   async loadSuppliers() {

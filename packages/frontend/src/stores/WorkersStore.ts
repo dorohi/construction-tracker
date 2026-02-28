@@ -6,11 +6,38 @@ export class WorkersStore {
   workers: Worker[] = [];
   loading = false;
   error: string | null = null;
+
+  // UI
+  formOpen = false;
+  editingWorker: Worker | null = null;
   deletingId: string | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
   }
+
+  // --- UI actions ---
+
+  openAddForm() {
+    this.editingWorker = null;
+    this.formOpen = true;
+  }
+
+  openEditForm(worker: Worker) {
+    this.editingWorker = worker;
+    this.formOpen = true;
+  }
+
+  closeForm() {
+    this.formOpen = false;
+    this.editingWorker = null;
+  }
+
+  setDeletingId(id: string | null) {
+    this.deletingId = id;
+  }
+
+  // --- API actions ---
 
   async loadWorkers() {
     this.loading = true;
@@ -89,6 +116,13 @@ export class WorkersStore {
       runInAction(() => {
         this.error = "Не удалось удалить работника";
       });
+    }
+  }
+
+  confirmDelete() {
+    if (this.deletingId) {
+      this.deleteWorker(this.deletingId);
+      this.deletingId = null;
     }
   }
 

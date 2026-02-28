@@ -102,18 +102,18 @@ const AdminPage = observer(() => {
             </Grid>
 
             <TableContainer component={Paper}>
-              <Table size="small">
+              <Table stickyHeader size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Имя</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Регистрация</TableCell>
-                    <TableCell>Роль</TableCell>
-                    <TableCell align="center">Проекты</TableCell>
-                    <TableCell align="center">Поставщики</TableCell>
-                    <TableCell align="center">Доставщики</TableCell>
-                    <TableCell align="center">Работники</TableCell>
-                    <TableCell align="right">Расходы</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }}>Имя</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }}>Email</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }}>Регистрация</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }}>Роль</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }} align="center">Проекты</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }} align="center">Поставщики</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }} align="center">Доставщики</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }} align="center">Работники</TableCell>
+                    <TableCell sx={{ backgroundColor: 'lightslategrey' }} align="right">Расходы</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Container,
@@ -7,10 +7,6 @@ import {
   CardContent,
   Button,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton,
   Tooltip,
   Link,
@@ -25,30 +21,19 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import LanguageIcon from "@mui/icons-material/Language";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { useStore } from "../../stores/RootStore";
+import AppProgress from "@/components/AppProgress";
+import EntityTitleAndAdd from "@/components/EntityTitleAndAdd";
+import useSearch from "@/hooks/useSearch";
 import CarrierForm from "./CarrierForm";
-import type { Carrier } from "@construction-tracker/shared/dist";
-import AppProgress from '@/components/AppProgress';
-import EntityTitleAndAdd from '@/components/EntityTitleAndAdd';
-import useSearch from '@/hooks/useSearch';
+import DeleteCarrierDialog from "./DeleteCarrierDialog";
 
 const CarriersPage = observer(() => {
   const { carrierStore } = useStore();
-  const {
-    loading,
-    carriers,
-    deletingId,
-    loadCarriers,
-    deleteCarrier,
-    updateCarrier,
-    createCarrier,
-  } = carrierStore;
-  const { search, searchField } = useSearch({ placeholder: "Поиск по имени, телефону, машине или номеру..." })
-
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingCarrier, setEditingCarrier] = useState<Carrier | null>(null);
+  const { loading, carriers } = carrierStore;
+  const { search, searchField } = useSearch({ placeholder: "Поиск по имени, телефону, машине или номеру..." });
 
   useEffect(() => {
-    loadCarriers();
+    carrierStore.loadCarriers();
   }, [carrierStore]);
 
   const filteredCarriers = search
@@ -57,66 +42,23 @@ const CarriersPage = observer(() => {
           c.name.toLowerCase().includes(search.toLowerCase()) ||
           c.phone?.includes(search) ||
           c.licensePlate?.toLowerCase().includes(search.toLowerCase()) ||
-          c.vehicle?.toLowerCase().includes(search.toLowerCase())
+          c.vehicle?.toLowerCase().includes(search.toLowerCase()),
       )
     : carriers;
-
-  const handleCreate = () => {
-    setEditingCarrier(null);
-    setFormOpen(true);
-  };
-
-  const handleEdit = (carrier: Carrier, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingCarrier(carrier);
-    setFormOpen(true);
-  };
-
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    carrierStore.deletingId = id;
-  };
-
-  const confirmDelete = async () => {
-    if (deletingId) {
-      await deleteCarrier(deletingId);
-      carrierStore.deletingId = null;
-    }
-  };
-
-  const handleSubmit = async (data: Record<string, unknown>) => {
-    if (editingCarrier) {
-      await updateCarrier(editingCarrier.id, data as unknown as Parameters<typeof updateCarrier>[1]);
-    } else {
-      await createCarrier(data as unknown as Parameters<typeof createCarrier>[0]);
-    }
-  };
 
   return (
     <>
       {loading && <AppProgress />}
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
-        <EntityTitleAndAdd title="Доставщики" handleCreate={handleCreate} />
+        <EntityTitleAndAdd title="Доставщики" handleCreate={carrierStore.openAddForm} />
         {carriers.length > 3 && searchField}
+
         <Grid container spacing={3}>
           {filteredCarriers.map((carrier) => (
             <Grid size={{ xs: 12, md: 6, lg: 4 }} key={carrier.id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  "&:hover": { boxShadow: 4 },
-                }}
-              >
+              <Card sx={{ height: "100%", display: "flex", flexDirection: "column", "&:hover": { boxShadow: 4 } }}>
                 <CardContent sx={{ flex: 1 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                    }}
-                  >
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <Typography variant="h6" noWrap sx={{ flex: 1 }}>
                       {carrier.name}
                     </Typography>
@@ -124,59 +66,37 @@ const CarriersPage = observer(() => {
                       <Tooltip title={carrier.isFavorite ? "Убрать из избранного" : "В избранное"}>
                         <IconButton
                           size="small"
-                          onClick={(e) => { e.stopPropagation(); carrierStore.toggleFavorite(carrier.id); }}
+                          onClick={() => carrierStore.toggleFavorite(carrier.id)}
                           sx={{ color: carrier.isFavorite ? "warning.main" : "action.disabled" }}
                         >
                           {carrier.isFavorite ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Редактировать">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleEdit(carrier, e)}
-                        >
+                        <IconButton size="small" onClick={() => carrierStore.openEditForm(carrier)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Удалить">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={(e) => handleDelete(carrier.id, e)}
-                        >
+                        <IconButton size="small" color="error" onClick={() => carrierStore.setDeletingId(carrier.id)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </Box>
                   </Box>
 
-                  <Box
-                    sx={{
-                      mt: 1.5,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 0.75,
-                    }}
-                  >
+                  <Box sx={{ mt: 1.5, display: "flex", flexDirection: "column", gap: 0.75 }}>
                     {carrier.phone && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <PhoneIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
-                        <Link
-                          href={`tel:${carrier.phone}`}
-                          variant="body2"
-                          underline="hover"
-                        >
+                        <PhoneIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                        <Link href={`tel:${carrier.phone}`} variant="body2" underline="hover">
                           {carrier.phone}
                         </Link>
                       </Box>
                     )}
                     {carrier.website && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <LanguageIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
+                        <LanguageIcon sx={{ fontSize: 18, color: "text.secondary" }} />
                         <Link
                           href={carrier.website.startsWith("http") ? carrier.website : `https://${carrier.website}`}
                           target="_blank"
@@ -190,13 +110,9 @@ const CarriersPage = observer(() => {
                     )}
                     {(carrier.vehicle || carrier.licensePlate) && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <DirectionsCarIcon
-                          sx={{ fontSize: 18, color: "text.secondary" }}
-                        />
+                        <DirectionsCarIcon sx={{ fontSize: 18, color: "text.secondary" }} />
                         <Typography variant="body2">
-                          {[carrier.vehicle, carrier.licensePlate]
-                            .filter(Boolean)
-                            .join(" — ")}
+                          {[carrier.vehicle, carrier.licensePlate].filter(Boolean).join(" — ")}
                         </Typography>
                       </Box>
                     )}
@@ -206,14 +122,7 @@ const CarriersPage = observer(() => {
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{
-                        mt: 1.5,
-                        fontStyle: "italic",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
+                      sx={{ mt: 1.5, fontStyle: "italic", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                     >
                       {carrier.notes}
                     </Typography>
@@ -232,14 +141,9 @@ const CarriersPage = observer(() => {
                 {!search && (
                   <>
                     <Typography color="text.secondary" sx={{ mb: 2 }}>
-                      Добавьте водителей для удобного выбора при создании
-                      расходов на доставку
+                      Добавьте водителей для удобного выбора при создании расходов на доставку
                     </Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={handleCreate}
-                    >
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={carrierStore.openAddForm}>
                       Добавить водителя
                     </Button>
                   </>
@@ -249,33 +153,8 @@ const CarriersPage = observer(() => {
           )}
         </Grid>
 
-        <CarrierForm
-          open={formOpen}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleSubmit}
-          carrier={editingCarrier}
-        />
-
-        <Dialog
-          open={!!deletingId}
-          onClose={() => carrierStore.deletingId = null}
-          maxWidth="xs"
-        >
-          <DialogTitle>Удалить водителя?</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Водитель будет удалён. Расходы, связанные с ним, сохранятся.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => carrierStore.deletingId = null} variant="contained">
-              Отмена
-            </Button>
-            <Button onClick={confirmDelete} variant="contained" color="error">
-              Удалить
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <CarrierForm />
+        <DeleteCarrierDialog />
       </Container>
     </>
   );

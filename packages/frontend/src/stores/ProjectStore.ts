@@ -15,8 +15,41 @@ export class ProjectStore {
   loading = false;
   error: string | null = null;
 
+  // UI
+  formOpen = false;
+  editingProject: ProjectWithTotals | (Project & { categories: Category[] }) | null = null;
+  deletingProjectId: string | null = null;
+
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  // --- UI actions ---
+
+  openCreateForm() {
+    this.editingProject = null;
+    this.formOpen = true;
+  }
+
+  openEditForm(project: ProjectWithTotals | (Project & { categories: Category[] })) {
+    this.editingProject = project;
+    this.formOpen = true;
+  }
+
+  closeForm() {
+    this.formOpen = false;
+    this.editingProject = null;
+  }
+
+  setDeletingProjectId(id: string | null) {
+    this.deletingProjectId = id;
+  }
+
+  confirmDeleteProject() {
+    if (this.deletingProjectId) {
+      this.deleteProject(this.deletingProjectId);
+      this.deletingProjectId = null;
+    }
   }
 
   async loadProjects() {

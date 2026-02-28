@@ -59,9 +59,9 @@ export default function DayExpensesDialog({
           alignItems: "center",
         }}
       >
-        <Typography variant="h6" sx={{ textTransform: "capitalize" }}>
+        <Box component="span" sx={{ textTransform: "capitalize" }}>
           {dateKey ? formatDayLong(dateKey) : ""}
-        </Typography>
+        </Box>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
         </IconButton>

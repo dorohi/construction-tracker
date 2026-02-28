@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Dialog,
   DialogTitle,
@@ -14,62 +15,45 @@ import {
   Switch,
   Autocomplete,
 } from "@mui/material";
-import type { Expense, Category, ExpenseType, Supplier, Carrier, Worker } from "@construction-tracker/shared/dist";
+import type { ExpenseType } from "@construction-tracker/shared/dist";
+import { useStore } from "../../stores/RootStore";
 
-interface ExpenseFormProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: Record<string, unknown>) => void;
-  expense?: Expense | null;
-  initialData?: Expense | null;
-  categories: Category[];
-  suppliers?: Supplier[];
-  carriers?: Carrier[];
-  workers?: Worker[];
-}
+const ExpenseForm = observer(() => {
+  const { expenseStore, projectStore, supplierStore, carrierStore, workersStore } = useStore();
 
-export default function ExpenseForm({
-  open,
-  onClose,
-  onSubmit,
-  expense,
-  initialData,
-  categories,
-  suppliers = [],
-  carriers = [],
-  workers = [],
-}: ExpenseFormProps) {
+  const { formOpen, editingExpense, duplicatingExpense } = expenseStore;
+  const categories = projectStore.categories;
+  const suppliers = supplierStore.suppliers;
+  const carriers = carrierStore.carriers;
+  const workers = workersStore.workers;
+
   const [type, setType] = useState<ExpenseType>("MATERIAL");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [categoryId, setCategoryId] = useState("");
-  // Material fields
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [supplier, setSupplier] = useState("");
   const [supplierId, setSupplierId] = useState<string | null>(null);
-  // Labor fields
   const [worker, setWorker] = useState("");
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [hoursWorked, setHoursWorked] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
-  // Delivery fields
   const [carrier, setCarrier] = useState("");
   const [carrierId, setCarrierId] = useState<string | null>(null);
-  // Planned
   const [planned, setPlanned] = useState(false);
 
   useEffect(() => {
-    const source = expense || initialData;
+    const source = editingExpense || duplicatingExpense;
     if (source) {
       setType(source.type as ExpenseType);
       setTitle(source.title);
       setDescription(source.description || "");
       setAmount(String(source.amount));
-      setDate(initialData && !expense ? new Date().toISOString().split("T")[0] : source.date.split("T")[0]);
+      setDate(duplicatingExpense && !editingExpense ? new Date().toISOString().split("T")[0] : source.date.split("T")[0]);
       setCategoryId(source.categoryId || "");
       setQuantity(source.quantity != null ? String(source.quantity) : "");
       setUnit(source.unit || "");
@@ -86,7 +70,7 @@ export default function ExpenseForm({
     } else {
       resetForm();
     }
-  }, [expense, initialData, open]);
+  }, [editingExpense, duplicatingExpense, formOpen]);
 
   const resetForm = () => {
     setType("MATERIAL");
@@ -145,18 +129,23 @@ export default function ExpenseForm({
       data.carrierId = carrierId || undefined;
     }
 
-    onSubmit(data);
-    onClose();
+    const projectId = projectStore.currentProject!.id;
+    const editing = editingExpense;
+    expenseStore.closeForm();
+
+    if (editing) {
+      expenseStore.updateExpense(editing.id, data).then(() => projectStore.loadProject(projectId));
+    } else {
+      expenseStore.createExpense(projectId, data as unknown as Parameters<typeof expenseStore.createExpense>[1]).then(() => projectStore.loadProject(projectId));
+    }
   };
 
-  // Auto-calculate amount for materials
   useEffect(() => {
     if (type === "MATERIAL" && quantity && unitPrice) {
       setAmount(String(parseFloat(quantity) * parseFloat(unitPrice)));
     }
   }, [quantity, unitPrice, type]);
 
-  // Auto-calculate amount for labor
   useEffect(() => {
     if (type === "LABOR" && hoursWorked && hourlyRate) {
       setAmount(String(parseFloat(hoursWorked) * parseFloat(hourlyRate)));
@@ -164,8 +153,8 @@ export default function ExpenseForm({
   }, [hoursWorked, hourlyRate, type]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{expense ? "Редактировать расход" : "Добавить расход"}</DialogTitle>
+    <Dialog open={formOpen} onClose={expenseStore.closeForm} maxWidth="sm" fullWidth>
+      <DialogTitle>{editingExpense ? "Редактировать расход" : "Добавить расход"}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <ToggleButtonGroup
@@ -181,44 +170,18 @@ export default function ExpenseForm({
           </ToggleButtonGroup>
 
           <FormControlLabel
-            control={
-              <Switch
-                checked={planned}
-                onChange={(e) => setPlanned(e.target.checked)}
-              />
-            }
+            control={<Switch checked={planned} onChange={(e) => setPlanned(e.target.checked)} />}
             label="Запланированный расход"
           />
 
-          <TextField
-            label="Название"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            fullWidth
-          />
+          <TextField label="Название" value={title} onChange={(e) => setTitle(e.target.value)} required fullWidth />
 
-          <TextField
-            label="Описание"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            multiline
-            rows={2}
-            fullWidth
-          />
+          <TextField label="Описание" value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={2} fullWidth />
 
-          <TextField
-            label="Категория"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            select
-            fullWidth
-          >
+          <TextField label="Категория" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} select fullWidth>
             <MenuItem value="">Без категории</MenuItem>
             {filteredCategories.map((c) => (
-              <MenuItem key={c.id} value={c.id}>
-                {c.name}
-              </MenuItem>
+              <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
             ))}
           </TextField>
 
@@ -235,47 +198,20 @@ export default function ExpenseForm({
           {type === "MATERIAL" && (
             <>
               <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField
-                  label="Количество"
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  label="Ед. изм."
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  placeholder="кг, м², шт..."
-                  sx={{ flex: 1 }}
-                />
+                <TextField label="Количество" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} sx={{ flex: 1 }} />
+                <TextField label="Ед. изм." value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="кг, м², шт..." sx={{ flex: 1 }} />
               </Box>
-              <TextField
-                label="Цена за единицу"
-                type="number"
-                value={unitPrice}
-                onChange={(e) => setUnitPrice(e.target.value)}
-                fullWidth
-              />
+              <TextField label="Цена за единицу" type="number" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} fullWidth />
               <Autocomplete
                 freeSolo
                 options={suppliers}
-                getOptionLabel={(option) =>
-                  typeof option === "string" ? option : option.name
-                }
-                value={
-                  supplierId
-                    ? suppliers.find((s) => s.id === supplierId) || supplier
-                    : supplier
-                }
+                getOptionLabel={(option) => typeof option === "string" ? option : option.name}
+                value={supplierId ? suppliers.find((s) => s.id === supplierId) || supplier : supplier}
                 inputValue={supplier}
                 onInputChange={(_, value) => {
                   setSupplier(value);
-                  // If the typed text doesn't match any supplier, clear supplierId
                   const match = suppliers.find((s) => s.name === value);
-                  if (!match) {
-                    setSupplierId(null);
-                  }
+                  if (!match) setSupplierId(null);
                 }}
                 onChange={(_, value) => {
                   if (value && typeof value !== "string") {
@@ -289,9 +225,7 @@ export default function ExpenseForm({
                     setSupplierId(null);
                   }
                 }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Поставщик" fullWidth />
-                )}
+                renderInput={(params) => <TextField {...params} label="Поставщик" fullWidth />}
               />
             </>
           )}
@@ -301,22 +235,13 @@ export default function ExpenseForm({
               <Autocomplete
                 freeSolo
                 options={workers}
-                getOptionLabel={(option) =>
-                  typeof option === "string" ? option : option.name
-                }
-                value={
-                  workerId
-                    ? workers.find((w) => w.id === workerId) || worker
-                    : worker
-                }
+                getOptionLabel={(option) => typeof option === "string" ? option : option.name}
+                value={workerId ? workers.find((w) => w.id === workerId) || worker : worker}
                 inputValue={worker}
                 onInputChange={(_, value) => {
                   setWorker(value);
-                  // If the typed text doesn't match any worker, clear workerId
                   const match = workers.find((s) => s.name === value);
-                  if (!match) {
-                    setWorkerId(null);
-                  }
+                  if (!match) setWorkerId(null);
                 }}
                 onChange={(_, value) => {
                   if (value && typeof value !== "string") {
@@ -330,25 +255,11 @@ export default function ExpenseForm({
                     setWorkerId(null);
                   }
                 }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Работник" fullWidth />
-                )}
+                renderInput={(params) => <TextField {...params} label="Работник" fullWidth />}
               />
               <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField
-                  label="Отработано часов"
-                  type="number"
-                  value={hoursWorked}
-                  onChange={(e) => setHoursWorked(e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  label="Ставка в час"
-                  type="number"
-                  value={hourlyRate}
-                  onChange={(e) => setHourlyRate(e.target.value)}
-                  sx={{ flex: 1 }}
-                />
+                <TextField label="Отработано часов" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} sx={{ flex: 1 }} />
+                <TextField label="Ставка в час" type="number" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} sx={{ flex: 1 }} />
               </Box>
             </>
           )}
@@ -357,24 +268,14 @@ export default function ExpenseForm({
             <Autocomplete
               freeSolo
               options={carrierOptions}
-              groupBy={(option) =>
-                typeof option === "string" ? "" : option._group
-              }
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option.name
-              }
-              value={
-                carrierId
-                  ? carrierOptions.find((c) => c.id === carrierId) || carrier
-                  : carrier
-              }
+              groupBy={(option) => typeof option === "string" ? "" : option._group}
+              getOptionLabel={(option) => typeof option === "string" ? option : option.name}
+              value={carrierId ? carrierOptions.find((c) => c.id === carrierId) || carrier : carrier}
               inputValue={carrier}
               onInputChange={(_, value) => {
                 setCarrier(value);
                 const match = carrierOptions.find((c) => c.name === value);
-                if (!match) {
-                  setCarrierId(null);
-                }
+                if (!match) setCarrierId(null);
               }}
               onChange={(_, value) => {
                 if (value && typeof value !== "string") {
@@ -388,32 +289,21 @@ export default function ExpenseForm({
                   setCarrierId(null);
                 }
               }}
-              renderInput={(params) => (
-                <TextField {...params} label="Перевозчик" fullWidth />
-              )}
+              renderInput={(params) => <TextField {...params} label="Перевозчик" fullWidth />}
             />
           )}
 
-          <TextField
-            label="Итого"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-            fullWidth
-          />
+          <TextField label="Итого" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required fullWidth />
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained">Отмена</Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={!title || !amount || !date}
-        >
-          {expense ? "Сохранить" : "Добавить"}
+        <Button onClick={expenseStore.closeForm} variant="contained">Отмена</Button>
+        <Button onClick={handleSubmit} variant="contained" disabled={!title || !amount || !date}>
+          {editingExpense ? "Сохранить" : "Добавить"}
         </Button>
       </DialogActions>
     </Dialog>
   );
-}
+});
+
+export default ExpenseForm;

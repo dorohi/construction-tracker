@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Dialog,
   DialogTitle,
@@ -8,43 +9,40 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import type { News } from "@construction-tracker/shared";
+import { useStore } from "@/stores/RootStore";
 
-interface NewsFormProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: { title: string; content: string }) => void;
-  news?: News | null;
-}
+const NewsForm = observer(() => {
+  const { newsStore } = useStore();
+  const { formOpen, editingNews } = newsStore;
 
-export default function NewsForm({
-  open,
-  onClose,
-  onSubmit,
-  news,
-}: NewsFormProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    if (news) {
-      setTitle(news.title);
-      setContent(news.content);
+    if (editingNews) {
+      setTitle(editingNews.title);
+      setContent(editingNews.content);
     } else {
       setTitle("");
       setContent("");
     }
-  }, [news, open]);
+  }, [editingNews, formOpen]);
 
   const handleSubmit = () => {
-    onSubmit({ title, content });
-    onClose();
+    const editing = editingNews;
+    newsStore.closeForm();
+
+    if (editing) {
+      newsStore.updateNews(editing.id, { title, content });
+    } else {
+      newsStore.createNews({ title, content });
+    }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={formOpen} onClose={newsStore.closeForm} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {news ? "Редактировать новость" : "Создать новость"}
+        {editingNews ? "Редактировать новость" : "Создать новость"}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
@@ -67,17 +65,13 @@ export default function NewsForm({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained">
-          Отмена
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={!title.trim() || !content.trim()}
-        >
-          {news ? "Сохранить" : "Создать"}
+        <Button onClick={newsStore.closeForm} variant="contained">Отмена</Button>
+        <Button onClick={handleSubmit} variant="contained" disabled={!title.trim() || !content.trim()}>
+          {editingNews ? "Сохранить" : "Создать"}
         </Button>
       </DialogActions>
     </Dialog>
   );
-}
+});
+
+export default NewsForm;

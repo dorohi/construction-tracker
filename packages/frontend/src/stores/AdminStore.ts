@@ -8,7 +8,7 @@ export class AdminStore {
   error: string | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   async loadDashboard() {

@@ -28,6 +28,8 @@ import {
   formatDateKey,
   formatMonthYear,
 } from "./calendarUtils";
+import AddIcon from '@mui/icons-material/Add';
+import ExpenseForm from '@/pages/expenses/ExpenseForm';
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -159,9 +161,9 @@ const CalendarPage = observer(() => {
                 <ChevronLeftIcon />
               </IconButton>
               <Typography
-                variant={isMobile ? "h6" : "h5"}
+                variant={isMobile ? "body1" : "h5"}
                 sx={{
-                  minWidth: isMobile ? 150 : 220,
+                  minWidth: isMobile ? 100 : 220,
                   textAlign: "center",
                   textTransform: "capitalize",
                 }}
@@ -175,21 +177,38 @@ const CalendarPage = observer(() => {
                 Сегодня
               </Button>
             </Box>
-            {isMobile ? (
-              <Tooltip title="Расходы">
-                <IconButton onClick={() => navigate(`/projects/${id}/expenses`)}>
-                  <ViewListIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Button
-                variant="outlined"
-                startIcon={<ViewListIcon />}
-                onClick={() => navigate(`/projects/${id}/expenses`)}
-              >
-                Расходы
-              </Button>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              {isMobile ? (
+                <>
+                  <Tooltip title="Расходы">
+                    <IconButton onClick={() => navigate(`/projects/${id}/expenses`)}>
+                      <ViewListIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Добавить">
+                    <IconButton color="primary" onClick={expenseStore.openAddForm}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outlined"
+                    startIcon={<ViewListIcon />}
+                    onClick={() => navigate(`/projects/${id}/expenses`)}
+                  >
+                    Расходы
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={expenseStore.openAddForm}>
+                    Добавить
+                  </Button>
+                </>
             )}
+            </Box>
           </Box>
 
           {/* Calendar */}
@@ -252,6 +271,7 @@ const CalendarPage = observer(() => {
             dateKey={selectedDate}
             expenses={selectedExpenses}
           />
+          <ExpenseForm />
         </Container>
       )}
     </>

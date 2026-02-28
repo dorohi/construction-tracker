@@ -6,10 +6,42 @@ export class CarrierStore {
   carriers: Carrier[] = [];
   loading = false;
   error: string | null = null;
+
+  // UI
+  formOpen = false;
+  editingCarrier: Carrier | null = null;
   deletingId: string | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  // --- UI actions ---
+
+  openAddForm() {
+    this.editingCarrier = null;
+    this.formOpen = true;
+  }
+
+  openEditForm(carrier: Carrier) {
+    this.editingCarrier = carrier;
+    this.formOpen = true;
+  }
+
+  closeForm() {
+    this.formOpen = false;
+    this.editingCarrier = null;
+  }
+
+  setDeletingId(id: string | null) {
+    this.deletingId = id;
+  }
+
+  confirmDelete() {
+    if (this.deletingId) {
+      this.deleteCarrier(this.deletingId);
+      this.deletingId = null;
+    }
   }
 
   async loadCarriers() {

@@ -19,76 +19,25 @@ import ClearIcon from "@mui/icons-material/Clear";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import type { ExpenseType, Category, Supplier, Carrier, Worker } from "@construction-tracker/shared/dist";
+import type { ExpenseType } from "@construction-tracker/shared/dist";
+import { useStore } from "../../stores/RootStore";
+import { defaultFilters, type ExpenseFilterValues } from "../../stores/ExpenseStore";
 
-export interface ExpenseFilterValues {
-  types: ExpenseType[];
-  categoryIds: string[];
-  title: string;
-  dateFrom: string | null;
-  dateTo: string | null;
-  amountFrom: number | null;
-  amountTo: number | null;
-  supplier: string;
-  carrier: string;
-  worker: string;
-  plannedStatus: "all" | "planned" | "actual";
-}
-
-export const defaultFilters: ExpenseFilterValues = {
-  types: [],
-  categoryIds: [],
-  title: "",
-  dateFrom: null,
-  dateTo: null,
-  amountFrom: null,
-  amountTo: null,
-  supplier: "",
-  carrier: "",
-  worker: "",
-  plannedStatus: "all",
-};
-
-export function countActiveFilters(f: ExpenseFilterValues): number {
-  let count = 0;
-  if (f.types.length > 0) count++;
-  if (f.categoryIds.length > 0) count++;
-  if (f.title) count++;
-  if (f.dateFrom) count++;
-  if (f.dateTo) count++;
-  if (f.amountFrom !== null) count++;
-  if (f.amountTo !== null) count++;
-  if (f.supplier) count++;
-  if (f.carrier) count++;
-  if (f.worker) count++;
-  if (f.plannedStatus !== "all") count++;
-  return count;
-}
-
-interface ExpenseFiltersProps {
-  open: boolean;
-  onClose: () => void;
-  filters: ExpenseFilterValues;
-  onChange: (filters: ExpenseFilterValues) => void;
-  categories: Category[];
-  suppliers: Supplier[];
-  carriers: Carrier[];
-  workers: Worker[];
-}
-
-const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories, suppliers, carriers, workers }: ExpenseFiltersProps) => {
+const ExpenseFilters = observer(() => {
+  const { projectStore, supplierStore, carrierStore, workersStore, expenseStore } = useStore();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("sm"));
 
+  const { filters } = expenseStore;
+  const categories = projectStore.categories;
+
   const update = (patch: Partial<ExpenseFilterValues>) => {
-    onChange({ ...filters, ...patch });
+    expenseStore.setFilters({ ...filters, ...patch });
   };
 
   const reset = () => {
-    onChange({ ...defaultFilters });
+    expenseStore.setFilters({ ...defaultFilters });
   };
-
-  const activeCount = countActiveFilters(filters);
 
   const filteredCategories = useMemo(() => {
     if (filters.types.length === 0) return [];
@@ -97,16 +46,15 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
 
   const selectedCategories = filteredCategories.filter((c) => filters.categoryIds.includes(c.id));
 
-  const supplierNames = useMemo(() => [...new Set(suppliers.map((s) => s.name))], [suppliers]);
-  const carrierNames = useMemo(() => [...new Set(carriers.map((c) => c.name))], [carriers]);
-  const workerNames = useMemo(() => [...new Set(workers.map((w) => w.name))], [workers]);
+  const supplierNames = useMemo(() => [...new Set(supplierStore.suppliers.map((s) => s.name))], [supplierStore.suppliers]);
+  const carrierNames = useMemo(() => [...new Set(carrierStore.carriers.map((c) => c.name))], [carrierStore.carriers]);
+  const workerNames = useMemo(() => [...new Set(workersStore.workers.map((w) => w.name))], [workersStore.workers]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={isMobile}>
+    <Dialog open={expenseStore.filtersOpen} onClose={expenseStore.closeFilters} maxWidth="sm" fullWidth fullScreen={isMobile}>
       <DialogTitle>Фильтры</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
-          {/* Тип */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
               Тип
@@ -141,7 +89,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             </ToggleButtonGroup>
           </Box>
 
-          {/* Категория */}
           <Autocomplete
             multiple
             size="small"
@@ -159,7 +106,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             )}
           />
 
-          {/* Название */}
           <TextField
             size="small"
             label="Название"
@@ -167,7 +113,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             onChange={(e) => update({ title: e.target.value })}
           />
 
-          {/* Даты */}
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <TextField
               size="small"
@@ -187,7 +132,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             />
           </Box>
 
-          {/* Суммы */}
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <TextField
               size="small"
@@ -205,7 +149,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             />
           </Box>
 
-          {/* Поставщик */}
           <Autocomplete
             freeSolo
             size="small"
@@ -216,7 +159,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             renderInput={(params) => <TextField {...params} label="Поставщик" />}
           />
 
-          {/* Доставщик */}
           <Autocomplete
             freeSolo
             size="small"
@@ -227,7 +169,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             renderInput={(params) => <TextField {...params} label="Доставщик" />}
           />
 
-          {/* Работник */}
           <Autocomplete
             freeSolo
             size="small"
@@ -238,7 +179,6 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
             renderInput={(params) => <TextField {...params} label="Работник" />}
           />
 
-          {/* Запланированные */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
               Статус
@@ -260,12 +200,12 @@ const ExpenseFilters = observer(({ open, onClose, filters, onChange, categories,
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        {activeCount > 0 && (
+        {expenseStore.activeFilterCount > 0 && (
           <Button startIcon={<ClearIcon />} onClick={reset} sx={{ mr: "auto" }}>
-            Сбросить ({activeCount})
+            Сбросить ({expenseStore.activeFilterCount})
           </Button>
         )}
-        <Button variant="contained" onClick={onClose}>
+        <Button variant="contained" onClick={expenseStore.closeFilters}>
           Закрыть
         </Button>
       </DialogActions>

@@ -2,9 +2,7 @@ import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import type { Expense } from "@construction-tracker/shared/dist";
 import type { CalendarDay } from "./calendarUtils";
 import { getTypeColor } from "./calendarUtils";
-
-const WEEKDAYS_FULL = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-const WEEKDAYS_SHORT = ["П", "В", "С", "Ч", "П", "С", "В"];
+import CalendarDays from '@/pages/calendar/CalendarDays';
 
 function formatCompact(amount: number): string {
   if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(1)}М`;
@@ -25,31 +23,11 @@ export default function CalendarGrid({
 }: CalendarGridProps) {
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
-  const weekdays = isMobile ? WEEKDAYS_SHORT : WEEKDAYS_FULL;
 
   return (
     <Box>
       {/* Weekday header */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        {weekdays.map((day, i) => (
-          <Box key={i} sx={{ py: 1, textAlign: "center" }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={600}
-            >
-              {day}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
+      <CalendarDays />
 
       {/* Calendar grid */}
       <Box
@@ -75,13 +53,17 @@ export default function CalendarGrid({
                 borderRight: 1,
                 borderBottom: 1,
                 borderColor: "divider",
-                bgcolor: day.isCurrentMonth
-                  ? "background.paper"
-                  : "action.hover",
+                bgcolor: day.isToday
+                  ? "rgba(0,175,220,0.15)"
+                  : day.isCurrentMonth
+                    ? "background.paper"
+                    : "action.hover",
                 cursor: "pointer",
                 overflow: "hidden",
                 "&:hover": {
-                  bgcolor: day.isCurrentMonth
+                  bgcolor: day.isToday
+                    ? "rgba(0,175,220,0.32)"
+                    : day.isCurrentMonth
                     ? "action.hover"
                     : "action.selected",
                 },
@@ -106,13 +88,9 @@ export default function CalendarGrid({
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "50%",
-                    bgcolor: day.isToday ? "primary.main" : "transparent",
-                    color: day.isToday
-                      ? "primary.contrastText"
-                      : day.isCurrentMonth
-                        ? "text.primary"
-                        : "text.disabled",
-                    fontWeight: day.isToday ? 700 : 400,
+                    color: day.isCurrentMonth
+                      ? "text.primary"
+                      : "text.disabled",
                     fontSize: isMobile ? "0.7rem" : "0.8rem",
                   }}
                 >
