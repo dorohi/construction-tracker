@@ -28,3 +28,12 @@ export interface CategorySummary {
   total: number;
   count: number;
 }
+
+export interface UserStats {
+  projectsCount: number;
+  totalExpenses: number;
+  expensesCount: number;
+  suppliersCount: number;
+  carriersCount: number;
+  workersCount: number;
+}

@@ -71,8 +71,23 @@ const ExpensesPage = observer(() => {
           </Breadcrumbs>
 
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, gap: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant={isMobile ? "h5" : "h4"}>Расходы</Typography>
+              {isMobile ? (
+                <Tooltip title="Фильтры">
+                  <IconButton onClick={expenseStore.openFilters}>
+                    <Badge badgeContent={expenseStore.activeFilterCount} color="primary">
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Badge badgeContent={expenseStore.activeFilterCount} color="primary">
+                  <Button variant="outlined" size="small" startIcon={<FilterListIcon />} onClick={expenseStore.openFilters}>
+                    Фильтры
+                  </Button>
+                </Badge>
+              )}
             </Box>
             <Box sx={{ display: "flex", gap: 1 }}>
               {isMobile ? (
@@ -80,13 +95,6 @@ const ExpensesPage = observer(() => {
                   <Tooltip title="Календарь">
                     <IconButton onClick={() => navigate(`/projects/${id}/calendar`)}>
                       <CalendarMonthIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Фильтры">
-                    <IconButton onClick={expenseStore.openFilters}>
-                      <Badge badgeContent={expenseStore.activeFilterCount} color="primary">
-                        <FilterListIcon />
-                      </Badge>
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Добавить">
@@ -100,11 +108,6 @@ const ExpensesPage = observer(() => {
                   <Button variant="outlined" startIcon={<CalendarMonthIcon />} onClick={() => navigate(`/projects/${id}/calendar`)}>
                     Календарь
                   </Button>
-                  <Badge badgeContent={expenseStore.activeFilterCount} color="primary">
-                    <Button variant="outlined" startIcon={<FilterListIcon />} onClick={expenseStore.openFilters}>
-                      Фильтры
-                    </Button>
-                  </Badge>
                   <Button variant="contained" startIcon={<AddIcon />} onClick={expenseStore.openAddForm}>
                     Добавить
                   </Button>

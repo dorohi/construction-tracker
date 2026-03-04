@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -10,6 +10,7 @@ import {
   IconButton,
   Button,
   Tooltip,
+  Popover,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -30,6 +31,11 @@ import {
 } from "./calendarUtils";
 import AddIcon from '@mui/icons-material/Add';
 import ExpenseForm from '@/pages/expenses/ExpenseForm';
+
+const MONTHS_SHORT = [
+  "янв", "фев", "мар", "апр", "май", "июн",
+  "июл", "авг", "сен", "окт", "ноя", "дек",
+];
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -107,6 +113,21 @@ const CalendarPage = observer(() => {
     setCurrentMonth(new Date(now.getFullYear(), now.getMonth(), 1));
   };
 
+  const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
+  const pickerOpen = Boolean(pickerAnchor);
+
+  const [pickerYear, setPickerYear] = useState(currentMonth.getFullYear());
+
+  const handleOpenPicker = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    setPickerYear(currentMonth.getFullYear());
+    setPickerAnchor(e.currentTarget);
+  }, [currentMonth]);
+
+  const handlePickMonth = useCallback((month: number) => {
+    setCurrentMonth(new Date(pickerYear, month, 1));
+    setPickerAnchor(null);
+  }, [pickerYear]);
+
   if (!isLoading && !project) {
     return (
       <Container>
@@ -162,10 +183,15 @@ const CalendarPage = observer(() => {
               </IconButton>
               <Typography
                 variant={isMobile ? "body1" : "h5"}
+                onClick={handleOpenPicker}
                 sx={{
                   minWidth: isMobile ? 100 : 220,
                   textAlign: "center",
                   textTransform: "capitalize",
+                  cursor: "pointer",
+                  borderRadius: 1,
+                  px: 1,
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 {formatMonthYear(currentMonth)}
@@ -177,6 +203,44 @@ const CalendarPage = observer(() => {
                 Сегодня
               </Button>
             </Box>
+
+            <Popover
+              open={pickerOpen}
+              anchorEl={pickerAnchor}
+              onClose={() => setPickerAnchor(null)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              transformOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+              <Box sx={{ p: 2, width: 280 }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+                  <IconButton size="small" onClick={() => setPickerYear((y) => y - 1)}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                  <Typography variant="subtitle1" fontWeight={700}>
+                    {pickerYear}
+                  </Typography>
+                  <IconButton size="small" onClick={() => setPickerYear((y) => y + 1)}>
+                    <ChevronRightIcon />
+                  </IconButton>
+                </Box>
+                <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0.5 }}>
+                  {MONTHS_SHORT.map((name, i) => {
+                    const isActive = pickerYear === currentMonth.getFullYear() && i === currentMonth.getMonth();
+                    return (
+                      <Button
+                        key={i}
+                        size="small"
+                        variant={isActive ? "contained" : "text"}
+                        onClick={() => handlePickMonth(i)}
+                        sx={{ textTransform: "capitalize", minWidth: 0 }}
+                      >
+                        {name}
+                      </Button>
+                    );
+                  })}
+                </Box>
+              </Box>
+            </Popover>
             <Box sx={{ display: "flex", gap: 1 }}>
               {isMobile ? (
                 <>

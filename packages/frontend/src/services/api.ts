@@ -26,6 +26,7 @@ import type {
   CreateWorkerInput,
   News,
   AdminDashboard,
+  UserStats,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -189,6 +190,13 @@ export const newsApi = {
       `/news/${id}/reaction`,
       { type }
     ).then((r) => r.data.data!),
+};
+
+// Profile
+export const profileApi = {
+  stats: () =>
+    api.get<ApiResponse<UserStats>>("/profile/stats")
+      .then((r) => r.data.data!),
 };
 
 // Admin

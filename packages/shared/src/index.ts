@@ -22,6 +22,7 @@ export type {
   AuthResponse,
   ProjectSummary,
   CategorySummary,
+  UserStats,
 } from "./types/api";
 
 export type {
