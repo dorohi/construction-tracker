@@ -11,6 +11,7 @@ import type {
   Expense,
   CreateExpenseInput,
   UpdateExpenseInput,
+  TransferExpenseInput,
   Category,
   CreateCategoryInput,
   ProjectSummary,
@@ -99,6 +100,9 @@ export const expensesApi = {
       .then((r) => r.data.data!),
   delete: (id: string) =>
     api.delete(`/expenses/${id}`),
+  transfer: (id: string, data: TransferExpenseInput) =>
+    api.post<ApiResponse<{ source: Expense | null; target: Expense }>>(`/expenses/${id}/transfer`, data)
+      .then((r) => r.data.data!),
 };
 
 // Categories

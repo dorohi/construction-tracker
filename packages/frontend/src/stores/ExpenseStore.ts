@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable, runInAction } from "mobx";
-import type { Expense, CreateExpenseInput, UpdateExpenseInput, ExpenseType } from "@construction-tracker/shared";
+import type { Expense, CreateExpenseInput, UpdateExpenseInput, TransferExpenseInput, ExpenseType } from "@construction-tracker/shared";
 import { expensesApi } from "../services/api";
 import { rootStore } from "./RootStore";
 
@@ -64,6 +64,7 @@ export class ExpenseStore {
   // UI: confirmations
   purchasingExpense: Expense | null = null;
   deletingExpense: Expense | null = null;
+  transferringExpense: Expense | null = null;
 
   // UI: pagination
   page = 0;
@@ -230,6 +231,26 @@ export class ExpenseStore {
     }
   }
 
+  async transferExpense(id: string, data: TransferExpenseInput) {
+    try {
+      const result = await expensesApi.transfer(id, data);
+      runInAction(() => {
+        if (result.source) {
+          const idx = this.expenses.findIndex((e) => e.id === id);
+          if (idx !== -1) this.expenses[idx] = result.source;
+        } else {
+          this.expenses = this.expenses.filter((e) => e.id !== id);
+        }
+      });
+      rootStore.snackbarStore.show("Трансфер выполнен", "success");
+      return result;
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось выполнить трансфер";
+      rootStore.snackbarStore.show(msg, "error");
+      return null;
+    }
+  }
+
   clearError() {
     this.error = null;
   }
@@ -273,6 +294,7 @@ export class ExpenseStore {
 
   setPurchasingExpense(expense: Expense | null) { this.purchasingExpense = expense; }
   setDeletingExpense(expense: Expense | null) { this.deletingExpense = expense; }
+  setTransferringExpense(expense: Expense | null) { this.transferringExpense = expense; }
 
   // --- Actions: UI pagination ---
 

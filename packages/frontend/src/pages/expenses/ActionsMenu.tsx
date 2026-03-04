@@ -4,6 +4,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import type { Expense } from "@construction-tracker/shared/dist";
 import { useStore } from "../../stores/RootStore";
 
@@ -27,6 +28,12 @@ const ActionsMenu = observer(() => {
         <MenuItem onClick={() => handleAction(expenseStore.setPurchasingExpense)}>
           <ListItemIcon><ShoppingCartIcon fontSize="small" color="success" /></ListItemIcon>
           <ListItemText>Купить</ListItemText>
+        </MenuItem>
+      )}
+      {expenseStore.menuExpense?.type === "MATERIAL" && (expenseStore.menuExpense?.quantity ?? 0) > 0 && (
+        <MenuItem onClick={() => handleAction(expenseStore.setTransferringExpense)}>
+          <ListItemIcon><SwapHorizIcon fontSize="small" color="info" /></ListItemIcon>
+          <ListItemText>Трансфер</ListItemText>
         </MenuItem>
       )}
       <MenuItem onClick={() => handleAction(expenseStore.openEditForm)}>

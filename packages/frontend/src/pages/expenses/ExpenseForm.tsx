@@ -14,12 +14,17 @@ import {
   FormControlLabel,
   Switch,
   Autocomplete,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import type { ExpenseType } from "@construction-tracker/shared/dist";
 import { useStore } from "../../stores/RootStore";
 
 const ExpenseForm = observer(() => {
   const { expenseStore, projectStore, supplierStore, carrierStore, workersStore } = useStore();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { formOpen, editingExpense, duplicatingExpense } = expenseStore;
   const categories = projectStore.categories;
@@ -53,7 +58,7 @@ const ExpenseForm = observer(() => {
       setTitle(source.title);
       setDescription(source.description || "");
       setAmount(String(source.amount));
-      setDate(duplicatingExpense && !editingExpense ? new Date().toISOString().split("T")[0] : source.date.split("T")[0]);
+      setDate(source.date.split("T")[0]);
       setCategoryId(source.categoryId || "");
       setQuantity(source.quantity != null ? String(source.quantity) : "");
       setUnit(source.unit || "");
@@ -154,7 +159,7 @@ const ExpenseForm = observer(() => {
   }, [hoursWorked, hourlyRate, type]);
 
   return (
-    <Dialog open={formOpen} onClose={expenseStore.closeForm} maxWidth="sm" fullWidth>
+    <Dialog open={formOpen} onClose={expenseStore.closeForm} maxWidth="sm" fullWidth fullScreen={isMobile}>
       <DialogTitle>{editingExpense ? "Редактировать расход" : "Добавить расход"}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>

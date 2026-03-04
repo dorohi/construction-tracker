@@ -4,6 +4,7 @@ export type {
   Expense,
   CreateExpenseInput,
   UpdateExpenseInput,
+  TransferExpenseInput,
   CreateCategoryInput,
 } from "./types/expense";
 

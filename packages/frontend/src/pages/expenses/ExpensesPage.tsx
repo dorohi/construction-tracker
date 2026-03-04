@@ -23,6 +23,7 @@ import ExpenseForm from "./ExpenseForm";
 import ExpenseFilters from "./ExpenseFilters";
 import DeleteExpenseDialog from "./DeleteExpenseDialog";
 import PurchaseDialog from "./PurchaseDialog";
+import TransferDialog from "./TransferDialog";
 import AppProgress from "@/components/AppProgress";
 
 const ExpensesPage = observer(() => {
@@ -37,6 +38,7 @@ const ExpensesPage = observer(() => {
       projectStore.loadProject(id);
       expenseStore.loadExpenses(id);
     }
+    projectStore.loadProjects();
     supplierStore.loadSuppliers();
     carrierStore.loadCarriers();
     workersStore.loadWorkers();
@@ -116,6 +118,7 @@ const ExpensesPage = observer(() => {
           <ExpenseForm />
           <DeleteExpenseDialog />
           <PurchaseDialog />
+          <TransferDialog />
         </Container>
       )}
     </>

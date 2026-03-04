@@ -55,6 +55,14 @@ export interface CreateExpenseInput {
 
 export interface UpdateExpenseInput extends Partial<CreateExpenseInput> {}
 
+export interface TransferExpenseInput {
+  targetProjectId: string;
+  targetType: ExpenseType;
+  targetCategoryId?: string;
+  quantity: number;
+  description?: string;
+}
+
 export interface CreateCategoryInput {
   name: string;
   type: ExpenseType;
