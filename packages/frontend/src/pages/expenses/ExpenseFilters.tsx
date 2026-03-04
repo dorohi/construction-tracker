@@ -47,7 +47,7 @@ const ExpenseFilters = observer(() => {
   const selectedCategories = filteredCategories.filter((c) => filters.categoryIds.includes(c.id));
 
   const supplierNames = useMemo(() => [...new Set(supplierStore.suppliers.map((s) => s.name))], [supplierStore.suppliers]);
-  const carrierNames = useMemo(() => [...new Set(carrierStore.carriers.map((c) => c.name))], [carrierStore.carriers]);
+  const carrierNames = useMemo(() => carrierStore.carriers.map((c) => c.vehicle ? `${c.name} — ${c.vehicle}` : c.name), [carrierStore.carriers]);
   const workerNames = useMemo(() => [...new Set(workersStore.workers.map((w) => w.name))], [workersStore.workers]);
 
   return (

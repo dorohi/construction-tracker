@@ -275,7 +275,11 @@ const ExpenseForm = observer(() => {
               freeSolo
               options={carrierOptions}
               groupBy={(option) => typeof option === "string" ? "" : option._group}
-              getOptionLabel={(option) => typeof option === "string" ? option : option.name}
+              getOptionLabel={(option) => {
+                if (typeof option === "string") return option;
+                if ("vehicle" in option && option.vehicle) return `${option.name} — ${option.vehicle}`;
+                return option.name;
+              }}
               value={carrierId || supplierId ? carrierOptions.find((c) => c.id === (carrierId || supplierId)) || carrier : carrier}
               inputValue={carrier}
               onInputChange={(_, value) => {
