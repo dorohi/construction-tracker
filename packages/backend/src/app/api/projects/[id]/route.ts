@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -45,6 +46,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     },
   });
 
+  logAction({ userId: auth.userId, action: "UPDATE", entity: "project", entityId: id, details: project.name, ip: getClientIp(request) });
+
   return NextResponse.json({ data: project });
 }
 
@@ -61,5 +64,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   }
 
   await prisma.project.delete({ where: { id } });
+
+  logAction({ userId: auth.userId, action: "DELETE", entity: "project", entityId: id, details: existing.name, ip: getClientIp(request) });
+
   return NextResponse.json({ data: { success: true } });
 }

@@ -4,6 +4,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } f
 import SettingsIcon from '@mui/icons-material/Settings';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import HistoryIcon from '@mui/icons-material/History';
 import { useStore } from '@/stores/RootStore';
 
 const Settings = observer((
@@ -98,6 +99,33 @@ const Settings = observer((
             </ListItemIcon>
             <ListItemText
               primary="Настройки"
+              sx={{ opacity: showText ? 1 : 0 }}
+            />
+          </ListItemButton>
+        </Tooltip>
+      </ListItem>
+      <ListItem disablePadding sx={{ display: "block" }}>
+        <Tooltip title={showText ? "" : "Логи"} placement="right">
+          <ListItemButton
+            selected={location.pathname.startsWith("/audit-logs")}
+            onClick={() => handleNavigate("/audit-logs")}
+            sx={{
+              minHeight: 48,
+              justifyContent: showText ? "initial" : "center",
+              px: 2.5,
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: showText ? 2 : "auto",
+                justifyContent: "center",
+              }}
+            >
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Логи"
               sx={{ opacity: showText ? 1 : 0 }}
             />
           </ListItemButton>

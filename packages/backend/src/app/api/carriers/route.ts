@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request);
@@ -40,6 +41,8 @@ export async function POST(request: NextRequest) {
         userId: auth.userId,
       },
     });
+
+    logAction({ userId: auth.userId, action: "CREATE", entity: "carrier", entityId: carrier.id, details: carrier.name, ip: getClientIp(request) });
 
     return NextResponse.json({ data: carrier }, { status: 201 });
   } catch (error) {

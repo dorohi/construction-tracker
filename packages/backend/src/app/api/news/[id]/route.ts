@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 export async function GET(
   request: NextRequest,
@@ -81,6 +82,8 @@ export async function PUT(
     const userReaction =
       updated.reactions.find((r) => r.userId === auth.userId)?.type ?? null;
 
+    logAction({ userId: auth.userId, action: "UPDATE", entity: "news", entityId: id, details: updated.title, ip: getClientIp(request) });
+
     return NextResponse.json({
       data: {
         id: updated.id,
@@ -122,6 +125,8 @@ export async function DELETE(
   }
 
   await prisma.news.delete({ where: { id } });
+
+  logAction({ userId: auth.userId, action: "DELETE", entity: "news", entityId: id, details: existing.title, ip: getClientIp(request) });
 
   return NextResponse.json({ data: { success: true } });
 }

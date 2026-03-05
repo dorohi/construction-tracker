@@ -10,6 +10,7 @@ import { WorkersStore } from '@/stores/WorkersStore';
 import { NewsStore } from './NewsStore';
 import { AdminStore } from './AdminStore';
 import { SnackbarStore } from './SnackbarStore';
+import { AuditLogStore } from './AuditLogStore';
 
 export class RootStore {
   authStore: AuthStore;
@@ -23,6 +24,7 @@ export class RootStore {
   themeStore: ThemeStore;
   uiStore: UIStore;
   snackbarStore: SnackbarStore;
+  auditLogStore: AuditLogStore;
 
   constructor() {
     this.authStore = new AuthStore();
@@ -36,6 +38,7 @@ export class RootStore {
     this.themeStore = new ThemeStore();
     this.uiStore = new UIStore();
     this.snackbarStore = new SnackbarStore();
+    this.auditLogStore = new AuditLogStore();
   }
 }
 

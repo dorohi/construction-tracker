@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken } from "@/lib/auth";
+import { logAction, getClientIp } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,6 +35,8 @@ export async function POST(request: NextRequest) {
     });
 
     const token = signToken({ userId: user.id, email: user.email, isAdmin: user.isAdmin });
+
+    logAction({ userId: user.id, action: "REGISTER", entity: "session", details: user.email, ip: getClientIp(request) });
 
     return NextResponse.json({
       data: {

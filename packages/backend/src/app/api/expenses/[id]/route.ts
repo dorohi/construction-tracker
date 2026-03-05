@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -51,6 +52,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       include: { category: true },
     });
 
+    logAction({ userId: auth.userId, action: "UPDATE", entity: "expense", entityId: id, details: updated.title, ip: getClientIp(request) });
+
     return NextResponse.json({ data: updated });
   } catch (error: unknown) {
     console.error("Update expense error:", error);
@@ -87,5 +90,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   }
 
   await prisma.expense.delete({ where: { id } });
+
+  logAction({ userId: auth.userId, action: "DELETE", entity: "expense", entityId: id, details: expense.title, ip: getClientIp(request) });
+
   return NextResponse.json({ data: { success: true } });
 }

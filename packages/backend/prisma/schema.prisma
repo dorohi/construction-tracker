@@ -19,6 +19,7 @@ model User {
   workers       Worker[]
   news          News[]
   newsReactions NewsReaction[]
+  auditLogs     AuditLog[]
   createdAt     DateTime       @default(now())
 }
 
@@ -144,4 +145,21 @@ model NewsReaction {
   userId String
 
   @@unique([newsId, userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entity])
+  @@index([action])
 }

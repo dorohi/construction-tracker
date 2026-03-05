@@ -50,3 +50,9 @@ export type {
   AdminSummary,
   AdminDashboard,
 } from "./types/admin";
+
+export type {
+  AuditLog,
+  AuditLogFilters,
+  AuditLogResponse,
+} from "./types/audit";

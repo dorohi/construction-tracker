@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -59,6 +60,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     });
 
+    logAction({ userId: auth.userId, action: "UPDATE", entity: "supplier", entityId: id, details: updated.name, ip: getClientIp(request) });
+
     return NextResponse.json({ data: updated });
   } catch (error) {
     console.error("Update supplier error:", error);
@@ -92,5 +95,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   });
 
   await prisma.supplier.delete({ where: { id } });
+
+  logAction({ userId: auth.userId, action: "DELETE", entity: "supplier", entityId: id, details: supplier.name, ip: getClientIp(request) });
+
   return NextResponse.json({ data: { success: true } });
 }

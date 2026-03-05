@@ -14,6 +14,7 @@ import NewsPage from "./pages/news/NewsPage";
 import AdminPage from "./pages/admin/AdminPage";
 import SettingsPage from "./pages/SettingsPage";
 import CalendarPage from "./pages/calendar/CalendarPage";
+import AuditLogsPage from "./pages/audit-logs/AuditLogsPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { authStore } = useStore();
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/news" element={<NewsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/audit-logs" element={<AuditLogsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/projects" replace />} />
       </Routes>

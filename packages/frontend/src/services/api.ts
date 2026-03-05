@@ -27,6 +27,8 @@ import type {
   News,
   AdminDashboard,
   UserStats,
+  AuditLogResponse,
+  AuditLogFilters,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -203,6 +205,13 @@ export const profileApi = {
 export const adminApi = {
   dashboard: () =>
     api.get<ApiResponse<AdminDashboard>>("/admin/users")
+      .then((r) => r.data.data!),
+};
+
+// Audit Logs
+export const auditApi = {
+  list: (params: AuditLogFilters & { page?: number; limit?: number }) =>
+    api.get<ApiResponse<AuditLogResponse>>("/audit-logs", { params })
       .then((r) => r.data.data!),
 };
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -92,6 +93,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       },
       include: { category: true },
     });
+
+    logAction({ userId: auth.userId, action: "CREATE", entity: "expense", entityId: expense.id, details: expense.title, ip: getClientIp(request) });
 
     return NextResponse.json({ data: expense }, { status: 201 });
   } catch (error: unknown) {

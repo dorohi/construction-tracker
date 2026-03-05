@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -68,6 +69,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       }),
     ]);
 
+    logAction({ userId: auth.userId, action: "DELETE", entity: "category", entityId: categoryId, details: category.name, ip: getClientIp(request) });
+
     return NextResponse.json({ data: { success: true } });
   } catch (error) {
     console.error("Delete category error:", error);
@@ -111,6 +114,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     const category = await prisma.category.create({
       data: { name, type, projectId },
     });
+
+    logAction({ userId: auth.userId, action: "CREATE", entity: "category", entityId: category.id, details: category.name, ip: getClientIp(request) });
 
     return NextResponse.json({ data: category }, { status: 201 });
   } catch (error) {

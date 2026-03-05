@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 const DEFAULT_MATERIAL_CATEGORIES = [
   "Фундамент", "Стены", "Кровля", "Сантехника", "Электрика", "Отделка",
@@ -105,6 +106,8 @@ export async function POST(request: NextRequest) {
       })),
     ];
     await prisma.category.createMany({ data: categoryData });
+
+    logAction({ userId: auth.userId, action: "CREATE", entity: "project", entityId: project.id, details: project.name, ip: getClientIp(request) });
 
     return NextResponse.json({ data: project }, { status: 201 });
   } catch (error) {

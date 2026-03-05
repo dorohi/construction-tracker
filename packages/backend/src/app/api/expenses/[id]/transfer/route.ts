@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
+import { logAction, getClientIp } from "@/lib/audit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -97,6 +98,8 @@ export async function POST(request: NextRequest, { params }: Params) {
 
       return { source, target };
     });
+
+    logAction({ userId: auth.userId, action: "TRANSFER", entity: "expense", entityId: id, details: `${expense.title} → ${targetProject.name}`, ip: getClientIp(request) });
 
     return NextResponse.json({ data: result });
   } catch (error) {
