@@ -20,7 +20,9 @@ import TableViewIcon from "@mui/icons-material/TableView";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import type { Expense } from "@construction-tracker/shared";
 import { useStore } from "../../stores/RootStore";
+import { expensesApi } from "@/services/api";
 import AppProgress from "@/components/AppProgress";
 import CalendarGrid from "./CalendarGrid";
 import DayExpensesDialog from "./DayExpensesDialog";
@@ -56,26 +58,38 @@ const CalendarPage = observer(() => {
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [calendarExpenses, setCalendarExpenses] = useState<Expense[]>([]);
+  const [loadingExpenses, setLoadingExpenses] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      projectStore.loadProject(id);
-      expenseStore.loadExpenses(id);
-    }
-  }, [id, projectStore, expenseStore]);
+    if (id) projectStore.loadProject(id);
+  }, [id, projectStore]);
+
+  useEffect(() => {
+    if (!id) return;
+    const from = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    const to = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 2, 0);
+    const dateFrom = from.toISOString().split("T")[0];
+    const dateTo = to.toISOString().split("T")[0];
+    setLoadingExpenses(true);
+    expensesApi.list(id, { dateFrom, dateTo, all: true }).then((data) => {
+      setCalendarExpenses(data.expenses);
+      setLoadingExpenses(false);
+    }).catch(() => setLoadingExpenses(false));
+  }, [id, currentMonth]);
 
   const { currentProject: project } = projectStore;
-  const isLoading = projectStore.loading || expenseStore.loading;
+  const isLoading = projectStore.loading || loadingExpenses;
 
   const expensesByDate = useMemo(() => {
-    const map = new Map<string, import("@construction-tracker/shared/dist").Expense[]>();
-    for (const expense of expenseStore.expenses) {
+    const map = new Map<string, Expense[]>();
+    for (const expense of calendarExpenses) {
       const dateKey = formatDateKey(new Date(expense.date));
       if (!map.has(dateKey)) map.set(dateKey, []);
       map.get(dateKey)!.push(expense);
     }
     return map;
-  }, [expenseStore.expenses]);
+  }, [calendarExpenses]);
 
   const calendarDays = useMemo(
     () => buildCalendarGrid(currentMonth),
@@ -89,7 +103,7 @@ const CalendarPage = observer(() => {
     let material = 0;
     let labor = 0;
     let delivery = 0;
-    for (const expense of expenseStore.expenses) {
+    for (const expense of calendarExpenses) {
       const d = new Date(expense.date);
       if (d.getFullYear() === y && d.getMonth() === m) {
         if (expense.type === "MATERIAL") material += expense.amount;
@@ -98,7 +112,7 @@ const CalendarPage = observer(() => {
       }
     }
     return { material, labor, delivery, total: material + labor + delivery };
-  }, [expenseStore.expenses, currentMonth]);
+  }, [calendarExpenses, currentMonth]);
 
   const prevMonth = () =>
     setCurrentMonth(

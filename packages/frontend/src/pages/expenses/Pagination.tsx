@@ -10,7 +10,7 @@ const Pagination = observer(() => {
   return (
     <TablePagination
       component="div"
-      count={expenseStore.filteredExpenses.length}
+      count={expenseStore.total}
       page={expenseStore.page}
       onPageChange={(_, newPage) => expenseStore.setPage(newPage)}
       rowsPerPage={expenseStore.rowsPerPage}

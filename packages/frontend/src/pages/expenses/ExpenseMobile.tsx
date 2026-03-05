@@ -15,7 +15,7 @@ const ExpenseMobile = observer(() => {
   return (
     <Box>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        {expenseStore.paginatedExpenses.map((expense) => (
+        {expenseStore.expenses.map((expense) => (
           <Card key={expense.id} variant="outlined" sx={expense.planned ? { opacity: 0.7 } : undefined}>
             <CardContent sx={{ pb: 0.5, "&:last-child": { pb: 0.5 } }}>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>

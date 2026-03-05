@@ -12,6 +12,8 @@ import type {
   CreateExpenseInput,
   UpdateExpenseInput,
   TransferExpenseInput,
+  ExpenseFilters,
+  ExpenseListResponse,
   Category,
   CreateCategoryInput,
   ProjectSummary,
@@ -89,11 +91,24 @@ export const projectsApi = {
 
 // Expenses
 export const expensesApi = {
-  list: async (projectId: string, type?: string) => {
-    const params = type ? `?type=${type}` : "";
-    const r = await api
-      .get<ApiResponse<Expense[]>>(`/projects/${projectId}/expenses${params}`);
-    return r.data.data!;
+  list: (projectId: string, filters: ExpenseFilters & { page?: number; limit?: number; all?: boolean } = {}) => {
+    const params: Record<string, string> = {};
+    if (filters.all) params.all = "true";
+    if (filters.page) params.page = String(filters.page);
+    if (filters.limit) params.limit = String(filters.limit);
+    if (filters.types?.length) params.types = filters.types.join(",");
+    if (filters.categoryIds?.length) params.categoryIds = filters.categoryIds.join(",");
+    if (filters.title) params.title = filters.title;
+    if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+    if (filters.dateTo) params.dateTo = filters.dateTo;
+    if (filters.amountFrom != null) params.amountFrom = String(filters.amountFrom);
+    if (filters.amountTo != null) params.amountTo = String(filters.amountTo);
+    if (filters.supplier) params.supplier = filters.supplier;
+    if (filters.carrier) params.carrier = filters.carrier;
+    if (filters.worker) params.worker = filters.worker;
+    if (filters.plannedStatus && filters.plannedStatus !== "all") params.plannedStatus = filters.plannedStatus;
+    return api.get<ApiResponse<ExpenseListResponse>>(`/projects/${projectId}/expenses`, { params })
+      .then((r) => r.data.data!);
   },
   create: (projectId: string, data: CreateExpenseInput) =>
     api.post<ApiResponse<Expense>>(`/projects/${projectId}/expenses`, data)

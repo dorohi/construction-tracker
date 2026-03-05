@@ -67,3 +67,24 @@ export interface CreateCategoryInput {
   name: string;
   type: ExpenseType;
 }
+
+export interface ExpenseFilters {
+  types?: ExpenseType[];
+  categoryIds?: string[];
+  title?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  amountFrom?: number;
+  amountTo?: number;
+  supplier?: string;
+  carrier?: string;
+  worker?: string;
+  plannedStatus?: "all" | "planned" | "actual";
+}
+
+export interface ExpenseListResponse {
+  expenses: Expense[];
+  total: number;
+  page: number;
+  limit: number;
+}

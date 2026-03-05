@@ -48,7 +48,7 @@ const ExpenseTable = observer(() => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  if (expenseStore.filteredExpenses.length === 0) {
+  if (!expenseStore.loading && expenseStore.expenses.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center" }}>
         <Typography color="text.secondary">Расходы не найдены</Typography>
@@ -76,7 +76,7 @@ const ExpenseTable = observer(() => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {expenseStore.paginatedExpenses.map((expense) => (
+            {expenseStore.expenses.map((expense) => (
               <TableRow key={expense.id} hover sx={expense.planned ? { opacity: 0.7 } : undefined}>
                 <TableCell>{formatDate(expense.date)}</TableCell>
                 <TableCell>

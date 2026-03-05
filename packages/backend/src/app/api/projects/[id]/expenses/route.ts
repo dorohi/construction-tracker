@@ -18,21 +18,72 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Проект не найден" }, { status: 404 });
   }
 
-  const url = new URL(request.url);
-  const type = url.searchParams.get("type");
-  const categoryId = url.searchParams.get("categoryId");
+  const sp = new URL(request.url).searchParams;
+
+  const all = sp.get("all") === "true";
+  const page = all ? 1 : Math.max(1, parseInt(sp.get("page") || "1"));
+  const limit = all ? 0 : Math.min(100, Math.max(1, parseInt(sp.get("limit") || "25")));
 
   const where: Record<string, unknown> = { projectId };
-  if (type) where.type = type;
-  if (categoryId) where.categoryId = categoryId;
 
-  const expenses = await prisma.expense.findMany({
-    where,
-    include: { category: true },
-    orderBy: { date: "desc" },
-  });
+  // type filter (comma-separated: MATERIAL,LABOR)
+  const types = sp.get("types");
+  if (types) where.type = { in: types.split(",") };
 
-  return NextResponse.json({ data: expenses });
+  // category filter (comma-separated ids)
+  const categoryIds = sp.get("categoryIds");
+  if (categoryIds) where.categoryId = { in: categoryIds.split(",") };
+
+  // title search (contains, case-insensitive)
+  const title = sp.get("title");
+  if (title) where.title = { contains: title, mode: "insensitive" };
+
+  // date range
+  const dateFrom = sp.get("dateFrom");
+  const dateTo = sp.get("dateTo");
+  if (dateFrom || dateTo) {
+    const dateFilter: Record<string, Date> = {};
+    if (dateFrom) dateFilter.gte = new Date(dateFrom);
+    if (dateTo) dateFilter.lte = new Date(dateTo + "T23:59:59.999Z");
+    where.date = dateFilter;
+  }
+
+  // amount range
+  const amountFrom = sp.get("amountFrom");
+  const amountTo = sp.get("amountTo");
+  if (amountFrom || amountTo) {
+    const amountFilter: Record<string, number> = {};
+    if (amountFrom) amountFilter.gte = parseFloat(amountFrom);
+    if (amountTo) amountFilter.lte = parseFloat(amountTo);
+    where.amount = amountFilter;
+  }
+
+  // text search fields
+  const supplier = sp.get("supplier");
+  if (supplier) where.supplier = { contains: supplier, mode: "insensitive" };
+
+  const carrier = sp.get("carrier");
+  if (carrier) where.carrier = { contains: carrier, mode: "insensitive" };
+
+  const worker = sp.get("worker");
+  if (worker) where.worker = { contains: worker, mode: "insensitive" };
+
+  // planned status
+  const plannedStatus = sp.get("plannedStatus");
+  if (plannedStatus === "planned") where.planned = true;
+  else if (plannedStatus === "actual") where.planned = false;
+
+  const [expenses, total] = await Promise.all([
+    prisma.expense.findMany({
+      where,
+      include: { category: true },
+      orderBy: { date: "desc" },
+      ...(all ? {} : { skip: (page - 1) * limit, take: limit }),
+    }),
+    prisma.expense.count({ where }),
+  ]);
+
+  return NextResponse.json({ data: { expenses, total, page, limit } });
 }
 
 export async function POST(request: NextRequest, { params }: Params) {

@@ -49,8 +49,12 @@ export function countActiveFilters(f: ExpenseFilterValues): number {
 
 export class ExpenseStore {
   expenses: Expense[] = [];
+  total = 0;
   loading = false;
   error: string | null = null;
+
+  // current project id for reloads
+  projectId: string | null = null;
 
   // UI: filters
   filters: ExpenseFilterValues = { ...defaultFilters };
@@ -80,85 +84,7 @@ export class ExpenseStore {
     }, { autoBind: true });
   }
 
-  // --- Computed: data ---
-
-  get materialExpenses() {
-    return this.expenses.filter((e) => e.type === "MATERIAL");
-  }
-
-  get laborExpenses() {
-    return this.expenses.filter((e) => e.type === "LABOR");
-  }
-
-  get deliveryExpenses() {
-    return this.expenses.filter((e) => e.type === "DELIVERY");
-  }
-
-  get plannedExpenses() {
-    return this.expenses.filter((e) => e.planned);
-  }
-
-  get actualExpenses() {
-    return this.expenses.filter((e) => !e.planned);
-  }
-
-  get totalAmount() {
-    return this.expenses.reduce((s, e) => s + e.amount, 0);
-  }
-
-  get filteredExpenses() {
-    let result = this.expenses;
-    const f = this.filters;
-
-    if (f.types.length > 0) {
-      result = result.filter((e) => f.types.includes(e.type));
-    }
-    if (f.categoryIds.length > 0) {
-      result = result.filter((e) => e.categoryId && f.categoryIds.includes(e.categoryId));
-    }
-    if (f.title) {
-      const search = f.title.toLowerCase();
-      result = result.filter((e) => e.title.toLowerCase().includes(search));
-    }
-    if (f.dateFrom) {
-      result = result.filter((e) => e.date >= f.dateFrom!);
-    }
-    if (f.dateTo) {
-      result = result.filter((e) => e.date <= f.dateTo! + "T23:59:59");
-    }
-    if (f.amountFrom !== null) {
-      result = result.filter((e) => e.amount >= f.amountFrom!);
-    }
-    if (f.amountTo !== null) {
-      result = result.filter((e) => e.amount <= f.amountTo!);
-    }
-    if (f.supplier) {
-      const s = f.supplier.toLowerCase();
-      result = result.filter((e) => e.supplier?.toLowerCase().includes(s));
-    }
-    if (f.carrier) {
-      const s = f.carrier.toLowerCase();
-      result = result.filter((e) => e.carrier?.toLowerCase().includes(s));
-    }
-    if (f.worker) {
-      const s = f.worker.toLowerCase();
-      result = result.filter((e) => e.worker?.toLowerCase().includes(s));
-    }
-    if (f.plannedStatus === "planned") {
-      result = result.filter((e) => e.planned);
-    } else if (f.plannedStatus === "actual") {
-      result = result.filter((e) => !e.planned);
-    }
-
-    return result;
-  }
-
-  get paginatedExpenses() {
-    return this.filteredExpenses.slice(
-      this.page * this.rowsPerPage,
-      this.page * this.rowsPerPage + this.rowsPerPage,
-    );
-  }
+  // --- Computed ---
 
   get activeFilterCount() {
     return countActiveFilters(this.filters);
@@ -166,12 +92,29 @@ export class ExpenseStore {
 
   // --- Actions: API ---
 
-  async loadExpenses(projectId: string, type?: string) {
+  async loadExpenses(projectId: string) {
+    this.projectId = projectId;
     this.loading = true;
     try {
-      const expenses = await expensesApi.list(projectId, type);
+      const { types, categoryIds, title, dateFrom, dateTo, amountFrom, amountTo, supplier, carrier, worker, plannedStatus } = this.filters;
+      const result = await expensesApi.list(projectId, {
+        page: this.page + 1, // backend is 1-based
+        limit: this.rowsPerPage,
+        types: types.length > 0 ? types : undefined,
+        categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+        title: title || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+        amountFrom: amountFrom ?? undefined,
+        amountTo: amountTo ?? undefined,
+        supplier: supplier || undefined,
+        carrier: carrier || undefined,
+        worker: worker || undefined,
+        plannedStatus: plannedStatus !== "all" ? plannedStatus : undefined,
+      });
       runInAction(() => {
-        this.expenses = expenses;
+        this.expenses = result.expenses;
+        this.total = result.total;
         this.loading = false;
       });
     } catch {
@@ -182,13 +125,15 @@ export class ExpenseStore {
     }
   }
 
+  reload() {
+    if (this.projectId) this.loadExpenses(this.projectId);
+  }
+
   async createExpense(projectId: string, data: CreateExpenseInput) {
     try {
       const expense = await expensesApi.create(projectId, data);
-      runInAction(() => {
-        this.expenses.unshift(expense);
-      });
       rootStore.snackbarStore.show("Расход добавлен", "success");
+      this.reload();
       return expense;
     } catch (e: any) {
       const msg = e.response?.data?.error || "Не удалось создать расход";
@@ -201,13 +146,8 @@ export class ExpenseStore {
   async updateExpense(id: string, data: UpdateExpenseInput) {
     try {
       const updated = await expensesApi.update(id, data);
-      runInAction(() => {
-        const idx = this.expenses.findIndex((e) => e.id === id);
-        if (idx !== -1) {
-          this.expenses[idx] = updated;
-        }
-      });
       rootStore.snackbarStore.show("Расход обновлён", "success");
+      this.reload();
       return updated;
     } catch (e: any) {
       const msg = e.response?.data?.error || "Не удалось обновить расход";
@@ -220,10 +160,8 @@ export class ExpenseStore {
   async deleteExpense(id: string) {
     try {
       await expensesApi.delete(id);
-      runInAction(() => {
-        this.expenses = this.expenses.filter((e) => e.id !== id);
-      });
       rootStore.snackbarStore.show("Расход удалён", "success");
+      this.reload();
     } catch (e: any) {
       const msg = e.response?.data?.error || "Не удалось удалить расход";
       runInAction(() => { this.error = msg; });
@@ -234,15 +172,8 @@ export class ExpenseStore {
   async transferExpense(id: string, data: TransferExpenseInput) {
     try {
       const result = await expensesApi.transfer(id, data);
-      runInAction(() => {
-        if (result.source) {
-          const idx = this.expenses.findIndex((e) => e.id === id);
-          if (idx !== -1) this.expenses[idx] = result.source;
-        } else {
-          this.expenses = this.expenses.filter((e) => e.id !== id);
-        }
-      });
       rootStore.snackbarStore.show("Трансфер выполнен", "success");
+      this.reload();
       return result;
     } catch (e: any) {
       const msg = e.response?.data?.error || "Не удалось выполнить трансфер";
@@ -259,6 +190,8 @@ export class ExpenseStore {
 
   setFilters(filters: ExpenseFilterValues) {
     this.filters = filters;
+    this.page = 0;
+    this.reload();
   }
 
   openFilters() { this.filtersOpen = true; }
@@ -298,10 +231,15 @@ export class ExpenseStore {
 
   // --- Actions: UI pagination ---
 
-  setPage(page: number) { this.page = page; }
+  setPage(page: number) {
+    this.page = page;
+    this.reload();
+  }
+
   setRowsPerPage(rowsPerPage: number) {
     this.rowsPerPage = rowsPerPage;
     this.page = 0;
+    this.reload();
   }
 
   // --- Actions: UI menu ---

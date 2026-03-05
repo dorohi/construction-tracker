@@ -6,6 +6,8 @@ export type {
   UpdateExpenseInput,
   TransferExpenseInput,
   CreateCategoryInput,
+  ExpenseFilters,
+  ExpenseListResponse,
 } from "./types/expense";
 
 export type {
