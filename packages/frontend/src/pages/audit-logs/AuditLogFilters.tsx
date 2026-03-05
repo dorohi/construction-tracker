@@ -1,13 +1,16 @@
-import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Box,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   MenuItem,
   TextField,
-  Collapse,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useStore } from "@/stores/RootStore";
 
@@ -36,57 +39,30 @@ const ENTITIES = [
 
 const AuditLogFilters = observer(() => {
   const { auditLogStore } = useStore();
-  const [action, setAction] = useState(auditLogStore.filters.action || "");
-  const [entity, setEntity] = useState(auditLogStore.filters.entity || "");
-  const [dateFrom, setDateFrom] = useState(auditLogStore.filters.dateFrom || "");
-  const [dateTo, setDateTo] = useState(auditLogStore.filters.dateTo || "");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { filters } = auditLogStore;
 
-  const hasFilters = action || entity || dateFrom || dateTo;
-
-  const applyFilters = () => {
-    auditLogStore.setFilters({
-      action: action || undefined,
-      entity: entity || undefined,
-      dateFrom: dateFrom || undefined,
-      dateTo: dateTo || undefined,
-    });
+  const update = (patch: Partial<typeof filters>) => {
+    auditLogStore.setFilters({ ...filters, ...patch });
   };
 
-  const clearFilters = () => {
-    setAction("");
-    setEntity("");
-    setDateFrom("");
-    setDateTo("");
+  const reset = () => {
     auditLogStore.clearFilters();
   };
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-        <Button
-          size="small"
-          startIcon={<FilterListIcon />}
-          onClick={auditLogStore.toggleFilters}
-          variant={auditLogStore.filtersOpen ? "contained" : "outlined"}
-        >
-          Фильтры
-        </Button>
-        {hasFilters && (
-          <Button size="small" startIcon={<ClearIcon />} onClick={clearFilters} color="secondary">
-            Сбросить
-          </Button>
-        )}
-      </Box>
-
-      <Collapse in={auditLogStore.filtersOpen}>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 1, mb: 1 }}>
+    <Dialog open={auditLogStore.filtersOpen} onClose={auditLogStore.closeFilters} maxWidth="sm" fullWidth fullScreen={isMobile}>
+      <DialogTitle>Фильтры</DialogTitle>
+      <DialogContent>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
           <TextField
             select
             label="Действие"
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
+            value={filters.action || ""}
+            onChange={(e) => update({ action: e.target.value || undefined })}
             size="small"
-            sx={{ minWidth: 150 }}
+            fullWidth
           >
             {ACTIONS.map((a) => (
               <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>
@@ -96,42 +72,47 @@ const AuditLogFilters = observer(() => {
           <TextField
             select
             label="Сущность"
-            value={entity}
-            onChange={(e) => setEntity(e.target.value)}
+            value={filters.entity || ""}
+            onChange={(e) => update({ entity: e.target.value || undefined })}
             size="small"
-            sx={{ minWidth: 150 }}
+            fullWidth
           >
             {ENTITIES.map((e) => (
               <MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>
             ))}
           </TextField>
 
-          <TextField
-            label="Дата от"
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            size="small"
-            slotProps={{ inputLabel: { shrink: true } }}
-            sx={{ minWidth: 150 }}
-          />
-
-          <TextField
-            label="Дата до"
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            size="small"
-            slotProps={{ inputLabel: { shrink: true } }}
-            sx={{ minWidth: 150 }}
-          />
-
-          <Button variant="contained" size="small" onClick={applyFilters}>
-            Применить
-          </Button>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <TextField
+              label="Дата с"
+              type="date"
+              value={filters.dateFrom || ""}
+              onChange={(e) => update({ dateFrom: e.target.value || undefined })}
+              size="small"
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+            <TextField
+              label="Дата по"
+              type="date"
+              value={filters.dateTo || ""}
+              onChange={(e) => update({ dateTo: e.target.value || undefined })}
+              size="small"
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+          </Box>
         </Box>
-      </Collapse>
-    </Box>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        {auditLogStore.activeFilterCount > 0 && (
+          <Button startIcon={<ClearIcon />} onClick={reset} sx={{ mr: "auto" }}>
+            Сбросить ({auditLogStore.activeFilterCount})
+          </Button>
+        )}
+        <Button variant="contained" onClick={auditLogStore.closeFilters}>
+          Закрыть
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 });
 

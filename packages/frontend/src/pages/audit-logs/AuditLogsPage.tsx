@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Container, Typography, Box } from "@mui/material";
+import { Container, Typography, Box, Button, Badge } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { useStore } from "@/stores/RootStore";
 import AppProgress from "@/components/AppProgress";
 import AuditLogFilters from "./AuditLogFilters";
@@ -21,6 +22,15 @@ const AuditLogsPage = observer(() => {
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             Логи действий
           </Typography>
+          <Badge badgeContent={auditLogStore.activeFilterCount} color="primary">
+            <Button
+              variant="outlined"
+              startIcon={<FilterListIcon />}
+              onClick={auditLogStore.openFilters}
+            >
+              Фильтры
+            </Button>
+          </Badge>
         </Box>
 
         <AuditLogFilters />

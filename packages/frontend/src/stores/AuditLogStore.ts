@@ -37,8 +37,21 @@ export class AuditLogStore {
     this.loadLogs();
   }
 
-  toggleFilters() {
-    this.filtersOpen = !this.filtersOpen;
+  openFilters() {
+    this.filtersOpen = true;
+  }
+
+  closeFilters() {
+    this.filtersOpen = false;
+  }
+
+  get activeFilterCount() {
+    let count = 0;
+    if (this.filters.action) count++;
+    if (this.filters.entity) count++;
+    if (this.filters.dateFrom) count++;
+    if (this.filters.dateTo) count++;
+    return count;
   }
 
   async loadLogs() {
