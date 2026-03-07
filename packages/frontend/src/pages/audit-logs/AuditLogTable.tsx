@@ -86,25 +86,29 @@ const AuditLogTable = observer(() => {
           return (
             <Card key={log.id} sx={{ mb: 1 }}>
               <CardContent sx={{ py: 1.5, px: 2, "&:last-child": { pb: 1.5 } }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
-                  <Chip label={actionInfo.label} color={actionInfo.color} size="small" />
-                  <Typography variant="caption" color="text.secondary">
-                    {formatDateTime(log.createdAt)}
-                  </Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {ENTITY_LABELS[log.entity] || log.entity}
+                    </Typography>
+                    {log.details && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                        {log.details}
+                      </Typography>
+                    )}
+                    {isAdmin && log.user && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                        {log.user.name}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box sx={{ textAlign: "right", flexShrink: 0 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                      {formatDateTime(log.createdAt)}
+                    </Typography>
+                    <Chip label={actionInfo.label} color={actionInfo.color} size="small" sx={{ mt: 0.5 }} />
+                  </Box>
                 </Box>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {ENTITY_LABELS[log.entity] || log.entity}
-                </Typography>
-                {log.details && (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
-                    {log.details}
-                  </Typography>
-                )}
-                {isAdmin && log.user && (
-                  <Typography variant="caption" color="text.secondary">
-                    {log.user.name}
-                  </Typography>
-                )}
               </CardContent>
             </Card>
           );

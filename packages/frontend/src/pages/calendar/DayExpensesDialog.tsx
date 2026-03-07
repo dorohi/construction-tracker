@@ -8,6 +8,7 @@ import {
   useMediaQuery,
   useTheme,
   Divider,
+  Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { Expense } from "@construction-tracker/shared/dist";
@@ -99,70 +100,88 @@ export default function DayExpensesDialog({
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "center",
                         gap: 1,
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        noWrap
-                        sx={{ opacity: exp.planned ? 0.6 : 1 }}
-                      >
-                        {exp.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        sx={{ whiteSpace: "nowrap" }}
-                      >
-                        {formatCurrency(exp.amount)}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 0.5,
-                        mt: 0.5,
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontSize: "0.7rem" }}
-                      >
-                        {TYPE_LABELS[exp.type] || exp.type}
-                      </Typography>
-                      {exp.category && (
-                        <CategoryChip
-                          name={exp.category.name}
-                          type={exp.category.type}
-                        />
-                      )}
-                      {exp.planned && (
+                      <Box sx={{ minWidth: 0 }}>
                         <Typography
-                          variant="caption"
+                          variant="body2"
+                          fontWeight={600}
+                          noWrap
+                          sx={{ opacity: exp.planned ? 0.6 : 1 }}
+                        >
+                          {exp.title}
+                        </Typography>
+                        {exp.description && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: "block", mt: 0.25 }}
+                          >
+                            {exp.description}
+                          </Typography>
+                        )}
+                        <Box
                           sx={{
-                            fontSize: "0.65rem",
-                            color: "warning.main",
-                            fontStyle: "italic",
+                            display: "flex",
+                            gap: 0.5,
+                            mt: 0.5,
+                            flexWrap: "wrap",
+                            alignItems: "center",
                           }}
                         >
-                          план
+                          <Chip
+                            label={TYPE_LABELS[exp.type] || exp.type}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              bgcolor: getTypeColor(exp.type),
+                              color: "#fff",
+                              "& .MuiChip-label": { px: 0.75 },
+                            }}
+                          />
+                          {exp.category && (
+                            <CategoryChip
+                              name={exp.category.name}
+                              type={exp.category.type}
+                            />
+                          )}
+                          {exp.planned && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontSize: "0.65rem",
+                                color: "warning.main",
+                                fontStyle: "italic",
+                              }}
+                            >
+                              план
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                      <Box sx={{ textAlign: "right", flexShrink: 0 }}>
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          sx={{ whiteSpace: "nowrap" }}
+                        >
+                          {formatCurrency(exp.amount)}
                         </Typography>
-                      )}
+                        {exp.type === "MATERIAL" && exp.quantity != null && exp.unitPrice != null && (
+                          <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                            {exp.quantity} {exp.unit || "шт."} × {formatCurrency(exp.unitPrice)}
+                          </Typography>
+                        )}
+                        {exp.type === "LABOR" && exp.hoursWorked != null && exp.hourlyRate != null && (
+                          <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                            {exp.hoursWorked} ч × {formatCurrency(exp.hourlyRate)}
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
-                    {exp.description && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: "block", mt: 0.25 }}
-                      >
-                        {exp.description}
-                      </Typography>
-                    )}
                   </Box>
                 </Box>
               </Box>
