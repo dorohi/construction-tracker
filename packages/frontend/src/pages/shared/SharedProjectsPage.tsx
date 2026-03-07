@@ -8,13 +8,15 @@ import {
   Card,
   CardContent,
   CardActionArea,
-  Chip,
+  LinearProgress,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import PublicIcon from "@mui/icons-material/Public";
 import PersonIcon from "@mui/icons-material/Person";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -93,76 +95,50 @@ const SharedProjectsPage = observer(() => {
                         </Typography>
                       </Box>
 
-                      {project.budget != null && (
-                        <Box sx={{ mb: 1.5 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Бюджет: {formatCurrency(project.budget)}
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <AttachMoneyIcon sx={{ fontSize: 18, color: "warning.main" }} />
+                          <Typography variant="body2">
+                            Потрачено: <strong>{formatCurrency(project.totalSpent)}</strong>
                           </Typography>
-                          {budgetPercent != null && (
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
-                              <Box
-                                sx={{
-                                  flex: 1,
-                                  height: 6,
-                                  borderRadius: 3,
-                                  bgcolor: "action.hover",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                <Box
-                                  sx={{
-                                    width: `${Math.min(budgetPercent, 100)}%`,
-                                    height: "100%",
-                                    borderRadius: 3,
-                                    bgcolor:
-                                      budgetPercent > 90
-                                        ? "error.main"
-                                        : budgetPercent > 70
-                                          ? "warning.main"
-                                          : "primary.main",
-                                  }}
-                                />
-                              </Box>
-                              <Typography variant="caption" color="text.secondary">
-                                {budgetPercent}%
-                              </Typography>
-                            </Box>
-                          )}
                         </Box>
-                      )}
+                        {project.budget != null && (
+                          <>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <AccountBalanceIcon sx={{ fontSize: 18, color: "info.main" }} />
+                              <Typography variant="body2">Бюджет: {formatCurrency(project.budget)}</Typography>
+                            </Box>
+                            {budgetPercent != null && (
+                              <LinearProgress
+                                variant="determinate"
+                                value={Math.min(budgetPercent, 100)}
+                                color={budgetPercent > 90 ? "error" : budgetPercent > 70 ? "warning" : "primary"}
+                                sx={{ mt: 0.5, height: 6, borderRadius: 3 }}
+                              />
+                            )}
+                          </>
+                        )}
+                      </Box>
 
-                      <Typography variant="h6" sx={{ mb: 1 }}>
-                        {formatCurrency(project.totalSpent)}
-                      </Typography>
-
-                      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-                        {project.materialTotal > 0 && (
-                          <Chip
-                            size="small"
-                            icon={<BuildIcon />}
-                            label={formatCurrency(project.materialTotal)}
-                            variant="outlined"
-                            color="primary"
-                          />
-                        )}
-                        {project.laborTotal > 0 && (
-                          <Chip
-                            size="small"
-                            icon={<PeopleIcon />}
-                            label={formatCurrency(project.laborTotal)}
-                            variant="outlined"
-                            color="secondary"
-                          />
-                        )}
-                        {project.deliveryTotal > 0 && (
-                          <Chip
-                            size="small"
-                            icon={<LocalShippingIcon />}
-                            label={formatCurrency(project.deliveryTotal)}
-                            variant="outlined"
-                            color="success"
-                          />
-                        )}
+                      <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 2, rowGap: 0.5, mt: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <BuildIcon sx={{ fontSize: 14, color: "primary.main" }} />
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            Материалы: {formatCurrency(project.materialTotal)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <PeopleIcon sx={{ fontSize: 14, color: "secondary.main" }} />
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            Работы: {formatCurrency(project.laborTotal)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <LocalShippingIcon sx={{ fontSize: 14, color: "success.main" }} />
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            Доставки: {formatCurrency(project.deliveryTotal)}
+                          </Typography>
+                        </Box>
                       </Box>
                     </CardContent>
                   </CardActionArea>

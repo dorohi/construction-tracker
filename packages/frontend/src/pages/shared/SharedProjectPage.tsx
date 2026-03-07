@@ -8,11 +8,15 @@ import {
   LinearProgress,
   Breadcrumbs,
   Link,
+  Badge,
+  Button,
+  IconButton,
+  Tooltip,
+  TablePagination,
   useMediaQuery,
   useTheme,
   Card,
   CardContent,
-  Chip,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +25,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import Grid from "@mui/material/Grid2";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
@@ -29,35 +34,17 @@ import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import { useStore } from "../../stores/RootStore";
 import SummaryCard from "../../components/SummaryCard";
 import ExpenseChart from "../../components/charts/ExpenseChart";
+import CategoryChip from "@/components/CategoryChip";
 import AppProgress from "@/components/AppProgress";
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
-  }).format(amount);
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("ru-RU");
-}
-
-const TYPE_LABELS: Record<string, string> = {
-  MATERIAL: "Материал",
-  LABOR: "Работа",
-  DELIVERY: "Доставка",
-};
-
-const TYPE_COLORS_MAP: Record<string, "primary" | "secondary" | "success"> = {
-  MATERIAL: "primary",
-  LABOR: "secondary",
-  DELIVERY: "success",
-};
+import { formatCurrency, formatDate } from "@/Utils";
+import { getDetails } from "@/pages/expenses/ExpenseTable";
+import SharedFilters from "./SharedFilters";
 
 const SharedProjectPage = observer(() => {
   const { token } = useParams<{ token: string }>();
@@ -90,7 +77,8 @@ const SharedProjectPage = observer(() => {
 
   if (!detail) return <AppProgress />;
 
-  const { project, summary, expenses } = detail;
+  const { project, summary } = detail;
+  const expenses = sharedStore.paginatedExpenses;
 
   return (
     <>
@@ -260,60 +248,140 @@ const SharedProjectPage = observer(() => {
           );
         })()}
 
-        {/* Expenses table */}
-        {expenses.length > 0 && (
+        {/* Expenses */}
+        {sharedStore.allExpenses.length > 0 && (
           <Box>
-            <Typography variant="h6" gutterBottom>
-              Расходы ({expenses.length})
-            </Typography>
-            <TableContainer component={Paper}>
-              <Table size={isMobile ? "small" : "medium"}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Дата</TableCell>
-                    <TableCell>Название</TableCell>
-                    <TableCell>Тип</TableCell>
-                    {!isMobile && <TableCell>Категория</TableCell>}
-                    <TableCell align="right">Сумма</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {expenses.map((expense) => (
-                    <TableRow key={expense.id} sx={expense.planned ? { opacity: 0.6 } : undefined}>
-                      <TableCell sx={{ whiteSpace: "nowrap" }}>
-                        {formatDate(expense.date)}
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: isMobile ? 120 : 300 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Typography variant="h6">
+                Расходы ({sharedStore.totalFiltered})
+              </Typography>
+              {isMobile ? (
+                <Tooltip title="Фильтры">
+                  <IconButton onClick={sharedStore.openFilters}>
+                    <Badge badgeContent={sharedStore.activeFilterCount} color="primary">
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Badge badgeContent={sharedStore.activeFilterCount} color="primary">
+                  <Button variant="outlined" size="small" startIcon={<FilterListIcon />} onClick={sharedStore.openFilters}>
+                    Фильтры
+                  </Button>
+                </Badge>
+              )}
+            </Box>
+
+            <SharedFilters />
+
+            {isMobile ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                {expenses.map((expense) => (
+                  <Card key={expense.id} variant="outlined" sx={expense.planned ? { opacity: 0.7 } : undefined}>
+                    <CardContent sx={{ pb: 1, "&:last-child": { pb: 1 } }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography variant="body2" fontWeight={600} noWrap>
+                            {expense.planned && (
+                              <HourglassEmptyIcon sx={{ fontSize: 14, verticalAlign: "text-bottom", mr: 0.5, color: "text.secondary" }} />
+                            )}
                             {expense.title}
                           </Typography>
-                          {expense.planned && (
-                            <Chip size="small" label="План" variant="outlined" sx={{ mt: 0.5, height: 20, fontSize: "0.65rem" }} />
+                          {expense.description && (
+                            <Typography variant="caption" color="text.secondary" noWrap component="div">
+                              {expense.description}
+                            </Typography>
                           )}
                         </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="small"
-                          label={TYPE_LABELS[expense.type] || expense.type}
-                          color={TYPE_COLORS_MAP[expense.type] || "default"}
-                          variant="outlined"
+                        <Typography variant="body2" fontWeight={700} sx={{ ml: 1, whiteSpace: "nowrap" }}>
+                          {formatCurrency(expense.amount)}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, alignItems: "center", mt: 0.5 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDate(expense.date)}
+                        </Typography>
+                        <CategoryChip
+                          name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                          type={expense.type}
                         />
-                      </TableCell>
-                      {!isMobile && (
+                        {expense.category && (
+                          <CategoryChip name={expense.category.name} type={expense.category.type} />
+                        )}
+                      </Box>
+
+                      {getDetails(expense) && (
+                        <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 0.5 }}>
+                          {getDetails(expense)}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
+            ) : (
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Дата</TableCell>
+                      <TableCell>Название</TableCell>
+                      <TableCell>Тип</TableCell>
+                      <TableCell>Категория</TableCell>
+                      <TableCell>Детали</TableCell>
+                      <TableCell align="right">Сумма</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expenses.map((expense) => (
+                      <TableRow key={expense.id} sx={expense.planned ? { opacity: 0.6 } : undefined}>
+                        <TableCell sx={{ whiteSpace: "nowrap" }}>
+                          {formatDate(expense.date)}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" noWrap sx={{ maxWidth: 300 }}>
+                            {expense.planned && (
+                              <HourglassEmptyIcon sx={{ fontSize: 14, verticalAlign: "text-bottom", mr: 0.5, color: "text.secondary" }} />
+                            )}
+                            {expense.title}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <CategoryChip
+                            name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                            type={expense.type}
+                          />
+                        </TableCell>
                         <TableCell>
                           {expense.category?.name || "—"}
                         </TableCell>
-                      )}
-                      <TableCell align="right" sx={{ whiteSpace: "nowrap", fontWeight: 600 }}>
-                        {formatCurrency(expense.amount)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                        <TableCell>
+                          <Typography variant="caption" color="text.secondary">
+                            {getDetails(expense)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right" sx={{ whiteSpace: "nowrap", fontWeight: 600 }}>
+                          {formatCurrency(expense.amount)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+
+            <TablePagination
+              component="div"
+              count={sharedStore.totalFiltered}
+              page={sharedStore.page}
+              onPageChange={(_, p) => sharedStore.setPage(p)}
+              rowsPerPage={sharedStore.rowsPerPage}
+              onRowsPerPageChange={(e) => sharedStore.setRowsPerPage(parseInt(e.target.value, 10))}
+              rowsPerPageOptions={[10, 25, 50, 100]}
+              labelRowsPerPage="Строк:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
+            />
           </Box>
         )}
       </Container>
