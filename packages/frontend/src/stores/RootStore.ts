@@ -11,6 +11,7 @@ import { NewsStore } from './NewsStore';
 import { AdminStore } from './AdminStore';
 import { SnackbarStore } from './SnackbarStore';
 import { AuditLogStore } from './AuditLogStore';
+import { SharedStore } from './SharedStore';
 
 export class RootStore {
   authStore: AuthStore;
@@ -25,6 +26,7 @@ export class RootStore {
   uiStore: UIStore;
   snackbarStore: SnackbarStore;
   auditLogStore: AuditLogStore;
+  sharedStore: SharedStore;
 
   constructor() {
     this.authStore = new AuthStore();
@@ -39,6 +41,7 @@ export class RootStore {
     this.uiStore = new UIStore();
     this.snackbarStore = new SnackbarStore();
     this.auditLogStore = new AuditLogStore();
+    this.sharedStore = new SharedStore();
   }
 }
 

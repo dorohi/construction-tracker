@@ -31,6 +31,8 @@ import type {
   UserStats,
   AuditLogResponse,
   AuditLogFilters,
+  SharedProject,
+  SharedProjectDetail,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -86,6 +88,9 @@ export const projectsApi = {
     api.delete(`/projects/${id}`),
   summary: (id: string) =>
     api.get<ApiResponse<ProjectSummary>>(`/projects/${id}/summary`)
+      .then((r) => r.data.data!),
+  toggleShare: (id: string) =>
+    api.post<ApiResponse<{ isPublic: boolean; shareToken: string | null }>>(`/projects/${id}/share`)
       .then((r) => r.data.data!),
 };
 
@@ -227,6 +232,16 @@ export const adminApi = {
 export const auditApi = {
   list: (params: AuditLogFilters & { page?: number; limit?: number }) =>
     api.get<ApiResponse<AuditLogResponse>>("/audit-logs", { params })
+      .then((r) => r.data.data!),
+};
+
+// Shared (public, no auth)
+export const sharedApi = {
+  list: () =>
+    api.get<ApiResponse<SharedProject[]>>("/shared")
+      .then((r) => r.data.data!),
+  get: (token: string) =>
+    api.get<ApiResponse<SharedProjectDetail>>(`/shared/${token}`)
       .then((r) => r.data.data!),
 };
 

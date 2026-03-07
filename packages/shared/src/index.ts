@@ -15,6 +15,8 @@ export type {
   ProjectWithTotals,
   CreateProjectInput,
   UpdateProjectInput,
+  SharedProject,
+  SharedProjectDetail,
 } from "./types/project";
 
 export type { User, LoginInput, RegisterInput } from "./types/user";

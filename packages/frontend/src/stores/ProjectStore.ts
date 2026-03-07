@@ -22,6 +22,9 @@ export class ProjectStore {
   editingProject: ProjectWithTotals | (Project & { categories: Category[] }) | null = null;
   deletingProjectId: string | null = null;
 
+  // UI: share dialog
+  shareDialogOpen = false;
+
   // UI: category dialog
   categoryDialogOpen = false;
   newCategoryName = "";
@@ -51,6 +54,32 @@ export class ProjectStore {
 
   setDeletingProjectId(id: string | null) {
     this.deletingProjectId = id;
+  }
+
+  // --- UI: share dialog ---
+  openShareDialog() { this.shareDialogOpen = true; }
+  closeShareDialog() { this.shareDialogOpen = false; }
+
+  async toggleShare(projectId: string) {
+    try {
+      const result = await projectsApi.toggleShare(projectId);
+      runInAction(() => {
+        if (this.currentProject && this.currentProject.id === projectId) {
+          this.currentProject = {
+            ...this.currentProject,
+            isPublic: result.isPublic,
+            shareToken: result.shareToken,
+          };
+        }
+      });
+      rootStore.snackbarStore.show(
+        result.isPublic ? "Проект опубликован" : "Проект скрыт",
+        "success"
+      );
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Не удалось изменить доступ";
+      rootStore.snackbarStore.show(msg, "error");
+    }
   }
 
   // --- UI: category dialog ---

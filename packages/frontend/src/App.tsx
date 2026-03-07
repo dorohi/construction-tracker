@@ -15,6 +15,8 @@ import AdminPage from "./pages/admin/AdminPage";
 import SettingsPage from "./pages/SettingsPage";
 import CalendarPage from "./pages/calendar/CalendarPage";
 import AuditLogsPage from "./pages/audit-logs/AuditLogsPage";
+import SharedProjectsPage from "./pages/shared/SharedProjectsPage";
+import SharedProjectPage from "./pages/shared/SharedProjectPage";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { authStore } = useStore();
@@ -75,6 +77,8 @@ export default function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/audit-logs" element={<AuditLogsPage />} />
         </Route>
+        <Route path="/shared" element={<SharedProjectsPage />} />
+        <Route path="/shared/:token" element={<SharedProjectPage />} />
         <Route path="*" element={<Navigate to="/projects" replace />} />
       </Routes>
     </BrowserRouter>

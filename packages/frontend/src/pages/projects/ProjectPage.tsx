@@ -26,6 +26,7 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import TableViewIcon from '@mui/icons-material/TableView';
 import EditIcon from "@mui/icons-material/Edit";
+import ShareIcon from "@mui/icons-material/Share";
 import CategoryIcon from "@mui/icons-material/Category";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useStore } from "../../stores/RootStore";
@@ -35,6 +36,7 @@ import AppProgress from "@/components/AppProgress";
 import ProjectForm from "./ProjectForm";
 import CategoryDialog from "./CategoryDialog";
 import DeleteCategoryDialog from "./DeleteCategoryDialog";
+import ShareDialog from "./ShareDialog";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
@@ -89,6 +91,15 @@ const ProjectPage = observer(() => {
               <Tooltip title="Редактировать проект">
                 <IconButton onClick={() => projectStore.openEditForm(project)} sx={{ flexShrink: 0 }}>
                   <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Поделиться">
+                <IconButton
+                  onClick={projectStore.openShareDialog}
+                  sx={{ flexShrink: 0 }}
+                  color={project.isPublic ? "primary" : "default"}
+                >
+                  <ShareIcon />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -236,6 +247,7 @@ const ProjectPage = observer(() => {
           <ProjectForm />
           <CategoryDialog />
           <DeleteCategoryDialog />
+          <ShareDialog />
         </Container>
       )}
     </>

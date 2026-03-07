@@ -1,0 +1,324 @@
+import { useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  Box,
+  LinearProgress,
+  Breadcrumbs,
+  Link,
+  useMediaQuery,
+  useTheme,
+  Card,
+  CardContent,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import BuildIcon from "@mui/icons-material/Build";
+import PeopleIcon from "@mui/icons-material/People";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SavingsIcon from "@mui/icons-material/Savings";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
+import { useStore } from "../../stores/RootStore";
+import SummaryCard from "../../components/SummaryCard";
+import ExpenseChart from "../../components/charts/ExpenseChart";
+import AppProgress from "@/components/AppProgress";
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+  }).format(amount);
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("ru-RU");
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  MATERIAL: "Материал",
+  LABOR: "Работа",
+  DELIVERY: "Доставка",
+};
+
+const TYPE_COLORS_MAP: Record<string, "primary" | "secondary" | "success"> = {
+  MATERIAL: "primary",
+  LABOR: "secondary",
+  DELIVERY: "success",
+};
+
+const SharedProjectPage = observer(() => {
+  const { token } = useParams<{ token: string }>();
+  const { sharedStore } = useStore();
+  const navigate = useNavigate();
+  const thm = useTheme();
+  const isMobile = useMediaQuery(thm.breakpoints.down("md"));
+
+  useEffect(() => {
+    if (token) {
+      sharedStore.loadProject(token);
+    }
+  }, [token, sharedStore]);
+
+  const { detail } = sharedStore;
+
+  if (!sharedStore.loading && !detail) {
+    return (
+      <Container sx={{ py: 6, textAlign: "center" }}>
+        <LockIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+        <Typography variant="h5" gutterBottom>
+          Проект не найден
+        </Typography>
+        <Typography color="text.secondary">
+          Этот проект не существует или больше не является публичным
+        </Typography>
+      </Container>
+    );
+  }
+
+  if (!detail) return <AppProgress />;
+
+  const { project, summary, expenses } = detail;
+
+  return (
+    <>
+      {sharedStore.loading && <AppProgress />}
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 }, py: 3 }}>
+        <Breadcrumbs sx={{ mb: 2 }}>
+          <Link
+            underline="hover"
+            color="inherit"
+            sx={{ cursor: "pointer" }}
+            onClick={() => navigate("/shared")}
+          >
+            Публичные проекты
+          </Link>
+          <Typography color="text.primary">{project.name}</Typography>
+        </Breadcrumbs>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant={isMobile ? "h5" : "h4"}>
+            {project.name}
+          </Typography>
+          {project.description && (
+            <Typography color="text.secondary">{project.description}</Typography>
+          )}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+            <PersonIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+            <Typography variant="body2" color="text.secondary">
+              {project.ownerName}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Summary cards */}
+        <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <SummaryCard
+              title="Бюджет"
+              value={summary.budget != null ? formatCurrency(summary.budget) : "Не задан"}
+              icon={<AccountBalanceIcon />}
+              color="info.main"
+            />
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <SummaryCard
+              title="Потрачено"
+              value={formatCurrency(summary.totalSpent)}
+              icon={<AttachMoneyIcon />}
+              color="warning.main"
+            />
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <SummaryCard
+              title="Запланировано"
+              value={formatCurrency(summary.plannedTotal)}
+              icon={<PlaylistAddCheckIcon />}
+              color="info.main"
+            />
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <SummaryCard
+              title="Остаток"
+              value={summary.remaining != null ? formatCurrency(summary.remaining) : "Н/Д"}
+              icon={<SavingsIcon />}
+              color={summary.remaining != null && summary.remaining < 0 ? "error.main" : "success.main"}
+            />
+          </Grid>
+        </Grid>
+
+        {/* Type breakdown */}
+        {isMobile ? (
+          <Card sx={{ mb: 4 }}>
+            <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { title: "Материалы", value: summary.materialTotal, icon: <BuildIcon sx={{ fontSize: "1rem" }} />, color: "primary.main" },
+                  { title: "Работы", value: summary.laborTotal, icon: <PeopleIcon sx={{ fontSize: "1rem" }} />, color: "secondary.main" },
+                  { title: "Доставки", value: summary.deliveryTotal, icon: <LocalShippingIcon sx={{ fontSize: "1rem" }} />, color: "success.main" },
+                ].map((item, i) => (
+                  <Box key={item.title} sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", py: 1.5, px: 1, borderLeft: i > 0 ? 1 : 0, borderColor: "divider" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: item.color, mb: 0.5 }}>
+                      {item.icon}
+                      <Typography variant="body2" sx={{ fontSize: "0.7rem", color: "text.secondary" }}>{item.title}</Typography>
+                    </Box>
+                    <Typography fontWeight={700} sx={{ fontSize: "0.85rem" }}>{formatCurrency(item.value)}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        ) : (
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ sm: 4 }}>
+              <SummaryCard title="Материалы" value={formatCurrency(summary.materialTotal)} icon={<BuildIcon />} color="primary.main" />
+            </Grid>
+            <Grid size={{ sm: 4 }}>
+              <SummaryCard title="Работы" value={formatCurrency(summary.laborTotal)} icon={<PeopleIcon />} color="secondary.main" />
+            </Grid>
+            <Grid size={{ sm: 4 }}>
+              <SummaryCard title="Доставки" value={formatCurrency(summary.deliveryTotal)} icon={<LocalShippingIcon />} color="success.main" />
+            </Grid>
+          </Grid>
+        )}
+
+        {/* Budget progress */}
+        {summary.budget != null && (
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="body2" gutterBottom>
+              Использование бюджета: {((summary.totalSpent / summary.budget) * 100).toFixed(1)}%
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={Math.min((summary.totalSpent / summary.budget) * 100, 100)}
+              color={summary.totalSpent / summary.budget > 0.9 ? "error" : summary.totalSpent / summary.budget > 0.7 ? "warning" : "primary"}
+              sx={{ height: 10, borderRadius: 5 }}
+            />
+          </Box>
+        )}
+
+        {/* Charts */}
+        {(() => {
+          const TYPE_COLORS: Record<string, string> = {
+            MATERIAL: "#1976d2",
+            LABOR: "#546e7a",
+            DELIVERY: "#16a34a",
+          };
+
+          function generateShades(hex: string, count: number): string[] {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            const shades: string[] = [];
+            for (let i = 0; i < count; i++) {
+              const factor = 0.4 + (0.6 * i) / Math.max(count - 1, 1);
+              const nr = Math.round(r + (255 - r) * (1 - factor));
+              const ng = Math.round(g + (255 - g) * (1 - factor));
+              const nb = Math.round(b + (255 - b) * (1 - factor));
+              shades.push(`#${nr.toString(16).padStart(2, "0")}${ng.toString(16).padStart(2, "0")}${nb.toString(16).padStart(2, "0")}`);
+            }
+            return shades;
+          }
+
+          const typeData = [
+            { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
+            { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
+            { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
+          ].filter((d) => d.total > 0);
+
+          const materialData = summary.byCategory.filter((c) => c.type === "MATERIAL");
+          const laborData = summary.byCategory.filter((c) => c.type === "LABOR");
+          const deliveryData = summary.byCategory.filter((c) => c.type === "DELIVERY");
+
+          return (
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <ExpenseChart data={typeData} colors={typeData.map((d) => TYPE_COLORS[d.type])} title="Расходы по типам" />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <ExpenseChart data={materialData} colors={generateShades(TYPE_COLORS.MATERIAL, materialData.length)} title="Расходы на материалы по категориям" />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <ExpenseChart data={laborData} colors={generateShades(TYPE_COLORS.LABOR, laborData.length)} title="Расходы на работы по категориям" />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <ExpenseChart data={deliveryData} colors={generateShades(TYPE_COLORS.DELIVERY, deliveryData.length)} title="Расходы на доставки по категориям" />
+              </Grid>
+            </Grid>
+          );
+        })()}
+
+        {/* Expenses table */}
+        {expenses.length > 0 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Расходы ({expenses.length})
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table size={isMobile ? "small" : "medium"}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Дата</TableCell>
+                    <TableCell>Название</TableCell>
+                    <TableCell>Тип</TableCell>
+                    {!isMobile && <TableCell>Категория</TableCell>}
+                    <TableCell align="right">Сумма</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {expenses.map((expense) => (
+                    <TableRow key={expense.id} sx={expense.planned ? { opacity: 0.6 } : undefined}>
+                      <TableCell sx={{ whiteSpace: "nowrap" }}>
+                        {formatDate(expense.date)}
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" noWrap sx={{ maxWidth: isMobile ? 120 : 300 }}>
+                            {expense.title}
+                          </Typography>
+                          {expense.planned && (
+                            <Chip size="small" label="План" variant="outlined" sx={{ mt: 0.5, height: 20, fontSize: "0.65rem" }} />
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size="small"
+                          label={TYPE_LABELS[expense.type] || expense.type}
+                          color={TYPE_COLORS_MAP[expense.type] || "default"}
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      {!isMobile && (
+                        <TableCell>
+                          {expense.category?.name || "—"}
+                        </TableCell>
+                      )}
+                      <TableCell align="right" sx={{ whiteSpace: "nowrap", fontWeight: 600 }}>
+                        {formatCurrency(expense.amount)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+      </Container>
+    </>
+  );
+});
+
+export default SharedProjectPage;

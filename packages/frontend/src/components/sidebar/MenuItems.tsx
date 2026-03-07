@@ -5,9 +5,11 @@ import FolderIcon from '@mui/icons-material/Folder';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import EngineeringIcon from '@mui/icons-material/Engineering';
+import PublicIcon from '@mui/icons-material/Public';
 
 const menuItems = [
   { label: "Проекты", icon: <FolderIcon />, path: "/projects" },
+  { label: "Публичные", icon: <PublicIcon />, path: "/shared" },
   { label: "Поставщики", icon: <StorefrontIcon />, path: "/suppliers" },
   { label: "Доставщики", icon: <LocalShippingIcon />, path: "/carriers" },
   { label: "Работники", icon: <EngineeringIcon />, path: "/workers" },
