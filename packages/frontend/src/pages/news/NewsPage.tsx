@@ -24,10 +24,16 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Highlight from "@tiptap/extension-highlight";
+import { RichTextReadOnly } from "mui-tiptap";
 import { useStore } from "@/stores/RootStore";
 import AppProgress from "@/components/AppProgress";
 import NewsForm from "./NewsForm";
 import DeleteNewsDialog from "./DeleteNewsDialog";
+
+const extensions = [StarterKit, Underline, Highlight];
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("ru-RU", {
@@ -84,9 +90,27 @@ const NewsPage = observer(() => {
                     </Typography>
                   </Box>
 
-                  <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", mb: 2 }}>
-                    {item.content}
-                  </Typography>
+                  <Box
+                    sx={{
+                      mb: 2,
+                      "& p": {
+                        my: 0.5,
+                      },
+                      "& ul, & ol": {
+                        my: 0.5,
+                        pl: 3,
+                      },
+                      "& blockquote": {
+                        borderLeft: 3,
+                        borderColor: "divider",
+                        pl: 2,
+                        ml: 0,
+                        color: "text.secondary",
+                      },
+                    }}
+                  >
+                    <RichTextReadOnly content={item.content} extensions={extensions} />
+                  </Box>
 
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <IconButton
