@@ -35,6 +35,7 @@ export function getDetails(expense: Expense) {
     if (expense.worker) parts.push(`Работник: ${expense.worker}`);
     if (expense.hoursWorked != null)
       parts.push(`${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`);
+    if (expense.calloutFee) parts.push(`Вызов: ${formatCurrency(expense.calloutFee)}`);
     return parts.join(" | ");
   }
   if (expense.type === "DELIVERY" && expense.carrier) {

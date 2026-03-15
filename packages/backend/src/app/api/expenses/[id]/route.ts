@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const body = await request.json();
     const {
       type, title, description, amount, quantity, unit, unitPrice,
-      supplier, supplierId, carrier, carrierId, worker, workerId, hoursWorked, hourlyRate,
+      supplier, supplierId, carrier, carrierId, worker, workerId, hoursWorked, hourlyRate, calloutFee,
       date, categoryId, planned,
     } = body;
 
@@ -45,6 +45,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         ...(workerId !== undefined && { workerId: workerId || null }),
         ...(hoursWorked !== undefined && { hoursWorked: hoursWorked ?? null }),
         ...(hourlyRate !== undefined && { hourlyRate: hourlyRate ?? null }),
+        ...(calloutFee !== undefined && { calloutFee: calloutFee ?? null }),
         ...(planned !== undefined && { planned }),
         ...(date !== undefined && { date: new Date(date) }),
         ...(categoryId !== undefined && { categoryId: categoryId || null }),

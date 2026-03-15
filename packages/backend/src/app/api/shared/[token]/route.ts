@@ -88,6 +88,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
         worker: e.worker,
         hoursWorked: e.hoursWorked,
         hourlyRate: e.hourlyRate,
+        calloutFee: e.calloutFee,
         planned: e.planned,
         date: e.date.toISOString(),
         categoryId: e.categoryId,

@@ -47,6 +47,7 @@ const ExpenseForm = observer(() => {
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [hoursWorked, setHoursWorked] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
+  const [calloutFee, setCalloutFee] = useState("");
   const [carrier, setCarrier] = useState("");
   const [carrierId, setCarrierId] = useState<string | null>(null);
   const [planned, setPlanned] = useState(false);
@@ -69,6 +70,7 @@ const ExpenseForm = observer(() => {
       setWorkerId(source.workerId || null);
       setHoursWorked(source.hoursWorked != null ? String(source.hoursWorked) : "");
       setHourlyRate(source.hourlyRate != null ? String(source.hourlyRate) : "");
+      setCalloutFee(source.calloutFee != null ? String(source.calloutFee) : "");
       setCarrier(source.carrier || "");
       setCarrierId(source.carrierId || null);
       setPlanned(source.planned ?? false);
@@ -93,6 +95,7 @@ const ExpenseForm = observer(() => {
     setWorkerId(null);
     setHoursWorked("");
     setHourlyRate("");
+    setCalloutFee("");
     setCarrier("");
     setCarrierId(null);
     setPlanned(false);
@@ -129,6 +132,7 @@ const ExpenseForm = observer(() => {
       data.workerId = workerId || undefined;
       if (hoursWorked) data.hoursWorked = parseFloat(hoursWorked);
       if (hourlyRate) data.hourlyRate = parseFloat(hourlyRate);
+      if (calloutFee) data.calloutFee = parseFloat(calloutFee);
     } else if (type === "DELIVERY") {
       if (carrier) data.carrier = carrier;
       data.carrierId = carrierId || undefined;
@@ -154,9 +158,11 @@ const ExpenseForm = observer(() => {
 
   useEffect(() => {
     if (type === "LABOR" && hoursWorked && hourlyRate) {
-      setAmount(String(parseFloat(hoursWorked) * parseFloat(hourlyRate)));
+      const labor = parseFloat(hoursWorked) * parseFloat(hourlyRate);
+      const fee = calloutFee ? parseFloat(calloutFee) : 0;
+      setAmount(String(labor + fee));
     }
-  }, [hoursWorked, hourlyRate, type]);
+  }, [hoursWorked, hourlyRate, calloutFee, type]);
 
   return (
     <Dialog open={formOpen} onClose={expenseStore.closeForm} maxWidth="sm" fullWidth fullScreen={isMobile}>
@@ -267,6 +273,7 @@ const ExpenseForm = observer(() => {
                 <TextField label="Отработано часов" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} sx={{ flex: 1 }} />
                 <TextField label="Ставка в час" type="number" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} sx={{ flex: 1 }} />
               </Box>
+              <TextField label="Вызов" type="number" value={calloutFee} onChange={(e) => setCalloutFee(e.target.value)} fullWidth />
             </>
           )}
 

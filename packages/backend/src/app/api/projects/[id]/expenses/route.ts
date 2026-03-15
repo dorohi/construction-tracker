@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   // title search (contains, case-insensitive)
   const title = sp.get("title");
-  if (title) where.title = { contains: title, mode: "insensitive" };
+  if (title) where.title = { contains: title };
 
   // date range
   const dateFrom = sp.get("dateFrom");
@@ -60,13 +60,13 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   // text search fields
   const supplier = sp.get("supplier");
-  if (supplier) where.supplier = { contains: supplier, mode: "insensitive" };
+  if (supplier) where.supplier = { contains: supplier };
 
   const carrier = sp.get("carrier");
-  if (carrier) where.carrier = { contains: carrier, mode: "insensitive" };
+  if (carrier) where.carrier = { contains: carrier };
 
   const worker = sp.get("worker");
-  if (worker) where.worker = { contains: worker, mode: "insensitive" };
+  if (worker) where.worker = { contains: worker };
 
   // planned status
   const plannedStatus = sp.get("plannedStatus");
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const body = await request.json();
     const {
       type, title, description, amount, quantity, unit, unitPrice,
-      supplier, supplierId, carrier, carrierId, worker,  workerId, hoursWorked, hourlyRate, date, categoryId, planned,
+      supplier, supplierId, carrier, carrierId, worker,  workerId, hoursWorked, hourlyRate, calloutFee, date, categoryId, planned,
     } = body;
 
     if (!type || !title || amount === undefined || !date) {
@@ -137,6 +137,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         workerId: workerId || null,
         hoursWorked: hoursWorked ?? null,
         hourlyRate: hourlyRate ?? null,
+        calloutFee: calloutFee ?? null,
         planned: planned ?? false,
         date: new Date(date),
         categoryId: categoryId || null,

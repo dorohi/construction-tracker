@@ -178,6 +178,7 @@ export default function DayExpensesDialog({
                         {exp.type === "LABOR" && exp.hoursWorked != null && exp.hourlyRate != null && (
                           <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
                             {exp.hoursWorked} ч × {formatCurrency(exp.hourlyRate)}
+                            {exp.calloutFee ? ` + ${formatCurrency(exp.calloutFee)}` : ""}
                           </Typography>
                         )}
                       </Box>
