@@ -172,7 +172,7 @@ const ExpenseForm = observer(() => {
           <ToggleButtonGroup
             value={type}
             exclusive
-            onChange={(_, val) => val && setType(val)}
+            onChange={(_, val) => { if (val) { setType(val); setCategoryId(""); } }}
             fullWidth
             size="small"
           >
