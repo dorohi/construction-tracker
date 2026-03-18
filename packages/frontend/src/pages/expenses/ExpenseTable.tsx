@@ -33,8 +33,12 @@ export function getDetails(expense: Expense) {
   if (expense.type === "LABOR") {
     const parts: string[] = [];
     if (expense.worker) parts.push(`Работник: ${expense.worker}`);
-    if (expense.hoursWorked != null)
+    if (expense.quantity != null) {
+      const u = expense.unit || "ч";
+      parts.push(`${expense.quantity} ${u} @ ${formatCurrency(expense.unitPrice || 0)}/${u}`);
+    } else if (expense.hoursWorked != null) {
       parts.push(`${expense.hoursWorked} ч @ ${formatCurrency(expense.hourlyRate || 0)}/ч`);
+    }
     if (expense.calloutFee) parts.push(`Вызов: ${formatCurrency(expense.calloutFee)}`);
     return parts.join(" | ");
   }

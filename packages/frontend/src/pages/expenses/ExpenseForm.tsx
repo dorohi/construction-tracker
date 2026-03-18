@@ -45,8 +45,6 @@ const ExpenseForm = observer(() => {
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [worker, setWorker] = useState("");
   const [workerId, setWorkerId] = useState<string | null>(null);
-  const [hoursWorked, setHoursWorked] = useState("");
-  const [hourlyRate, setHourlyRate] = useState("");
   const [calloutFee, setCalloutFee] = useState("");
   const [carrier, setCarrier] = useState("");
   const [carrierId, setCarrierId] = useState<string | null>(null);
@@ -61,15 +59,13 @@ const ExpenseForm = observer(() => {
       setAmount(String(source.amount));
       setDate(source.date.split("T")[0]);
       setCategoryId(source.categoryId || "");
-      setQuantity(source.quantity != null ? String(source.quantity) : "");
-      setUnit(source.unit || "");
-      setUnitPrice(source.unitPrice != null ? String(source.unitPrice) : "");
+      setQuantity(source.quantity != null ? String(source.quantity) : source.hoursWorked != null ? String(source.hoursWorked) : "");
+      setUnit(source.unit || (source.hoursWorked != null && source.quantity == null ? "ч" : ""));
+      setUnitPrice(source.unitPrice != null ? String(source.unitPrice) : source.hourlyRate != null ? String(source.hourlyRate) : "");
       setSupplier(source.supplier || "");
       setSupplierId(source.supplierId || null);
       setWorker(source.worker || "");
       setWorkerId(source.workerId || null);
-      setHoursWorked(source.hoursWorked != null ? String(source.hoursWorked) : "");
-      setHourlyRate(source.hourlyRate != null ? String(source.hourlyRate) : "");
       setCalloutFee(source.calloutFee != null ? String(source.calloutFee) : "");
       setCarrier(source.carrier || "");
       setCarrierId(source.carrierId || null);
@@ -93,8 +89,6 @@ const ExpenseForm = observer(() => {
     setSupplierId(null);
     setWorker("");
     setWorkerId(null);
-    setHoursWorked("");
-    setHourlyRate("");
     setCalloutFee("");
     setCarrier("");
     setCarrierId(null);
@@ -130,9 +124,12 @@ const ExpenseForm = observer(() => {
     } else if (type === "LABOR") {
       if (worker) data.worker = worker;
       data.workerId = workerId || undefined;
-      if (hoursWorked) data.hoursWorked = parseFloat(hoursWorked);
-      if (hourlyRate) data.hourlyRate = parseFloat(hourlyRate);
+      if (quantity) data.quantity = parseFloat(quantity);
+      if (unit) data.unit = unit;
+      if (unitPrice) data.unitPrice = parseFloat(unitPrice);
       if (calloutFee) data.calloutFee = parseFloat(calloutFee);
+      data.hoursWorked = null;
+      data.hourlyRate = null;
     } else if (type === "DELIVERY") {
       if (carrier) data.carrier = carrier;
       data.carrierId = carrierId || undefined;
@@ -151,18 +148,12 @@ const ExpenseForm = observer(() => {
   };
 
   useEffect(() => {
-    if (type === "MATERIAL" && quantity && unitPrice) {
-      setAmount(String(parseFloat(quantity) * parseFloat(unitPrice)));
+    if ((type === "MATERIAL" || type === "LABOR") && quantity && unitPrice) {
+      const base = parseFloat(quantity) * parseFloat(unitPrice);
+      const fee = type === "LABOR" && calloutFee ? parseFloat(calloutFee) : 0;
+      setAmount(String(base + fee));
     }
-  }, [quantity, unitPrice, type]);
-
-  useEffect(() => {
-    if (type === "LABOR" && hoursWorked && hourlyRate) {
-      const labor = parseFloat(hoursWorked) * parseFloat(hourlyRate);
-      const fee = calloutFee ? parseFloat(calloutFee) : 0;
-      setAmount(String(labor + fee));
-    }
-  }, [hoursWorked, hourlyRate, calloutFee, type]);
+  }, [quantity, unitPrice, calloutFee, type]);
 
   return (
     <Dialog open={formOpen} onClose={expenseStore.closeForm} maxWidth="sm" fullWidth fullScreen={isMobile}>
@@ -270,9 +261,10 @@ const ExpenseForm = observer(() => {
                 renderInput={(params) => <TextField {...params} label="Работник" fullWidth />}
               />
               <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField label="Отработано часов" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} sx={{ flex: 1 }} />
-                <TextField label="Ставка в час" type="number" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} sx={{ flex: 1 }} />
+                <TextField label="Количество" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} sx={{ flex: 1 }} />
+                <TextField label="Ед. изм." value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="ч, м², шт..." sx={{ flex: 1 }} />
               </Box>
+              <TextField label="Цена за единицу" type="number" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} fullWidth />
               <TextField label="Вызов" type="number" value={calloutFee} onChange={(e) => setCalloutFee(e.target.value)} fullWidth />
             </>
           )}

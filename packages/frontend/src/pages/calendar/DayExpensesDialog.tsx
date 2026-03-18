@@ -175,9 +175,11 @@ export default function DayExpensesDialog({
                             {exp.quantity} {exp.unit || "шт."} × {formatCurrency(exp.unitPrice)}
                           </Typography>
                         )}
-                        {exp.type === "LABOR" && exp.hoursWorked != null && exp.hourlyRate != null && (
+                        {exp.type === "LABOR" && (exp.quantity != null || exp.hoursWorked != null) && (
                           <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
-                            {exp.hoursWorked} ч × {formatCurrency(exp.hourlyRate)}
+                            {exp.quantity != null
+                              ? `${exp.quantity} ${exp.unit || "ч"} × ${formatCurrency(exp.unitPrice ?? 0)}`
+                              : `${exp.hoursWorked} ч × ${formatCurrency(exp.hourlyRate ?? 0)}`}
                             {exp.calloutFee ? ` + ${formatCurrency(exp.calloutFee)}` : ""}
                           </Typography>
                         )}
