@@ -12,6 +12,9 @@ const DEFAULT_LABOR_CATEGORIES = [
 const DEFAULT_DELIVERY_CATEGORIES = [
   "Доставка материалов", "Доставка оборудования",
 ];
+const DEFAULT_TOOL_CATEGORIES = [
+  "Ручной инструмент", "Электроинструмент", "Измерительный инструмент", "Расходники для инструмента",
+];
 
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request);
@@ -48,6 +51,9 @@ export async function GET(request: NextRequest) {
     const deliveryTotal = actual
       .filter((e) => e.type === "DELIVERY")
       .reduce((s, e) => s + e.amount, 0);
+    const toolTotal = actual
+      .filter((e) => e.type === "TOOL")
+      .reduce((s, e) => s + e.amount, 0);
 
     const { expenses, ...project } = p;
     return {
@@ -57,6 +63,7 @@ export async function GET(request: NextRequest) {
       materialTotal,
       laborTotal,
       deliveryTotal,
+      toolTotal,
       expenseCount: expenses.length,
     };
   });
@@ -102,6 +109,11 @@ export async function POST(request: NextRequest) {
       ...DEFAULT_DELIVERY_CATEGORIES.map((n) => ({
         name: n,
         type: "DELIVERY" as const,
+        projectId: project.id,
+      })),
+      ...DEFAULT_TOOL_CATEGORIES.map((n) => ({
+        name: n,
+        type: "TOOL" as const,
         projectId: project.id,
       })),
     ];

@@ -19,6 +19,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import HandymanIcon from "@mui/icons-material/Handyman";
 import { useStore } from "../../stores/RootStore";
 import { defaultSharedFilters, type SharedFilterValues } from "../../stores/SharedStore";
 
@@ -81,6 +82,10 @@ const SharedFilters = observer(() => {
               <ToggleButton value="DELIVERY">
                 <LocalShippingIcon sx={{ mr: 0.5, fontSize: 18 }} />
                 Доставка
+              </ToggleButton>
+              <ToggleButton value="TOOL">
+                <HandymanIcon sx={{ mr: 0.5, fontSize: 18 }} />
+                Инструменты
               </ToggleButton>
             </ToggleButtonGroup>
           </Box>

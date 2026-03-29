@@ -22,6 +22,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import HandymanIcon from "@mui/icons-material/Handyman";
 import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import TableViewIcon from '@mui/icons-material/TableView';
@@ -154,6 +155,7 @@ const ProjectPage = observer(() => {
                     { title: "Материалы", value: summary.materialTotal, icon: <BuildIcon sx={{ fontSize: "1rem" }} />, color: "primary.main" },
                     { title: "Работы", value: summary.laborTotal, icon: <PeopleIcon sx={{ fontSize: "1rem" }} />, color: "secondary.main" },
                     { title: "Доставки", value: summary.deliveryTotal, icon: <LocalShippingIcon sx={{ fontSize: "1rem" }} />, color: "success.main" },
+                    { title: "Инструменты", value: summary.toolTotal, icon: <HandymanIcon sx={{ fontSize: "1rem" }} />, color: "warning.main" },
                   ].map((item, i) => (
                     <Box key={item.title} sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", py: 1.5, px: 1, borderLeft: i > 0 ? 1 : 0, borderColor: "divider" }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: item.color, mb: 0.5 }}>
@@ -168,14 +170,17 @@ const ProjectPage = observer(() => {
             </Card>
           ) : (
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ sm: 4 }}>
+              <Grid size={{ sm: 3 }}>
                 <SummaryCard title="Материалы" value={formatCurrency(summary.materialTotal)} icon={<BuildIcon />} color="primary.main" />
               </Grid>
-              <Grid size={{ sm: 4 }}>
+              <Grid size={{ sm: 3 }}>
                 <SummaryCard title="Работы" value={formatCurrency(summary.laborTotal)} icon={<PeopleIcon />} color="secondary.main" />
               </Grid>
-              <Grid size={{ sm: 4 }}>
+              <Grid size={{ sm: 3 }}>
                 <SummaryCard title="Доставки" value={formatCurrency(summary.deliveryTotal)} icon={<LocalShippingIcon />} color="success.main" />
+              </Grid>
+              <Grid size={{ sm: 3 }}>
+                <SummaryCard title="Инструменты" value={formatCurrency(summary.toolTotal)} icon={<HandymanIcon />} color="warning.main" />
               </Grid>
             </Grid>
           )}
@@ -199,6 +204,7 @@ const ProjectPage = observer(() => {
               MATERIAL: "#1976d2",
               LABOR: "#546e7a",
               DELIVERY: "#16a34a",
+              TOOL: "#ed6c02",
             };
 
             function generateShades(hex: string, count: number): string[] {
@@ -220,11 +226,13 @@ const ProjectPage = observer(() => {
               { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
               { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
               { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
+              { categoryId: null, categoryName: "Инструменты", type: "TOOL", total: summary.toolTotal, count: 0 },
             ].filter((d) => d.total > 0);
 
             const materialData = summary.byCategory.filter((c) => c.type === "MATERIAL");
             const laborData = summary.byCategory.filter((c) => c.type === "LABOR");
             const deliveryData = summary.byCategory.filter((c) => c.type === "DELIVERY");
+            const toolData = summary.byCategory.filter((c) => c.type === "TOOL");
 
             return (
               <Grid container spacing={3}>
@@ -239,6 +247,9 @@ const ProjectPage = observer(() => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <ExpenseChart data={deliveryData} colors={generateShades(TYPE_COLORS.DELIVERY, deliveryData.length)} title="Расходы на доставки по категориям" />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <ExpenseChart data={toolData} colors={generateShades(TYPE_COLORS.TOOL, toolData.length)} title="Расходы на инструменты по категориям" />
                 </Grid>
               </Grid>
             );

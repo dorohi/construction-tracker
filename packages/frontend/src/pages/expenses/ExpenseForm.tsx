@@ -115,7 +115,7 @@ const ExpenseForm = observer(() => {
       planned,
     };
 
-    if (type === "MATERIAL") {
+    if (type === "MATERIAL" || type === "TOOL") {
       if (quantity) data.quantity = parseFloat(quantity);
       if (unit) data.unit = unit;
       if (unitPrice) data.unitPrice = parseFloat(unitPrice);
@@ -148,7 +148,7 @@ const ExpenseForm = observer(() => {
   };
 
   useEffect(() => {
-    if ((type === "MATERIAL" || type === "LABOR") && quantity && unitPrice) {
+    if ((type === "MATERIAL" || type === "LABOR" || type === "TOOL") && quantity && unitPrice) {
       const base = parseFloat(quantity) * parseFloat(unitPrice);
       const fee = type === "LABOR" && calloutFee ? parseFloat(calloutFee) : 0;
       setAmount(String(base + fee));
@@ -170,6 +170,7 @@ const ExpenseForm = observer(() => {
             <ToggleButton value="MATERIAL">Материал</ToggleButton>
             <ToggleButton value="LABOR">Работа</ToggleButton>
             <ToggleButton value="DELIVERY">Доставка</ToggleButton>
+            <ToggleButton value="TOOL">Инструмент</ToggleButton>
           </ToggleButtonGroup>
 
           <FormControlLabel
@@ -198,7 +199,7 @@ const ExpenseForm = observer(() => {
             slotProps={{ inputLabel: { shrink: true } }}
           />
 
-          {type === "MATERIAL" && (
+          {(type === "MATERIAL" || type === "TOOL") && (
             <>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField label="Количество" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} sx={{ flex: 1 }} />

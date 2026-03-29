@@ -73,6 +73,7 @@ async function main() {
     const materialCats = ["Фундамент", "Стены", "Кровля", "Сантехника", "Электрика", "Отделка"];
     const laborCats = ["Каменные работы", "Сантехнические работы", "Электромонтажные работы", "Разнорабочие"];
     const deliveryCats = ["Доставка материалов", "Доставка оборудования"];
+    const toolCats = ["Ручной инструмент", "Электроинструмент", "Измерительный инструмент", "Расходники для инструмента"];
 
     for (const name of materialCats) {
       const c = await prisma.category.create({ data: { name, type: "MATERIAL", projectId: project.id } });
@@ -84,6 +85,10 @@ async function main() {
     }
     for (const name of deliveryCats) {
       const c = await prisma.category.create({ data: { name, type: "DELIVERY", projectId: project.id } });
+      catMap[name] = c.id;
+    }
+    for (const name of toolCats) {
+      const c = await prisma.category.create({ data: { name, type: "TOOL", projectId: project.id } });
       catMap[name] = c.id;
     }
 

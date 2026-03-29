@@ -34,6 +34,7 @@ const CategoryDialog = observer(() => {
             { type: "MATERIAL" as const, label: "Материалы", color: "primary" as const },
             { type: "LABOR" as const, label: "Работы", color: "secondary" as const },
             { type: "DELIVERY" as const, label: "Доставки", color: "success" as const },
+            { type: "TOOL" as const, label: "Инструменты", color: "warning" as const },
           ] as const
         ).map(({ type, label, color }) => {
           const cats = projectStore.categories.filter((c) => c.type === type);
@@ -80,6 +81,7 @@ const CategoryDialog = observer(() => {
             <MenuItem value="MATERIAL">Материал</MenuItem>
             <MenuItem value="LABOR">Работа</MenuItem>
             <MenuItem value="DELIVERY">Доставка</MenuItem>
+            <MenuItem value="TOOL">Инструмент</MenuItem>
           </TextField>
         </Box>
       </DialogContent>

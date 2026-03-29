@@ -10,7 +10,7 @@ export default function CategoryChip({ name, type }: CategoryChipProps) {
     <Chip
       label={name}
       size="small"
-      color={type === "MATERIAL" ? "primary" : type === "LABOR" ? "secondary" : "success"}
+      color={type === "MATERIAL" ? "primary" : type === "LABOR" ? "secondary" : type === "TOOL" ? "warning" : "success"}
       variant="outlined"
     />
   );

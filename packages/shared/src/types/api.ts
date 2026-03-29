@@ -16,6 +16,7 @@ export interface ProjectSummary {
   materialTotal: number;
   laborTotal: number;
   deliveryTotal: number;
+  toolTotal: number;
   remaining: number | null;
   budget: number | null;
   byCategory: CategorySummary[];

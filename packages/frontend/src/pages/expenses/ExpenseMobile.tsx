@@ -42,7 +42,7 @@ const ExpenseMobile = observer(() => {
                   {formatDate(expense.date)}
                 </Typography>
                 <CategoryChip
-                  name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                  name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : expense.type === "TOOL" ? "Инструмент" : "Доставка"}
                   type={expense.type}
                 />
                 {expense.category && (

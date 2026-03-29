@@ -1,4 +1,4 @@
-export type ExpenseType = "MATERIAL" | "LABOR" | "DELIVERY";
+export type ExpenseType = "MATERIAL" | "LABOR" | "DELIVERY" | "TOOL";
 
 export interface Category {
   id: string;

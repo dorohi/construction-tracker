@@ -31,6 +31,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const materialTotal = actual.filter((e) => e.type === "MATERIAL").reduce((s, e) => s + e.amount, 0);
   const laborTotal = actual.filter((e) => e.type === "LABOR").reduce((s, e) => s + e.amount, 0);
   const deliveryTotal = actual.filter((e) => e.type === "DELIVERY").reduce((s, e) => s + e.amount, 0);
+  const toolTotal = actual.filter((e) => e.type === "TOOL").reduce((s, e) => s + e.amount, 0);
 
   // Group by category
   const categoryMap = new Map<
@@ -70,6 +71,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
         materialTotal,
         laborTotal,
         deliveryTotal,
+        toolTotal,
         budget: project.budget,
         remaining: project.budget ? project.budget - totalSpent : null,
         byCategory: Array.from(categoryMap.values()),

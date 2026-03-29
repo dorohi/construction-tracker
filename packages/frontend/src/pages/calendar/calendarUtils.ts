@@ -63,6 +63,8 @@ export function getTypeColor(type: string): string {
       return "secondary.main";
     case "DELIVERY":
       return "success.main";
+    case "TOOL":
+      return "warning.main";
     default:
       return "text.secondary";
   }

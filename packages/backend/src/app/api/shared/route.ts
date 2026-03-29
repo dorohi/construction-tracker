@@ -25,6 +25,7 @@ export async function GET() {
       materialTotal: actual.filter((e) => e.type === "MATERIAL").reduce((s, e) => s + e.amount, 0),
       laborTotal: actual.filter((e) => e.type === "LABOR").reduce((s, e) => s + e.amount, 0),
       deliveryTotal: actual.filter((e) => e.type === "DELIVERY").reduce((s, e) => s + e.amount, 0),
+      toolTotal: actual.filter((e) => e.type === "TOOL").reduce((s, e) => s + e.amount, 0),
       expenseCount: actual.length,
       shareToken: p.shareToken,
       createdAt: p.createdAt.toISOString(),

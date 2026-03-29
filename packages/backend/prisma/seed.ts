@@ -18,6 +18,13 @@ const DEFAULT_LABOR_CATEGORIES = [
   "Разнорабочие",
 ];
 
+const DEFAULT_TOOL_CATEGORIES = [
+  "Ручной инструмент",
+  "Электроинструмент",
+  "Измерительный инструмент",
+  "Расходники для инструмента",
+];
+
 async function seedCategoriesForProject(projectId: string) {
   for (const name of DEFAULT_MATERIAL_CATEGORIES) {
     await prisma.category.create({
@@ -27,6 +34,11 @@ async function seedCategoriesForProject(projectId: string) {
   for (const name of DEFAULT_LABOR_CATEGORIES) {
     await prisma.category.create({
       data: { name, type: "LABOR", projectId },
+    });
+  }
+  for (const name of DEFAULT_TOOL_CATEGORIES) {
+    await prisma.category.create({
+      data: { name, type: "TOOL", projectId },
     });
   }
 }

@@ -17,6 +17,7 @@ export interface ProjectWithTotals extends Project {
   materialTotal: number;
   laborTotal: number;
   deliveryTotal: number;
+  toolTotal: number;
   expenseCount: number;
 }
 
@@ -41,6 +42,7 @@ export interface SharedProject {
   materialTotal: number;
   laborTotal: number;
   deliveryTotal: number;
+  toolTotal: number;
   expenseCount: number;
   shareToken: string;
   createdAt: string;

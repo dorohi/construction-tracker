@@ -42,6 +42,13 @@ export function getDetails(expense: Expense) {
     if (expense.calloutFee) parts.push(`Вызов: ${formatCurrency(expense.calloutFee)}`);
     return parts.join(" | ");
   }
+  if (expense.type === "TOOL") {
+    const parts: string[] = [];
+    if (expense.supplier) parts.push(`Поставщик: ${expense.supplier}`);
+    if (expense.quantity != null)
+      parts.push(`${expense.quantity} ${expense.unit || "шт."} @ ${formatCurrency(expense.unitPrice || 0)}`);
+    return parts.join(" | ");
+  }
   if (expense.type === "DELIVERY" && expense.carrier) {
     return `Перевозчик: ${expense.carrier}`;
   }
@@ -97,7 +104,7 @@ const ExpenseTable = observer(() => {
                 </TableCell>
                 <TableCell>
                   <CategoryChip
-                    name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : "Доставка"}
+                    name={expense.type === "MATERIAL" ? "Материал" : expense.type === "LABOR" ? "Работа" : expense.type === "TOOL" ? "Инструмент" : "Доставка"}
                     type={expense.type}
                   />
                 </TableCell>

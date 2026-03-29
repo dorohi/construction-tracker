@@ -26,6 +26,7 @@ const TYPE_LABELS: Record<string, string> = {
   MATERIAL: "Материал",
   LABOR: "Работа",
   DELIVERY: "Доставка",
+  TOOL: "Инструмент",
 };
 
 interface DayExpensesDialogProps {
@@ -170,7 +171,7 @@ export default function DayExpensesDialog({
                         >
                           {formatCurrency(exp.amount)}
                         </Typography>
-                        {exp.type === "MATERIAL" && exp.quantity != null && exp.unitPrice != null && (
+                        {(exp.type === "MATERIAL" || exp.type === "TOOL") && exp.quantity != null && exp.unitPrice != null && (
                           <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
                             {exp.quantity} {exp.unit || "шт."} × {formatCurrency(exp.unitPrice)}
                           </Typography>
