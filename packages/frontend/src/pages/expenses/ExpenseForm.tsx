@@ -111,7 +111,7 @@ const ExpenseForm = observer(() => {
       description: description || undefined,
       amount: parseFloat(amount),
       date,
-      categoryId: categoryId || undefined,
+      categoryId: categoryId || null,
       planned,
     };
 
