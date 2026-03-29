@@ -154,8 +154,8 @@ const ProjectPage = observer(() => {
                   {[
                     { title: "Материалы", value: summary.materialTotal, icon: <BuildIcon sx={{ fontSize: "1rem" }} />, color: "primary.main" },
                     { title: "Работы", value: summary.laborTotal, icon: <PeopleIcon sx={{ fontSize: "1rem" }} />, color: "secondary.main" },
-                    { title: "Доставки", value: summary.deliveryTotal, icon: <LocalShippingIcon sx={{ fontSize: "1rem" }} />, color: "success.main" },
                     { title: "Инструменты", value: summary.toolTotal, icon: <HandymanIcon sx={{ fontSize: "1rem" }} />, color: "warning.main" },
+                    { title: "Доставки", value: summary.deliveryTotal, icon: <LocalShippingIcon sx={{ fontSize: "1rem" }} />, color: "success.main" },
                   ].map((item, i) => (
                     <Box key={item.title} sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", py: 1.5, px: 1, borderLeft: i > 0 ? 1 : 0, borderColor: "divider" }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: item.color, mb: 0.5 }}>
@@ -177,10 +177,10 @@ const ProjectPage = observer(() => {
                 <SummaryCard title="Работы" value={formatCurrency(summary.laborTotal)} icon={<PeopleIcon />} color="secondary.main" />
               </Grid>
               <Grid size={{ sm: 3 }}>
-                <SummaryCard title="Доставки" value={formatCurrency(summary.deliveryTotal)} icon={<LocalShippingIcon />} color="success.main" />
+                <SummaryCard title="Инструменты" value={formatCurrency(summary.toolTotal)} icon={<HandymanIcon />} color="warning.main" />
               </Grid>
               <Grid size={{ sm: 3 }}>
-                <SummaryCard title="Инструменты" value={formatCurrency(summary.toolTotal)} icon={<HandymanIcon />} color="warning.main" />
+                <SummaryCard title="Доставки" value={formatCurrency(summary.deliveryTotal)} icon={<LocalShippingIcon />} color="success.main" />
               </Grid>
             </Grid>
           )}
@@ -225,32 +225,32 @@ const ProjectPage = observer(() => {
             const typeData = [
               { categoryId: null, categoryName: "Материалы", type: "MATERIAL", total: summary.materialTotal, count: 0 },
               { categoryId: null, categoryName: "Работы", type: "LABOR", total: summary.laborTotal, count: 0 },
-              { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
               { categoryId: null, categoryName: "Инструменты", type: "TOOL", total: summary.toolTotal, count: 0 },
+              { categoryId: null, categoryName: "Доставки", type: "DELIVERY", total: summary.deliveryTotal, count: 0 },
             ].filter((d) => d.total > 0);
 
-            const materialData = summary.byCategory.filter((c) => c.type === "MATERIAL");
-            const laborData = summary.byCategory.filter((c) => c.type === "LABOR");
-            const deliveryData = summary.byCategory.filter((c) => c.type === "DELIVERY");
-            const toolData = summary.byCategory.filter((c) => c.type === "TOOL");
+            const categoryCharts = [
+              { type: "MATERIAL", title: "Расходы на материалы по категориям" },
+              { type: "LABOR", title: "Расходы на работы по категориям" },
+              { type: "TOOL", title: "Расходы на инструменты по категориям" },
+              { type: "DELIVERY", title: "Расходы на доставки по категориям" },
+            ]
+              .map(({ type, title }) => {
+                const data = summary.byCategory.filter((c) => c.type === type);
+                return { type, title, data, colors: generateShades(TYPE_COLORS[type], data.length) };
+              })
+              .filter(({ data }) => data.length > 0);
 
             return (
               <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <ExpenseChart data={typeData} colors={typeData.map((d) => TYPE_COLORS[d.type])} title="Расходы по типам" />
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <ExpenseChart data={materialData} colors={generateShades(TYPE_COLORS.MATERIAL, materialData.length)} title="Расходы на материалы по категориям" />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <ExpenseChart data={laborData} colors={generateShades(TYPE_COLORS.LABOR, laborData.length)} title="Расходы на работы по категориям" />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <ExpenseChart data={deliveryData} colors={generateShades(TYPE_COLORS.DELIVERY, deliveryData.length)} title="Расходы на доставки по категориям" />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <ExpenseChart data={toolData} colors={generateShades(TYPE_COLORS.TOOL, toolData.length)} title="Расходы на инструменты по категориям" />
-                </Grid>
+                {categoryCharts.map(({ type, title, data, colors }) => (
+                  <Grid key={type} size={{ xs: 12, md: 6 }}>
+                    <ExpenseChart data={data} colors={colors} title={title} />
+                  </Grid>
+                ))}
               </Grid>
             );
           })()}

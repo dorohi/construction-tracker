@@ -48,11 +48,11 @@ export async function GET(request: NextRequest) {
     const laborTotal = actual
       .filter((e) => e.type === "LABOR")
       .reduce((s, e) => s + e.amount, 0);
-    const deliveryTotal = actual
-      .filter((e) => e.type === "DELIVERY")
-      .reduce((s, e) => s + e.amount, 0);
     const toolTotal = actual
       .filter((e) => e.type === "TOOL")
+      .reduce((s, e) => s + e.amount, 0);
+    const deliveryTotal = actual
+      .filter((e) => e.type === "DELIVERY")
       .reduce((s, e) => s + e.amount, 0);
 
     const { expenses, ...project } = p;
@@ -62,8 +62,8 @@ export async function GET(request: NextRequest) {
       plannedTotal,
       materialTotal,
       laborTotal,
-      deliveryTotal,
       toolTotal,
+      deliveryTotal,
       expenseCount: expenses.length,
     };
   });
@@ -106,14 +106,14 @@ export async function POST(request: NextRequest) {
         type: "LABOR" as const,
         projectId: project.id,
       })),
-      ...DEFAULT_DELIVERY_CATEGORIES.map((n) => ({
-        name: n,
-        type: "DELIVERY" as const,
-        projectId: project.id,
-      })),
       ...DEFAULT_TOOL_CATEGORIES.map((n) => ({
         name: n,
         type: "TOOL" as const,
+        projectId: project.id,
+      })),
+      ...DEFAULT_DELIVERY_CATEGORIES.map((n) => ({
+        name: n,
+        type: "DELIVERY" as const,
         projectId: project.id,
       })),
     ];

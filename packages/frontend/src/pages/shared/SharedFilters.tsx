@@ -79,13 +79,13 @@ const SharedFilters = observer(() => {
                 <PeopleIcon sx={{ mr: 0.5, fontSize: 18 }} />
                 Работы
               </ToggleButton>
-              <ToggleButton value="DELIVERY">
-                <LocalShippingIcon sx={{ mr: 0.5, fontSize: 18 }} />
-                Доставка
-              </ToggleButton>
               <ToggleButton value="TOOL">
                 <HandymanIcon sx={{ mr: 0.5, fontSize: 18 }} />
                 Инструменты
+              </ToggleButton>
+              <ToggleButton value="DELIVERY">
+                <LocalShippingIcon sx={{ mr: 0.5, fontSize: 18 }} />
+                Доставка
               </ToggleButton>
             </ToggleButtonGroup>
           </Box>

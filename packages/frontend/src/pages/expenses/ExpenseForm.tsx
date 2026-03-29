@@ -169,8 +169,8 @@ const ExpenseForm = observer(() => {
           >
             <ToggleButton value="MATERIAL">Материал</ToggleButton>
             <ToggleButton value="LABOR">Работа</ToggleButton>
-            <ToggleButton value="DELIVERY">Доставка</ToggleButton>
             <ToggleButton value="TOOL">Инструмент</ToggleButton>
+            <ToggleButton value="DELIVERY">Доставка</ToggleButton>
           </ToggleButtonGroup>
 
           <FormControlLabel
