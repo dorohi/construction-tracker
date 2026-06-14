@@ -35,6 +35,7 @@ model Project {
   isPublic    Boolean    @default(false)
   shareToken  String?    @unique
   expenses    Expense[]
+  invoices    Invoice[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -75,6 +76,23 @@ model Expense {
   categoryId  String?
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
+  invoiceId   String?
+  invoice     Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  supplier    String?
+  supplierId  String?
+  supplierRef Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  planned     Boolean   @default(false)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  items       Expense[]
   createdAt   DateTime  @default(now())
 }
 
@@ -93,6 +111,7 @@ model Supplier {
   user        User      @relation(fields: [userId], references: [id])
   userId      String
   expenses    Expense[]
+  invoices    Invoice[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
