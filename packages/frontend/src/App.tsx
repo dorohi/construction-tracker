@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProjectsPage from "./pages/projects/ProjectsPage";
 import ProjectPage from "./pages/projects/ProjectPage";
 import ExpensesPage from "./pages/expenses/ExpensesPage";
+import InvoicesPage from "./pages/invoices/InvoicesPage";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CarriersPage from "./pages/carriers/CarriersPage";
 import WorkersPage from "./pages/workers/WorkersPage";
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectPage />} />
           <Route path="/projects/:id/expenses" element={<ExpensesPage />} />
+          <Route path="/projects/:id/invoices" element={<InvoicesPage />} />
           <Route path="/projects/:id/calendar" element={<CalendarPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/carriers" element={<CarriersPage />} />

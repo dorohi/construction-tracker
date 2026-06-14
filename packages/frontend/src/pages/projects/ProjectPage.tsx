@@ -26,6 +26,7 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import SavingsIcon from "@mui/icons-material/Savings";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import TableViewIcon from '@mui/icons-material/TableView';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import EditIcon from "@mui/icons-material/Edit";
 import ShareIcon from "@mui/icons-material/Share";
 import CategoryIcon from "@mui/icons-material/Category";
@@ -120,6 +121,14 @@ const ProjectPage = observer(() => {
               >
                 <CalendarMonthIcon sx={{ mr: 1 }} />
                 Календарь
+              </Button>
+              <Button
+                variant="contained"
+                fullWidth={isMobile}
+                onClick={() => navigate(`/projects/${id}/invoices`)}
+              >
+                <ReceiptLongIcon sx={{ mr: 1 }} />
+                Накладные
               </Button>
               <Button
                 variant="contained"
