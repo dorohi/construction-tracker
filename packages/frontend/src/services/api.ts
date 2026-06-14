@@ -33,6 +33,10 @@ import type {
   AuditLogFilters,
   SharedProject,
   SharedProjectDetail,
+  Invoice,
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+  InvoiceListResponse,
 } from "@construction-tracker/shared";
 
 const api = axios.create({
@@ -126,6 +130,26 @@ export const expensesApi = {
   transfer: (id: string, data: TransferExpenseInput) =>
     api.post<ApiResponse<{ source: Expense | null; target: Expense }>>(`/expenses/${id}/transfer`, data)
       .then((r) => r.data.data!),
+};
+
+// Invoices
+export const invoicesApi = {
+  list: (projectId: string, opts: { page?: number; limit?: number; all?: boolean } = {}) => {
+    const params: Record<string, string> = {};
+    if (opts.all) params.all = "true";
+    if (opts.page) params.page = String(opts.page);
+    if (opts.limit) params.limit = String(opts.limit);
+    return api
+      .get<ApiResponse<InvoiceListResponse>>(`/projects/${projectId}/invoices`, { params })
+      .then((r) => r.data.data!);
+  },
+  get: (id: string) =>
+    api.get<ApiResponse<Invoice>>(`/invoices/${id}`).then((r) => r.data.data!),
+  create: (projectId: string, data: CreateInvoiceInput) =>
+    api.post<ApiResponse<Invoice>>(`/projects/${projectId}/invoices`, data).then((r) => r.data.data!),
+  update: (id: string, data: UpdateInvoiceInput) =>
+    api.put<ApiResponse<Invoice>>(`/invoices/${id}`, data).then((r) => r.data.data!),
+  delete: (id: string) => api.delete(`/invoices/${id}`),
 };
 
 // Categories
