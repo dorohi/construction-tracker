@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import { AuthStore } from "./AuthStore";
 import { ProjectStore } from "./ProjectStore";
 import { ExpenseStore } from "./ExpenseStore";
+import { InvoiceStore } from "./InvoiceStore";
 import { SupplierStore } from "./SupplierStore";
 import { CarrierStore } from "./CarrierStore";
 import { ThemeStore } from "./ThemeStore";
@@ -17,6 +18,7 @@ export class RootStore {
   authStore: AuthStore;
   projectStore: ProjectStore;
   expenseStore: ExpenseStore;
+  invoiceStore: InvoiceStore;
   supplierStore: SupplierStore;
   carrierStore: CarrierStore;
   workersStore: WorkersStore;
@@ -32,6 +34,7 @@ export class RootStore {
     this.authStore = new AuthStore();
     this.projectStore = new ProjectStore();
     this.expenseStore = new ExpenseStore();
+    this.invoiceStore = new InvoiceStore();
     this.supplierStore = new SupplierStore();
     this.carrierStore = new CarrierStore();
     this.workersStore = new WorkersStore();
