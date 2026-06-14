@@ -11,6 +11,15 @@ export type {
 } from "./types/expense";
 
 export type {
+  Invoice,
+  InvoiceListItem,
+  InvoiceItemInput,
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+  InvoiceListResponse,
+} from "./types/invoice";
+
+export type {
   Project,
   ProjectWithTotals,
   CreateProjectInput,
