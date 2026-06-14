@@ -2,6 +2,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
+  Button,
   Box,
   Typography,
   IconButton,
@@ -11,6 +13,8 @@ import {
   Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import type { Expense } from "@construction-tracker/shared/dist";
 import CategoryChip from "../../components/CategoryChip";
 import { formatDayLong, getTypeColor } from "./calendarUtils";
@@ -34,6 +38,8 @@ interface DayExpensesDialogProps {
   onClose: () => void;
   dateKey: string | null;
   expenses: Expense[];
+  onAddExpense?: () => void;
+  onAddInvoice?: () => void;
 }
 
 export default function DayExpensesDialog({
@@ -41,6 +47,8 @@ export default function DayExpensesDialog({
   onClose,
   dateKey,
   expenses,
+  onAddExpense,
+  onAddInvoice,
 }: DayExpensesDialogProps) {
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
@@ -209,6 +217,14 @@ export default function DayExpensesDialog({
           </>
         )}
       </DialogContent>
+      <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
+        <Button variant="outlined" startIcon={<AddIcon />} onClick={onAddExpense}>
+          Добавить расход
+        </Button>
+        <Button variant="outlined" startIcon={<ReceiptLongIcon />} onClick={onAddInvoice}>
+          Добавить накладную
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

@@ -6,6 +6,7 @@ import {
   Typography,
   Box,
   Button,
+  Fab,
   Breadcrumbs,
   Link,
   Table,
@@ -14,8 +15,11 @@ import {
   TableRow,
   TableCell,
   IconButton,
+  Tooltip,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -27,6 +31,10 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import TableViewIcon from "@mui/icons-material/TableView";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useStore } from "../../stores/RootStore";
 import AppProgress from "@/components/AppProgress";
 import InvoiceForm from "./InvoiceForm";
@@ -77,9 +85,42 @@ const InvoicesPage = observer(() => {
 
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, gap: 1 }}>
         <Typography variant={isMobile ? "h5" : "h4"}>Накладные</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={invoiceStore.openAddForm}>
-          Создать накладную
-        </Button>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          {isMobile ? (
+            <>
+              <Tooltip title="Календарь">
+                <IconButton onClick={() => navigate(`/projects/${id}/calendar`)}>
+                  <CalendarMonthIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Расходы">
+                <IconButton onClick={() => navigate(`/projects/${id}/expenses`)}>
+                  <TableViewIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                startIcon={<CalendarMonthIcon />}
+                onClick={() => navigate(`/projects/${id}/calendar`)}
+              >
+                Календарь
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<TableViewIcon />}
+                onClick={() => navigate(`/projects/${id}/expenses`)}
+              >
+                Расходы
+              </Button>
+              <Button variant="contained" startIcon={<AddIcon />} onClick={invoiceStore.openAddForm}>
+                Создать
+              </Button>
+            </>
+          )}
+        </Box>
       </Box>
 
       {invoices.length === 0 && !invoiceStore.loading ? (
@@ -130,7 +171,8 @@ const InvoicesPage = observer(() => {
             invoiceStore.openEditForm(inv);
           }}
         >
-          Открыть
+          <ListItemIcon><OpenInNewIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Открыть</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -139,7 +181,8 @@ const InvoicesPage = observer(() => {
             invoiceStore.setDeletingInvoice(inv);
           }}
         >
-          Удалить
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText sx={{ color: "error.main" }}>Удалить</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -170,6 +213,17 @@ const InvoicesPage = observer(() => {
       </Dialog>
 
       <InvoiceForm />
+
+      {isMobile && (
+        <Fab
+          color="primary"
+          aria-label="Создать"
+          onClick={invoiceStore.openAddForm}
+          sx={{ position: "fixed", bottom: 24, right: 24 }}
+        >
+          <AddIcon />
+        </Fab>
+      )}
     </Container>
   );
 });

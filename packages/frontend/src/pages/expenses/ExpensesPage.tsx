@@ -6,6 +6,7 @@ import {
   Typography,
   Box,
   Button,
+  Fab,
   Badge,
   Breadcrumbs,
   Link,
@@ -17,6 +18,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { useStore } from "../../stores/RootStore";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseForm from "./ExpenseForm";
@@ -97,9 +99,9 @@ const ExpensesPage = observer(() => {
                       <CalendarMonthIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Добавить">
-                    <IconButton color="primary" onClick={expenseStore.openAddForm}>
-                      <AddIcon />
+                  <Tooltip title="Накладные">
+                    <IconButton onClick={() => navigate(`/projects/${id}/invoices`)}>
+                      <ReceiptLongIcon />
                     </IconButton>
                   </Tooltip>
                 </>
@@ -108,8 +110,11 @@ const ExpensesPage = observer(() => {
                   <Button variant="outlined" startIcon={<CalendarMonthIcon />} onClick={() => navigate(`/projects/${id}/calendar`)}>
                     Календарь
                   </Button>
+                  <Button variant="outlined" startIcon={<ReceiptLongIcon />} onClick={() => navigate(`/projects/${id}/invoices`)}>
+                    Накладные
+                  </Button>
                   <Button variant="contained" startIcon={<AddIcon />} onClick={expenseStore.openAddForm}>
-                    Добавить
+                    Создать
                   </Button>
                 </>
               )}
@@ -122,6 +127,17 @@ const ExpensesPage = observer(() => {
           <DeleteExpenseDialog />
           <PurchaseDialog />
           <TransferDialog />
+
+          {isMobile && (
+            <Fab
+              color="primary"
+              aria-label="Создать"
+              onClick={expenseStore.openAddForm}
+              sx={{ position: "fixed", bottom: 24, right: 24 }}
+            >
+              <AddIcon />
+            </Fab>
+          )}
         </Container>
       )}
     </>

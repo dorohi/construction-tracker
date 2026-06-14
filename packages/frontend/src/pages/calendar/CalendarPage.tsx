@@ -31,8 +31,9 @@ import {
   formatDateKey,
   formatMonthYear,
 } from "./calendarUtils";
-import AddIcon from '@mui/icons-material/Add';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ExpenseForm from '@/pages/expenses/ExpenseForm';
+import InvoiceForm from '@/pages/invoices/InvoiceForm';
 
 const MONTHS_SHORT = [
   "янв", "фев", "мар", "апр", "май", "июн",
@@ -48,7 +49,7 @@ function formatCurrency(amount: number) {
 
 const CalendarPage = observer(() => {
   const { id } = useParams<{ id: string }>();
-  const { projectStore, expenseStore } = useStore();
+  const { projectStore, expenseStore, invoiceStore } = useStore();
   const navigate = useNavigate();
   const thm = useTheme();
   const isMobile = useMediaQuery(thm.breakpoints.down("md"));
@@ -258,14 +259,14 @@ const CalendarPage = observer(() => {
             <Box sx={{ display: "flex", gap: 1 }}>
               {isMobile ? (
                 <>
+                  <Tooltip title="Накладные">
+                    <IconButton onClick={() => navigate(`/projects/${id}/invoices`)}>
+                      <ReceiptLongIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Расходы">
                     <IconButton onClick={() => navigate(`/projects/${id}/expenses`)}>
                       <TableViewIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Добавить">
-                    <IconButton color="primary" onClick={expenseStore.openAddForm}>
-                      <AddIcon />
                     </IconButton>
                   </Tooltip>
                 </>
@@ -273,16 +274,17 @@ const CalendarPage = observer(() => {
                 <>
                   <Button
                     variant="outlined"
+                    startIcon={<ReceiptLongIcon />}
+                    onClick={() => navigate(`/projects/${id}/invoices`)}
+                  >
+                    Накладные
+                  </Button>
+                  <Button
+                    variant="outlined"
                     startIcon={<TableViewIcon />}
                     onClick={() => navigate(`/projects/${id}/expenses`)}
                   >
                     Расходы
-                  </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={expenseStore.openAddForm}>
-                    Добавить
                   </Button>
                 </>
             )}
@@ -348,8 +350,11 @@ const CalendarPage = observer(() => {
             onClose={() => setSelectedDate(null)}
             dateKey={selectedDate}
             expenses={selectedExpenses}
+            onAddExpense={() => { setSelectedDate(null); expenseStore.openAddForm(); }}
+            onAddInvoice={() => { setSelectedDate(null); invoiceStore.openAddForm(); }}
           />
           <ExpenseForm />
+          <InvoiceForm />
         </Container>
       )}
     </>
