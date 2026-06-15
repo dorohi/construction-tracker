@@ -19,6 +19,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TableViewIcon from "@mui/icons-material/TableView";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
+import HandymanIcon from "@mui/icons-material/Handyman";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import type { Expense } from "@construction-tracker/shared";
 import { useStore } from "../../stores/RootStore";
@@ -103,16 +104,18 @@ const CalendarPage = observer(() => {
     const m = currentMonth.getMonth();
     let material = 0;
     let labor = 0;
+    let tool = 0;
     let delivery = 0;
     for (const expense of calendarExpenses) {
       const d = new Date(expense.date);
       if (d.getFullYear() === y && d.getMonth() === m) {
         if (expense.type === "MATERIAL") material += expense.amount;
         else if (expense.type === "LABOR") labor += expense.amount;
+        else if (expense.type === "TOOL") tool += expense.amount;
         else if (expense.type === "DELIVERY") delivery += expense.amount;
       }
     }
-    return { material, labor, delivery, total: material + labor + delivery };
+    return { material, labor, tool, delivery, total: material + labor + tool + delivery };
   }, [calendarExpenses, currentMonth]);
 
   const prevMonth = () =>
@@ -328,6 +331,16 @@ const CalendarPage = observer(() => {
                   />
                   <Typography variant="body2" color="text.secondary">
                     {formatCurrency(monthTotals.labor)}
+                  </Typography>
+                </Box>
+              )}
+              {monthTotals.tool > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <HandymanIcon
+                    sx={{ fontSize: "1rem", color: "warning.main" }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {formatCurrency(monthTotals.tool)}
                   </Typography>
                 </Box>
               )}
