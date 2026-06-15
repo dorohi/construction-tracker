@@ -105,40 +105,51 @@ const ProjectPage = observer(() => {
                 </IconButton>
               </Tooltip>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexShrink: 0, width: isMobile ? "100%" : "auto" }}>
-              <Button
-                variant="outlined"
-                fullWidth={isMobile}
-                onClick={projectStore.openCategoryDialog}
-              >
-                <CategoryIcon sx={{ mr: 1 }} />
-                Категории
-              </Button>
-              <Button
-                variant="contained"
-                fullWidth={isMobile}
-                onClick={() => navigate(`/projects/${id}/calendar`)}
-              >
-                <CalendarMonthIcon sx={{ mr: 1 }} />
-                Календарь
-              </Button>
-              <Button
-                variant="contained"
-                fullWidth={isMobile}
-                onClick={() => navigate(`/projects/${id}/invoices`)}
-              >
-                <ReceiptLongIcon sx={{ mr: 1 }} />
-                Накладные
-              </Button>
-              <Button
-                variant="contained"
-                fullWidth={isMobile}
-                onClick={() => navigate(`/projects/${id}/expenses`)}
-              >
-                <TableViewIcon sx={{ mr: 1 }} />
-                Расходы
-              </Button>
-            </Box>
+            {isMobile ? (
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <Tooltip title="Категории">
+                  <IconButton color="primary" onClick={projectStore.openCategoryDialog}>
+                    <CategoryIcon />
+                  </IconButton>
+                </Tooltip>
+                <Box sx={{ display: "flex", gap: 0.5 }}>
+                  <Tooltip title="Календарь">
+                    <IconButton color="primary" onClick={() => navigate(`/projects/${id}/calendar`)}>
+                      <CalendarMonthIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Накладные">
+                    <IconButton color="primary" onClick={() => navigate(`/projects/${id}/invoices`)}>
+                      <ReceiptLongIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Расходы">
+                    <IconButton color="primary" onClick={() => navigate(`/projects/${id}/expenses`)}>
+                      <TableViewIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                <Button variant="outlined" onClick={projectStore.openCategoryDialog}>
+                  <CategoryIcon sx={{ mr: 1 }} />
+                  Категории
+                </Button>
+                <Button variant="contained" onClick={() => navigate(`/projects/${id}/calendar`)}>
+                  <CalendarMonthIcon sx={{ mr: 1 }} />
+                  Календарь
+                </Button>
+                <Button variant="contained" onClick={() => navigate(`/projects/${id}/invoices`)}>
+                  <ReceiptLongIcon sx={{ mr: 1 }} />
+                  Накладные
+                </Button>
+                <Button variant="contained" onClick={() => navigate(`/projects/${id}/expenses`)}>
+                  <TableViewIcon sx={{ mr: 1 }} />
+                  Расходы
+                </Button>
+              </Box>
+            )}
           </Box>
 
           <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
