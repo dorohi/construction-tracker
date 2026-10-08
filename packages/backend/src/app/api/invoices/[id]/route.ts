@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
 import { logAction, getClientIp } from "@/lib/audit";
+import { deliveryData, type DeliveryInput } from "@/lib/invoiceDelivery";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
   try {
     const body = await request.json();
-    const { title, description, date, supplier, supplierId, planned, items } = body;
+    const { title, description, date, supplier, supplierId, planned, items, delivery } = body;
 
     const invoiceDate = date !== undefined ? new Date(date) : invoice.date;
     const newSupplier = supplier !== undefined ? supplier || null : invoice.supplier;
@@ -61,7 +62,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       });
 
       if (Array.isArray(items)) {
-        const existingIds = invoice.items.map((it) => it.id);
+        const existingIds = invoice.items.filter((it) => it.type !== "DELIVERY").map((it) => it.id);
         const keepIds = items
           .filter((it: { id?: string }) => it.id)
           .map((it: { id?: string }) => it.id as string);
@@ -102,13 +103,31 @@ export async function PUT(request: NextRequest, { params }: Params) {
       } else {
         // позиции не переданы — обновили только шапку, распространяем общие поля на позиции
         await tx.expense.updateMany({
-          where: { invoiceId: id },
+          where: { invoiceId: id, type: { not: "DELIVERY" } },
           data: {
             supplier: newSupplier,
             supplierId: newSupplierId,
             planned: newPlanned,
             date: invoiceDate,
           },
+        });
+      }
+
+      if (delivery !== undefined) {
+        // доставка передана (объект или null) — пересоздаём
+        await tx.expense.deleteMany({ where: { invoiceId: id, type: "DELIVERY" } });
+        const deliveryRow = deliveryData(delivery as DeliveryInput | null, {
+          title: title ?? invoice.title,
+          planned: newPlanned,
+          date: invoiceDate,
+          projectId: invoice.projectId,
+          invoiceId: id,
+        });
+        if (deliveryRow) await tx.expense.create({ data: deliveryRow });
+      } else {
+        await tx.expense.updateMany({
+          where: { invoiceId: id, type: "DELIVERY" },
+          data: { planned: newPlanned, date: invoiceDate },
         });
       }
 
@@ -133,7 +152,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     console.error("Update invoice error:", error);
     if (error && typeof error === "object" && "code" in error && (error as { code: string }).code === "P2003") {
       return NextResponse.json(
-        { error: "Связанная запись (поставщик или категория) не найдена. Возможно, она была удалена." },
+        { error: "Связанная запись (поставщик, перевозчик или категория) не найдена. Возможно, она была удалена." },
         { status: 400 }
       );
     }

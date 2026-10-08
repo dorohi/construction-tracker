@@ -34,6 +34,14 @@ export interface InvoiceItemInput {
   unitPrice: number;
 }
 
+export interface InvoiceDeliveryInput {
+  carrier?: string | null;
+  carrierId?: string | null;
+  supplierId?: string | null;
+  categoryId?: string | null;
+  amount: number;
+}
+
 export interface CreateInvoiceInput {
   title: string;
   description?: string;
@@ -42,6 +50,7 @@ export interface CreateInvoiceInput {
   supplierId?: string | null;
   planned?: boolean;
   items: InvoiceItemInput[];
+  delivery?: InvoiceDeliveryInput | null;
 }
 
 export type UpdateInvoiceInput = Partial<CreateInvoiceInput>;

@@ -34,13 +34,18 @@ interface Row {
 const emptyRow = (): Row => ({ title: "", categoryId: "", quantity: "", unit: "", unitPrice: "" });
 
 const InvoiceForm = observer(() => {
-  const { invoiceStore, projectStore, supplierStore } = useStore();
+  const { invoiceStore, projectStore, supplierStore, carrierStore } = useStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { formOpen, editingInvoice, loadingForm } = invoiceStore;
   const categories = projectStore.categories.filter((c) => c.type === "MATERIAL");
+  const deliveryCategories = projectStore.categories.filter((c) => c.type === "DELIVERY");
   const suppliers = supplierStore.suppliers;
+  const carrierOptions = [
+    ...carrierStore.carriers.map((c) => ({ ...c, _group: "Перевозчики" })),
+    ...suppliers.filter((s) => s.hasDelivery).map((s) => ({ ...s, _group: "Поставщики" })),
+  ];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -49,6 +54,11 @@ const InvoiceForm = observer(() => {
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [planned, setPlanned] = useState(false);
   const [rows, setRows] = useState<Row[]>([emptyRow()]);
+  const [carrier, setCarrier] = useState("");
+  const [carrierId, setCarrierId] = useState<string | null>(null);
+  const [carrierSupplierId, setCarrierSupplierId] = useState<string | null>(null);
+  const [deliveryCategoryId, setDeliveryCategoryId] = useState("");
+  const [deliveryAmount, setDeliveryAmount] = useState("");
 
   useEffect(() => {
     if (editingInvoice) {
@@ -58,9 +68,16 @@ const InvoiceForm = observer(() => {
       setSupplier(editingInvoice.supplier || "");
       setSupplierId(editingInvoice.supplierId || null);
       setPlanned(editingInvoice.planned);
+      const materialItems = editingInvoice.items.filter((it) => it.type !== "DELIVERY");
+      const delivery = editingInvoice.items.find((it) => it.type === "DELIVERY");
+      setCarrier(delivery?.carrier || "");
+      setCarrierId(delivery?.carrierId || null);
+      setCarrierSupplierId(delivery?.supplierId || null);
+      setDeliveryCategoryId(delivery?.categoryId || "");
+      setDeliveryAmount(delivery ? String(delivery.amount) : "");
       setRows(
-        editingInvoice.items.length
-          ? editingInvoice.items.map((it) => ({
+        materialItems.length
+          ? materialItems.map((it) => ({
               id: it.id,
               title: it.title,
               categoryId: it.categoryId || "",
@@ -78,6 +95,11 @@ const InvoiceForm = observer(() => {
       setSupplierId(null);
       setPlanned(false);
       setRows([emptyRow()]);
+      setCarrier("");
+      setCarrierId(null);
+      setCarrierSupplierId(null);
+      setDeliveryCategoryId(deliveryCategories.length === 1 ? deliveryCategories[0].id : "");
+      setDeliveryAmount("");
     }
   }, [editingInvoice, formOpen]);
 
@@ -88,7 +110,8 @@ const InvoiceForm = observer(() => {
     setRows((prev) => (prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev));
 
   const rowAmount = (r: Row) => (parseFloat(r.quantity) || 0) * (parseFloat(r.unitPrice) || 0);
-  const total = rows.reduce((s, r) => s + rowAmount(r), 0);
+  const deliveryCost = parseFloat(deliveryAmount) || 0;
+  const total = rows.reduce((s, r) => s + rowAmount(r), 0) + deliveryCost;
 
   const validRows = rows.filter((r) => r.title.trim() && r.quantity && r.unitPrice);
   const canSubmit = Boolean(title.trim() && date && validRows.length > 0);
@@ -109,6 +132,16 @@ const InvoiceForm = observer(() => {
         unit: r.unit || null,
         unitPrice: parseFloat(r.unitPrice),
       })),
+      delivery:
+        deliveryCost > 0
+          ? {
+              carrier: carrier || null,
+              carrierId: carrierId || null,
+              supplierId: carrierSupplierId || null,
+              categoryId: deliveryCategoryId || null,
+              amount: deliveryCost,
+            }
+          : null,
     };
     const projectId = projectStore.currentProject!.id;
     const editing = editingInvoice;
@@ -239,10 +272,92 @@ const InvoiceForm = observer(() => {
               </Box>
             ))}
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Box>
               <Button startIcon={<AddIcon />} onClick={addRow}>
                 Добавить строку
               </Button>
+            </Box>
+
+            <Divider>Доставка</Divider>
+
+            <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start", flexWrap: isMobile ? "wrap" : "nowrap" }}>
+              <Autocomplete
+                sx={{ flex: 2, minWidth: 180 }}
+                freeSolo
+                options={carrierOptions}
+                groupBy={(o) => (typeof o === "string" ? "" : o._group)}
+                getOptionLabel={(o) => {
+                  if (typeof o === "string") return o;
+                  if ("vehicle" in o && o.vehicle) return `${o.name} — ${o.vehicle}`;
+                  return o.name;
+                }}
+                value={
+                  carrierId || carrierSupplierId
+                    ? carrierOptions.find((c) => c.id === (carrierId || carrierSupplierId)) || carrier
+                    : carrier
+                }
+                inputValue={carrier}
+                onInputChange={(_, value) => {
+                  setCarrier(value);
+                  if (!carrierOptions.find((c) => c.name === value)) {
+                    setCarrierId(null);
+                    setCarrierSupplierId(null);
+                  }
+                }}
+                onChange={(_, value) => {
+                  if (value && typeof value !== "string") {
+                    setCarrier(value.name);
+                    if (value._group === "Поставщики") {
+                      setCarrierSupplierId(value.id);
+                      setCarrierId(null);
+                    } else {
+                      setCarrierId(value.id);
+                      setCarrierSupplierId(null);
+                    }
+                  } else {
+                    setCarrier(typeof value === "string" ? value : "");
+                    setCarrierId(null);
+                    setCarrierSupplierId(null);
+                  }
+                }}
+                renderInput={(params) => <TextField {...params} label="Перевозчик" fullWidth />}
+              />
+              <TextField
+                label="Категория"
+                value={deliveryCategoryId}
+                onChange={(e) => setDeliveryCategoryId(e.target.value)}
+                select
+                sx={{ flex: 1.2, minWidth: 120 }}
+              >
+                <MenuItem value="">Без категории</MenuItem>
+                {deliveryCategories.map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                label="Стоимость"
+                type="number"
+                value={deliveryAmount}
+                onChange={(e) => setDeliveryAmount(e.target.value)}
+                sx={{ flex: 1, minWidth: 100 }}
+              />
+              <IconButton
+                onClick={() => {
+                  setCarrier("");
+                  setCarrierId(null);
+                  setCarrierSupplierId(null);
+                  setDeliveryAmount("");
+                }}
+                disabled={!carrier && !deliveryAmount}
+                sx={{ mt: 1 }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
               <Typography variant="h6">Итого: {total.toFixed(2)} ₽</Typography>
             </Box>
           </Box>

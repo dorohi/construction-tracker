@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/middleware";
 import { logAction, getClientIp } from "@/lib/audit";
+import { deliveryData, type DeliveryInput } from "@/lib/invoiceDelivery";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   try {
     const body = await request.json();
-    const { title, description, date, supplier, supplierId, planned, items } = body;
+    const { title, description, date, supplier, supplierId, planned, items, delivery } = body;
 
     if (!title || !date || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -121,6 +122,15 @@ export async function POST(request: NextRequest, { params }: Params) {
         ),
       });
 
+      const deliveryRow = deliveryData(delivery as DeliveryInput | null | undefined, {
+        title,
+        planned: planned ?? false,
+        date: invoiceDate,
+        projectId,
+        invoiceId: inv.id,
+      });
+      if (deliveryRow) await tx.expense.create({ data: deliveryRow });
+
       return tx.invoice.findUnique({
         where: { id: inv.id },
         include: { items: { include: { category: true } } },
@@ -142,7 +152,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     console.error("Create invoice error:", error);
     if (error && typeof error === "object" && "code" in error && (error as { code: string }).code === "P2003") {
       return NextResponse.json(
-        { error: "Связанная запись (поставщик или категория) не найдена. Возможно, она была удалена." },
+        { error: "Связанная запись (поставщик, перевозчик или категория) не найдена. Возможно, она была удалена." },
         { status: 400 }
       );
     }

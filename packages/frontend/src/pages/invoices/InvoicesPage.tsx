@@ -10,6 +10,7 @@ import {
   Breadcrumbs,
   Link,
   Table,
+  TableContainer,
   TableHead,
   TableBody,
   TableRow,
@@ -49,7 +50,7 @@ function formatDate(d: string) {
 const InvoicesPage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { invoiceStore, projectStore, supplierStore } = useStore();
+  const { invoiceStore, projectStore, supplierStore, carrierStore } = useStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -59,7 +60,8 @@ const InvoicesPage = observer(() => {
       invoiceStore.loadInvoices(id);
     }
     supplierStore.loadSuppliers();
-  }, [id, invoiceStore, projectStore, supplierStore]);
+    carrierStore.loadCarriers();
+  }, [id, invoiceStore, projectStore, supplierStore, carrierStore]);
 
   const project = projectStore.currentProject;
   const { invoices, menuAnchor, menuInvoice, deletingInvoice } = invoiceStore;
@@ -126,14 +128,14 @@ const InvoicesPage = observer(() => {
       {invoices.length === 0 && !invoiceStore.loading ? (
         <Typography color="text.secondary">Накладных пока нет</Typography>
       ) : (
-        <Paper>
-          <Table size="small">
+        <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+          <Table size="small" sx={isMobile ? { "& .MuiTableCell-root": { px: 1 } } : undefined}>
             <TableHead>
               <TableRow>
                 <TableCell>Дата</TableCell>
                 <TableCell>Название</TableCell>
                 {!isMobile && <TableCell>Поставщик</TableCell>}
-                <TableCell align="right">Позиций</TableCell>
+                {!isMobile && <TableCell align="right">Позиций</TableCell>}
                 <TableCell align="right">Итого</TableCell>
                 <TableCell />
               </TableRow>
@@ -146,11 +148,11 @@ const InvoicesPage = observer(() => {
                   sx={{ cursor: "pointer", opacity: inv.planned ? 0.7 : 1 }}
                   onClick={() => invoiceStore.openEditForm(inv)}
                 >
-                  <TableCell>{formatDate(inv.date)}</TableCell>
-                  <TableCell>{inv.title}</TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>{formatDate(inv.date)}</TableCell>
+                  <TableCell sx={{ wordBreak: "break-word" }}>{inv.title}</TableCell>
                   {!isMobile && <TableCell>{inv.supplier || "—"}</TableCell>}
-                  <TableCell align="right">{inv.itemCount}</TableCell>
-                  <TableCell align="right">{formatCurrency(inv.total)}</TableCell>
+                  {!isMobile && <TableCell align="right">{inv.itemCount}</TableCell>}
+                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>{formatCurrency(inv.total)}</TableCell>
                   <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                     <IconButton size="small" onClick={(e) => invoiceStore.openMenu(e.currentTarget, inv)}>
                       <MoreVertIcon />
@@ -160,7 +162,7 @@ const InvoicesPage = observer(() => {
               ))}
             </TableBody>
           </Table>
-        </Paper>
+        </TableContainer>
       )}
 
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={invoiceStore.closeMenu}>
